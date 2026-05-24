@@ -1,0 +1,154 @@
+{
+  "homepage": {
+    "key": "homepage",
+    "heroEyebrow": "Engineering partner for modern product teams",
+    "heroTitle": "Enterprise-grade software systems for teams that need clarity, speed, and trust.",
+    "heroDescription": "CodeTelemetryLabs builds product platforms, internal tools, and automation systems for USA and Canada clients who want disciplined execution instead of generic agency output.",
+    "primaryCtaLabel": "Start a project",
+    "primaryCtaHref": "/contact",
+    "secondaryCtaLabel": "See case studies",
+    "secondaryCtaHref": "/projects",
+    "services": [
+      {
+        "title": "AI Automation",
+        "description": "Workflow automation, agent-assisted operations, and practical AI features that reduce manual effort without overpromising.",
+        "notes": "Operations, support, internal tooling"
+      },
+      {
+        "title": "Web Development",
+        "description": "Fast, accessible, and maintainable frontends built with modern React and Next.js architecture.",
+        "notes": "Marketing sites, portals, dashboards"
+      },
+      {
+        "title": "SaaS Platforms",
+        "description": "Multi-tenant product systems with authentication, roles, billing-ready structure, and admin foundations.",
+        "notes": "MVPs, internal SaaS, client portals"
+      },
+      {
+        "title": "API Engineering",
+        "description": "Clean backend layers, route handlers, integrations, and system boundaries that scale with product demand.",
+        "notes": "CRUD, integrations, sync jobs"
+      },
+      {
+        "title": "Technical Documentation",
+        "description": "Documentation systems that help teams ship, hand off, and support software without confusion.",
+        "notes": "Runbooks, product docs, onboarding"
+      },
+      {
+        "title": "Cloud Infrastructure",
+        "description": "Practical deployment architecture for Vercel and adjacent cloud services with an eye on reliability.",
+        "notes": "Deployment, environment setup, delivery"
+      }
+    ],
+    "testimonials": [
+      {
+        "name": "SaaS founder, Toronto",
+        "role": "Product lead",
+        "quote": "The work felt like it came from an internal engineering team: structured, specific, and easy to hand off."
+      },
+      {
+        "name": "Agency operator, Austin",
+        "role": "Delivery partner",
+        "quote": "They reduced ambiguity early and kept the build focused on what would actually ship."
+      }
+    ],
+    "stats": [
+      { "label": "Discovery to delivery", "value": "2-6 weeks" },
+      { "label": "Primary time zone", "value": "UTC-5 to UTC-8 overlap" },
+      { "label": "Engagement model", "value": "Project and retainer" }
+    ],
+    "process": [
+      {
+        "title": "1. Discover",
+        "description": "We scope the problem, constraints, users, and technical direction before touching production code."
+      },
+      {
+        "title": "2. Build",
+        "description": "We ship the smallest useful version quickly, then refine the structure and workflow with real feedback."
+      },
+      {
+        "title": "3. Stabilize",
+        "description": "We harden the system, document the handoff, and create a path for future features."
+      }
+    ],
+    "ctaTitle": "Build the next version with an engineering partner, not a template shop.",
+    "ctaDescription": "If the first release needs to feel credible to customers and investors, the foundation needs to be disciplined from day one."
+  },
+  "blogs": [
+    {
+      "id": "blog-why-projects-fail",
+      "slug": "why-agency-projects-fail-in-the-first-30-days",
+      "title": "Why agency projects fail in the first 30 days",
+      "excerpt": "Most delivery problems start with scope ambiguity, weak handoff discipline, and unstable content decisions.",
+      "content": "# Why agency projects fail in the first 30 days\n\nA project rarely fails because of one dramatic mistake. It usually drifts because the team has not defined what success means, who owns decisions, or what the first production release must include.\n\n## What we watch for\n\n- unclear scope\n- no content owner\n- tooling decisions made too early\n- no environment strategy\n\nThe fix is simple in principle and hard in practice: document the smallest viable release, lock the decision cadence, and keep the delivery surface narrow until the system is stable.",
+      "featuredImage": "/uploads/blog-placeholder.jpg",
+      "category": "Delivery",
+      "tags": ["delivery", "agency", "planning"],
+      "seoTitle": "Why agency projects fail in the first 30 days",
+      "seoDescription": "A practical breakdown of the early decisions that make software delivery succeed or stall.",
+      "isPublished": true,
+      "publishedAt": "2026-05-20T00:00:00.000Z",
+      "createdAt": "2026-05-20T00:00:00.000Z",
+      "updatedAt": "2026-05-20T00:00:00.000Z"
+    },
+    {
+      "id": "blog-admin-phase-one",
+      "slug": "what-a-real-admin-panel-needs-at-phase-one",
+      "title": "What a real admin panel needs at phase one",
+      "excerpt": "Phase one admin tools should make content changes safe, not impressive.",
+      "content": "# What a real admin panel needs at phase one\n\nA phase one admin system does not need every possible workflow. It needs a clear model for content, enough structure to avoid mistakes, and a path to scale without rewriting the dashboard later.\n\n## Useful first features\n\n- authentication\n- content editing\n- media management\n- audit trail\n- publish controls\n\nThat is enough to start operating the site like a real product instead of a brochure.",
+      "featuredImage": "/uploads/admin-placeholder.jpg",
+      "category": "Admin Systems",
+      "tags": ["admin", "cms", "architecture"],
+      "seoTitle": "What a real admin panel needs at phase one",
+      "seoDescription": "A straightforward checklist for the first version of an internal CMS.",
+      "isPublished": true,
+      "publishedAt": "2026-05-21T00:00:00.000Z",
+      "createdAt": "2026-05-21T00:00:00.000Z",
+      "updatedAt": "2026-05-21T00:00:00.000Z"
+    }
+  ],
+  "projects": [
+    {
+      "id": "project-portal-redesign",
+      "slug": "client-portal-redesign",
+      "title": "Client portal redesign for a remote services team",
+      "category": "Portal",
+      "problem": "The team needed a cleaner way to manage onboarding, project updates, and document handoff without adding support overhead.",
+      "solution": "We structured a dashboard-first portal with a content layer, role-aware navigation, and a predictable workflow for updates.",
+      "stack": ["Next.js", "Tailwind CSS", "Prisma", "PostgreSQL", "Auth.js"],
+      "screenshots": ["/uploads/project-portal-1.jpg", "/uploads/project-portal-2.jpg"],
+      "results": "Reduced repetitive status messages and created one source of truth for client communication.",
+      "featured": true,
+      "isPublished": true,
+      "createdAt": "2026-05-18T00:00:00.000Z",
+      "updatedAt": "2026-05-18T00:00:00.000Z"
+    },
+    {
+      "id": "project-automation-console",
+      "slug": "internal-automation-console",
+      "title": "Internal automation console for operations",
+      "category": "Automation",
+      "problem": "Manual data moves were slowing the team down and creating inconsistent records across tools.",
+      "solution": "We designed a console with controlled operations, clear logs, and a system that could expand into workflow automation later.",
+      "stack": ["Next.js", "API Routes", "Prisma", "Zod", "Vercel"],
+      "screenshots": ["/uploads/project-automation-1.jpg"],
+      "results": "Cut repetitive manual steps and made operational state easier to inspect.",
+      "featured": false,
+      "isPublished": true,
+      "createdAt": "2026-05-19T00:00:00.000Z",
+      "updatedAt": "2026-05-19T00:00:00.000Z"
+    }
+  ],
+  "messages": [],
+  "media": [],
+  "activity": [
+    {
+      "id": "activity-seed-1",
+      "kind": "seed",
+      "title": "CMS foundation seeded",
+      "detail": "Initial homepage, blog, project, and admin data were loaded.",
+      "createdAt": "2026-05-24T00:00:00.000Z"
+    }
+  ]
+}
