@@ -7,6 +7,10 @@ const credentialsSchema = z.object({
   password: z.string().min(1),
 })
 
+function firstNonEmpty(...values: Array<string | undefined>) {
+  return values.find((value) => value?.trim())?.trim()
+}
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
   trustHost: true,
   session: { strategy: "jwt" },
@@ -24,8 +28,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const parsed = credentialsSchema.safeParse(credentials)
         if (!parsed.success) return null
 
-        const adminEmail = process.env.ADMIN_EMAIL ?? "admin@codetelemetrylabs.com"
-        const adminPassword = process.env.ADMIN_PASSWORD ?? "admin1234"
+        const adminEmail = firstNonEmpty(process.env.ADMIN_EMAIL) ?? "admin@codetelemetrylabs.com"
+        const adminPassword = firstNonEmpty(process.env.ADMIN_PASSWORD) ?? "admin1234"
 
         if (
           parsed.data.email.toLowerCase() !== adminEmail?.toLowerCase() ||

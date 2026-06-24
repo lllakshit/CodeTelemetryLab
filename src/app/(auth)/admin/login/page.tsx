@@ -5,7 +5,7 @@ import { AdminLoginForm } from "@/components/admin-login-form"
 export default function AdminLoginPage({
   searchParams,
 }: {
-  searchParams?: { error?: string }
+  searchParams?: { error?: string; email?: string; password?: string }
 }) {
   return (
     <main className="mx-auto flex min-h-screen max-w-7xl items-center justify-center px-4 py-20 sm:px-6 lg:px-8">
@@ -28,7 +28,11 @@ export default function AdminLoginPage({
 
         <div className="rounded-[2rem] border border-white/10 bg-white/[0.04] p-8">
           <p className="text-xs uppercase tracking-[0.24em] text-blue-300">Admin sign-in</p>
-          <AdminLoginForm error={searchParams?.error} />
+          <AdminLoginForm
+            error={searchParams?.error}
+            initialEmail={searchParams?.email}
+            initialPassword={searchParams?.password}
+          />
         </div>
       </div>
     </main>

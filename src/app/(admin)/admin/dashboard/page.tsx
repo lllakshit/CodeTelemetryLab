@@ -1,14 +1,8 @@
 import { formatDistanceToNow } from "date-fns"
-import { LayoutDashboard, FileText, ImageIcon, MessageSquare, FolderKanban } from "lucide-react"
+import Link from "next/link"
+import { LayoutDashboard, FileText, MessageSquare, FolderKanban } from "lucide-react"
 import { SectionHeading } from "@/components/section-heading"
 import { getDashboardMetrics } from "@/lib/cms"
-
-const iconMap = {
-  blogs: FileText,
-  projects: FolderKanban,
-  messages: MessageSquare,
-  activity: LayoutDashboard,
-}
 
 export default async function AdminDashboardPage() {
   const metrics = await getDashboardMetrics()
@@ -32,13 +26,13 @@ export default async function AdminDashboardPage() {
         {cards.map((card) => {
           const Icon = card.icon
           return (
-            <a key={card.label} href={card.href} className="rounded-[1.6rem] border border-white/10 bg-white/[0.04] p-5 transition hover:bg-white/[0.06]">
+            <Link key={card.label} href={card.href} className="rounded-[1.6rem] border border-white/10 bg-white/[0.04] p-5 transition hover:bg-white/[0.06]">
               <div className="flex items-center justify-between">
                 <p className="text-sm text-slate-400">{card.label}</p>
                 <Icon className="h-5 w-5 text-blue-300" />
               </div>
               <p className="mt-4 text-3xl font-semibold text-white">{card.value}</p>
-            </a>
+            </Link>
           )
         })}
       </div>

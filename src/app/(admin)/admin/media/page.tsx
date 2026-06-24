@@ -2,6 +2,7 @@ import { Trash2, Upload } from "lucide-react"
 import { SectionHeading } from "@/components/section-heading"
 import { deleteMediaAction } from "@/app/(admin)/admin/actions"
 import { listMedia } from "@/lib/cms"
+import { filenameFromUrl } from "@/lib/utils"
 
 export default async function AdminMediaPage({
   searchParams,
@@ -16,7 +17,7 @@ export default async function AdminMediaPage({
       <SectionHeading
         eyebrow="Media library"
         title="Upload and manage assets."
-        description="Assets are stored under the public uploads folder for phase one and recorded in the CMS store."
+        description="Assets now land in Supabase Storage and are recorded in the CMS layer so Vercel deploys stay serverless."
       />
 
       {uploaded ? (
@@ -76,9 +77,19 @@ export default async function AdminMediaPage({
               <div>
                 <h3 className="text-base font-semibold text-white">{asset.name}</h3>
                 <p className="mt-1 text-sm text-slate-400">{asset.alt}</p>
+                <p className="mt-2 text-xs text-slate-500">
+                  {asset.storagePath ? asset.storagePath : filenameFromUrl(asset.url)}
+                </p>
               </div>
               <div className="flex items-center justify-between gap-4">
-                <p className="text-xs text-slate-500">{asset.url}</p>
+                <a
+                  href={asset.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="max-w-[14rem] truncate text-xs text-slate-500 transition hover:text-slate-300"
+                >
+                  {asset.url}
+                </a>
                 <form action={deleteMediaAction}>
                   <input type="hidden" name="id" value={asset.id} />
                   <button

@@ -1,9 +1,8 @@
 import { randomUUID } from "node:crypto"
-import { mkdir, writeFile } from "node:fs/promises"
-import path from "node:path"
 import { redirect } from "next/navigation"
 import { z } from "zod"
 import { addMediaAsset } from "@/lib/cms"
+import { createSupabaseAdminClient, SUPABASE_MEDIA_BUCKET } from "@/lib/supabase"
 
 const uploadSchema = z.object({
   name: z.string().min(2),
@@ -26,6 +25,31 @@ function extensionForMime(mimeType: string) {
   }
 }
 
+async function ensureMediaBucket() {
+  const supabase = createSupabaseAdminClient()
+  const { data, error } = await supabase.storage.listBuckets()
+
+  if (error) throw error
+
+  const bucket = data?.find((entry) => entry.name === SUPABASE_MEDIA_BUCKET)
+  if (!bucket) {
+    const { error: createError } = await supabase.storage.createBucket(SUPABASE_MEDIA_BUCKET, {
+      public: true,
+    })
+    if (createError) throw createError
+    return supabase
+  }
+
+  if (!bucket.public) {
+    const { error: updateError } = await supabase.storage.updateBucket(SUPABASE_MEDIA_BUCKET, {
+      public: true,
+    })
+    if (updateError) throw updateError
+  }
+
+  return supabase
+}
+
 export async function POST(request: Request) {
   const formData = await request.formData()
   const parsed = uploadSchema.safeParse({
@@ -38,19 +62,25 @@ export async function POST(request: Request) {
     return Response.json({ error: "Upload requires a file, name, and alt text." }, { status: 400 })
   }
 
-  const uploadsDir = path.join(process.cwd(), "public", "uploads")
-  await mkdir(uploadsDir, { recursive: true })
-
+  const supabase = await ensureMediaBucket()
   const ext = extensionForMime(file.type)
-  const filename = `${randomUUID()}.${ext}`
-  const filePath = path.join(uploadsDir, filename)
-  const bytes = await file.arrayBuffer()
-  await writeFile(filePath, Buffer.from(bytes))
+  const storagePath = `uploads/${randomUUID()}.${ext}`
+  const bytes = Buffer.from(await file.arrayBuffer())
+
+  const { error: uploadError } = await supabase.storage.from(SUPABASE_MEDIA_BUCKET).upload(storagePath, bytes, {
+    contentType: file.type,
+    upsert: false,
+  })
+  if (uploadError) throw uploadError
+
+  const { data: publicUrl } = supabase.storage.from(SUPABASE_MEDIA_BUCKET).getPublicUrl(storagePath)
 
   await addMediaAsset({
     name: parsed.data.name,
     alt: parsed.data.alt,
-    url: `/uploads/${filename}`,
+    url: publicUrl.publicUrl,
+    storageBucket: SUPABASE_MEDIA_BUCKET,
+    storagePath,
     mimeType: file.type,
     size: file.size,
   })

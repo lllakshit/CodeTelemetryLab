@@ -3,7 +3,7 @@ import { ArrowRight, CheckCircle2, Code2, Database, Layers3, ShieldCheck, Sparkl
 import { HeroPulse } from "@/components/hero-pulse"
 import { SectionHeading } from "@/components/section-heading"
 import { getHomeContent, listBlogPosts, listProjects } from "@/lib/cms"
-import { cn } from "@/lib/utils"
+import { cn, filenameFromUrl } from "@/lib/utils"
 
 const trustPoints = [
   "Built for USA and Canada remote collaboration",
@@ -241,7 +241,7 @@ export default async function HomePage() {
                     >
                       <div>
                         <p className="text-[11px] uppercase tracking-[0.22em] text-slate-400">Screenshot</p>
-                        <p className="mt-1 text-sm text-white">{shot.replace("/uploads/", "")}</p>
+                        <p className="mt-1 text-sm text-white">{filenameFromUrl(shot)}</p>
                       </div>
                     </div>
                   ))}

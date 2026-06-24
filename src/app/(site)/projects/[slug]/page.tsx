@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight } from "lucide-react"
 import Link from "next/link"
 import { SectionHeading } from "@/components/section-heading"
 import { getProjectBySlug, listProjects } from "@/lib/cms"
+import { filenameFromUrl } from "@/lib/utils"
 
 export async function generateMetadata({
   params,
@@ -71,7 +72,7 @@ export default async function ProjectDetailPage({
             >
               <div>
                 <p className="text-[11px] uppercase tracking-[0.22em] text-slate-400">Screenshot {index + 1}</p>
-                <p className="mt-1 text-sm text-white">{shot.replace("/uploads/", "")}</p>
+                <p className="mt-1 text-sm text-white">{filenameFromUrl(shot)}</p>
               </div>
             </div>
           ))}

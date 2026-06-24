@@ -91,6 +91,8 @@ export type MediaAsset = {
   name: string
   alt: string
   url: string
+  storageBucket?: string | null
+  storagePath?: string | null
   mimeType?: string | null
   size?: number | null
   createdAt: string
