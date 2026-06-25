@@ -7,6 +7,7 @@ import { LogOut, Menu, ShieldCheck } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { adminNav } from "@/lib/navigation"
 import { useState } from "react"
+import { DesignMark } from "@/components/design-mark"
 
 export function AdminShell({
   children,
@@ -18,16 +19,13 @@ export function AdminShell({
 
   return (
     <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.12),transparent_35%),linear-gradient(180deg,#0b1020,#0a1020)] text-white">
-      <div className="border-b border-white/8 bg-[#0b1020]/80 backdrop-blur-xl">
+      <div className="border-b border-white/8 bg-[#0b1020]/86 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
           <Link href="/admin/dashboard" className="flex items-center gap-3">
-            <span className="flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-sm font-semibold">
-              CT
-            </span>
-            <div>
-              <p className="text-sm font-semibold tracking-[0.24em] uppercase">CodeTelemetryLabs</p>
-              <p className="text-xs text-slate-500">Admin console</p>
-            </div>
+            <DesignMark
+              className="text-white"
+              labelClassName="hidden sm:inline-flex flex-col leading-none text-slate-200"
+            />
           </Link>
 
           <div className="hidden items-center gap-3 md:flex">

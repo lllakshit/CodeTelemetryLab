@@ -230,6 +230,16 @@ Production should always use real environment variables:
 - `ADMIN_PASSWORD`
 - `NEXTAUTH_SECRET`
 
+Deployment URL for this project:
+
+- `https://code-telemetry-lab.vercel.app`
+
+Local test URLs:
+
+- public site: `http://localhost:3000`
+- admin login: `http://localhost:3000/admin/login`
+- admin dashboard after login: `http://localhost:3000/admin/dashboard`
+
 ## 9) How Contact and Media Work
 
 ### Contact form
@@ -240,6 +250,7 @@ That route:
 
 - validates form input with Zod
 - creates a message record in the CMS store
+- can send an inbox notification when Resend env vars are configured
 - redirects back to `/contact?sent=1`
 
 ### Media upload
@@ -262,6 +273,7 @@ From the repository root:
 ```bash
 npm install
 npm run dev
+npm run cms:sync
 ```
 
 If you need to run Prisma tooling:
@@ -277,10 +289,17 @@ Copy `.env.example` to `.env.local` and set:
 
 - `DATABASE_URL`
 - `NEXTAUTH_SECRET`
-- `NEXTAUTH_URL`
+- `NEXTAUTH_URL` should be `https://code-telemetry-lab.vercel.app` in Vercel and `http://localhost:3000` locally
 - `ADMIN_EMAIL`
 - `ADMIN_PASSWORD`
 - `UPLOAD_DIR`
+- `RESEND_API_KEY`
+- `CONTACT_NOTIFICATION_FROM`
+- `CONTACT_NOTIFICATION_TO`
+
+Recommended production contact inbox:
+
+- `CONTACT_NOTIFICATION_TO=contact@codetelemetrylab.me`
 
 ## 11) Development Workflow To Keep Consistency
 

@@ -1,12 +1,22 @@
+import type { Metadata } from "next"
 import Link from "next/link"
 import { ShieldCheck } from "lucide-react"
 import { AdminLoginForm } from "@/components/admin-login-form"
+import { DesignMark } from "@/components/design-mark"
 
-export default function AdminLoginPage({
+export const metadata: Metadata = {
+  title: "Admin login",
+  description:
+    "Secure sign-in for the CodeTelemetryLabs admin dashboard, CMS controls, blog editing, and project management.",
+}
+
+export default async function AdminLoginPage({
   searchParams,
 }: {
-  searchParams?: { error?: string; email?: string; password?: string }
+  searchParams?: Promise<{ error?: string; email?: string; password?: string }>
 }) {
+  const resolvedSearchParams = await searchParams
+
   return (
     <main className="mx-auto flex min-h-screen max-w-7xl items-center justify-center px-4 py-20 sm:px-6 lg:px-8">
       <div className="grid w-full max-w-4xl gap-6 lg:grid-cols-[0.95fr_1.05fr]">
@@ -27,11 +37,14 @@ export default function AdminLoginPage({
         </div>
 
         <div className="rounded-[2rem] border border-white/10 bg-white/[0.04] p-8">
+          <div className="mb-6">
+            <DesignMark />
+          </div>
           <p className="text-xs uppercase tracking-[0.24em] text-blue-300">Admin sign-in</p>
           <AdminLoginForm
-            error={searchParams?.error}
-            initialEmail={searchParams?.email}
-            initialPassword={searchParams?.password}
+            error={resolvedSearchParams?.error}
+            initialEmail={resolvedSearchParams?.email}
+            initialPassword={resolvedSearchParams?.password}
           />
         </div>
       </div>

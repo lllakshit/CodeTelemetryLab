@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0B1020"/>
+      <stop offset="100%" stop-color="#09111F"/>
+    </linearGradient>
+    <linearGradient id="glow" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#007AFF" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#00F5FF" stop-opacity="0.1"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <circle cx="980" cy="120" r="180" fill="url(#glow)"/>
+  <circle cx="160" cy="520" r="150" fill="url(#glow)" opacity="0.8"/>
+  <rect x="82" y="72" width="1036" height="486" rx="36" stroke="#FFFFFF" stroke-opacity="0.08"/>
+  <path d="M170 180L126 224L170 268" stroke="#00F5FF" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M1030 180L1074 224L1030 268" stroke="#00F5FF" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M606 144L558 484" stroke="#007AFF" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="170" y="370" fill="#F4F7FB" font-size="78" font-family="Inter, system-ui, sans-serif" font-weight="700" letter-spacing="-2">
+    CodeTelemetryLabs
+  </text>
+  <text x="170" y="438" fill="#8FBDFE" font-size="30" font-family="JetBrains Mono, monospace" letter-spacing="1.8">
+    SVG-first agency site and admin system
+  </text>
+</svg>

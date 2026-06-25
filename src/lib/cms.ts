@@ -158,6 +158,20 @@ function isSupabaseReady() {
   return Boolean(supabase)
 }
 
+async function shouldUseStoreFallback() {
+  if (!isSupabaseReady()) return true
+
+  try {
+    await ensureSupabaseSeeded()
+    return false
+  } catch (error) {
+    if (isMissingSupabaseTableError(error)) {
+      return true
+    }
+    throw error
+  }
+}
+
 function toHomeRow(homepage: HomeContent): HomepageRow {
   return {
     key: homepage.key,
@@ -493,7 +507,7 @@ export async function getHomeContent(): Promise<HomeContent> {
 }
 
 export async function saveHomeContent(input: HomeContent) {
-  if (!isSupabaseReady()) {
+  if (await shouldUseStoreFallback()) {
     const store = await updateStore((draft) => {
       draft.homepage = input
       draft.activity.unshift({
@@ -594,7 +608,7 @@ export async function saveBlogPost(
     slug?: string
   },
 ) {
-  if (!isSupabaseReady()) {
+  if (await shouldUseStoreFallback()) {
     const timestamp = nowIso()
     const id = input.id ?? randomUUID()
     const slug = slugify(input.slug || input.title)
@@ -646,7 +660,7 @@ export async function saveBlogPost(
 }
 
 export async function deleteBlogPost(id: string) {
-  if (!isSupabaseReady()) {
+  if (await shouldUseStoreFallback()) {
     await updateStore((draft) => {
       const existing = draft.blogs.find((post) => post.id === id)
       draft.blogs = draft.blogs.filter((post) => post.id !== id)
@@ -750,7 +764,7 @@ export async function saveProject(
     slug?: string
   },
 ) {
-  if (!isSupabaseReady()) {
+  if (await shouldUseStoreFallback()) {
     const id = input.id ?? randomUUID()
     const timestamp = nowIso()
     const project: Project = {
@@ -800,7 +814,7 @@ export async function saveProject(
 }
 
 export async function deleteProject(id: string) {
-  if (!isSupabaseReady()) {
+  if (await shouldUseStoreFallback()) {
     await updateStore((draft) => {
       const existing = draft.projects.find((project) => project.id === id)
       draft.projects = draft.projects.filter((project) => project.id !== id)
@@ -846,7 +860,7 @@ export async function listMessages() {
 }
 
 export async function createMessage(input: Omit<Message, "id" | "createdAt" | "status">) {
-  if (!isSupabaseReady()) {
+  if (await shouldUseStoreFallback()) {
     const timestamp = nowIso()
     const message: Message = {
       id: randomUUID(),
@@ -899,7 +913,7 @@ export async function listMedia() {
 export async function addMediaAsset(
   input: Omit<MediaAsset, "id" | "createdAt">,
 ) {
-  if (!isSupabaseReady()) {
+  if (await shouldUseStoreFallback()) {
     const timestamp = nowIso()
     const asset: MediaAsset = {
       id: randomUUID(),
@@ -931,7 +945,7 @@ export async function addMediaAsset(
 }
 
 export async function deleteMediaAsset(id: string) {
-  if (!isSupabaseReady()) {
+  if (await shouldUseStoreFallback()) {
     await updateStore((draft) => {
       const existing = draft.media.find((asset) => asset.id === id)
       draft.media = draft.media.filter((asset) => asset.id !== id)

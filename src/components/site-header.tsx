@@ -6,24 +6,17 @@ import { useState } from "react"
 import { Menu, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { siteNav } from "@/lib/navigation"
+import { DesignMark } from "@/components/design-mark"
 
 export function SiteHeader() {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
 
   return (
-    <header className="sticky top-0 z-50 border-b border-white/8 bg-[#0B1020]/80 backdrop-blur-xl">
+    <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/88 backdrop-blur-xl">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
         <Link href="/" className="flex items-center gap-3">
-          <span className="flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-sm font-semibold text-white shadow-[0_0_0_1px_rgba(255,255,255,0.02)]">
-            CT
-          </span>
-          <div>
-            <p className="text-sm font-medium tracking-[0.24em] text-slate-300 uppercase">
-              CodeTelemetryLabs
-            </p>
-            <p className="text-xs text-slate-500">Software engineering studio</p>
-          </div>
+          <DesignMark labelClassName="hidden sm:inline-flex flex-col leading-none" />
         </Link>
 
         <nav className="hidden items-center gap-8 md:flex">
@@ -34,8 +27,8 @@ export function SiteHeader() {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "text-sm font-medium transition-colors hover:text-white",
-                  active ? "text-white" : "text-slate-300",
+                  "text-sm font-medium transition-colors",
+                  active ? "text-slate-950" : "text-slate-600 hover:text-slate-950",
                 )}
               >
                 {item.label}
@@ -47,7 +40,7 @@ export function SiteHeader() {
         <div className="hidden md:block">
           <Link
             href="/contact"
-            className="inline-flex items-center justify-center rounded-full border border-blue-400/30 bg-blue-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-blue-950/30 transition hover:bg-cyan-500"
+            className="inline-flex items-center justify-center rounded-full border border-slate-900 bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-700"
           >
             Start a project
           </Link>
@@ -55,7 +48,7 @@ export function SiteHeader() {
 
         <button
           type="button"
-          className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white md:hidden"
+          className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-900 md:hidden"
           aria-label="Toggle navigation"
           onClick={() => setOpen((value) => !value)}
         >
@@ -64,13 +57,13 @@ export function SiteHeader() {
       </div>
 
       {open ? (
-        <div className="border-t border-white/8 bg-[#0B1020]/95 px-4 py-4 md:hidden">
+        <div className="border-t border-slate-200 bg-white/95 px-4 py-4 md:hidden">
           <div className="mx-auto flex max-w-7xl flex-col gap-3">
             {siteNav.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className="rounded-2xl border border-white/8 bg-white/4 px-4 py-3 text-sm font-medium text-slate-200 transition hover:border-white/15 hover:bg-white/6"
+                className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-700 transition hover:border-slate-300 hover:text-slate-950"
                 onClick={() => setOpen(false)}
               >
                 {item.label}
@@ -78,7 +71,7 @@ export function SiteHeader() {
             ))}
             <Link
               href="/contact"
-              className="rounded-2xl bg-blue-500 px-4 py-3 text-center text-sm font-semibold text-white"
+              className="rounded-2xl bg-slate-950 px-4 py-3 text-center text-sm font-semibold text-white"
               onClick={() => setOpen(false)}
             >
               Start a project

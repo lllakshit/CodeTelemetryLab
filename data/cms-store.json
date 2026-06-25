@@ -3,7 +3,7 @@
     "key": "homepage",
     "heroEyebrow": "Engineering partner for modern product teams",
     "heroTitle": "Enterprise-grade software systems for teams that need clarity, speed, and trust.",
-    "heroDescription": "CodeTelemetryLabs builds product platforms, internal tools, and automation systems for USA and Canada clients who want disciplined execution instead of generic agency output.",
+    "heroDescription": "CodeTelemetryLabs builds product platforms, internal tools, and automation systems for USA and Canada clients who want disciplined execution, believable design, and a handoff path that stays readable after launch.",
     "primaryCtaLabel": "Start a project",
     "primaryCtaHref": "/contact",
     "secondaryCtaLabel": "See case studies",
@@ -11,32 +11,32 @@
     "services": [
       {
         "title": "AI Automation",
-        "description": "Workflow automation, agent-assisted operations, and practical AI features that reduce manual effort without overpromising.",
+        "description": "Workflow automation, agent-assisted operations, and practical AI features that reduce manual effort without turning the core product into a gimmick.",
         "notes": "Operations, support, internal tooling"
       },
       {
         "title": "Web Development",
-        "description": "Fast, accessible, and maintainable frontends built with modern React and Next.js architecture.",
+        "description": "Fast, accessible, and maintainable frontends built with modern React and Next.js architecture for public sites, dashboards, and internal tools.",
         "notes": "Marketing sites, portals, dashboards"
       },
       {
         "title": "SaaS Platforms",
-        "description": "Multi-tenant product systems with authentication, roles, billing-ready structure, and admin foundations.",
+        "description": "Multi-tenant product systems with authentication, roles, billing-ready structure, and admin foundations that can support the second phase without a rewrite.",
         "notes": "MVPs, internal SaaS, client portals"
       },
       {
         "title": "API Engineering",
-        "description": "Clean backend layers, route handlers, integrations, and system boundaries that scale with product demand.",
+        "description": "Clean backend layers, route handlers, integrations, and system boundaries that scale with product demand and team size.",
         "notes": "CRUD, integrations, sync jobs"
       },
       {
         "title": "Technical Documentation",
-        "description": "Documentation systems that help teams ship, hand off, and support software without confusion.",
+        "description": "Documentation systems that help teams ship, hand off, and support software without losing context between releases.",
         "notes": "Runbooks, product docs, onboarding"
       },
       {
         "title": "Cloud Infrastructure",
-        "description": "Practical deployment architecture for Vercel and adjacent cloud services with an eye on reliability.",
+        "description": "Practical deployment architecture for Vercel and adjacent cloud services with an eye on reliability, observability, and environment hygiene.",
         "notes": "Deployment, environment setup, delivery"
       }
     ],
@@ -50,29 +50,43 @@
         "name": "Agency operator, Austin",
         "role": "Delivery partner",
         "quote": "They reduced ambiguity early and kept the build focused on what would actually ship."
+      },
+      {
+        "name": "Operations lead, Vancouver",
+        "role": "Internal systems owner",
+        "quote": "The biggest difference was clarity. We knew what was live, what was editable, and what needed to happen next."
       }
     ],
     "stats": [
-      { "label": "Discovery to delivery", "value": "2-6 weeks" },
-      { "label": "Primary time zone", "value": "UTC-5 to UTC-8 overlap" },
-      { "label": "Engagement model", "value": "Project and retainer" }
+      {
+        "label": "Discovery to delivery",
+        "value": "2-8 weeks"
+      },
+      {
+        "label": "Primary time zone",
+        "value": "UTC-5 to UTC-8 overlap"
+      },
+      {
+        "label": "Engagement model",
+        "value": "Project and retainer"
+      }
     ],
     "process": [
       {
-        "title": "1. Discover",
+        "title": "Discover",
         "description": "We scope the problem, constraints, users, and technical direction before touching production code."
       },
       {
-        "title": "2. Build",
+        "title": "Build",
         "description": "We ship the smallest useful version quickly, then refine the structure and workflow with real feedback."
       },
       {
-        "title": "3. Stabilize",
+        "title": "Stabilize",
         "description": "We harden the system, document the handoff, and create a path for future features."
       }
     ],
     "ctaTitle": "Build the next version with an engineering partner, not a template shop.",
-    "ctaDescription": "If the first release needs to feel credible to customers and investors, the foundation needs to be disciplined from day one."
+    "ctaDescription": "If the first release needs to feel credible to customers, investors, or operators, the foundation has to be disciplined from day one."
   },
   "blogs": [
     {
@@ -80,10 +94,14 @@
       "slug": "why-agency-projects-fail-in-the-first-30-days",
       "title": "Why agency projects fail in the first 30 days",
       "excerpt": "Most delivery problems start with scope ambiguity, weak handoff discipline, and unstable content decisions.",
-      "content": "# Why agency projects fail in the first 30 days\n\nA project rarely fails because of one dramatic mistake. It usually drifts because the team has not defined what success means, who owns decisions, or what the first production release must include.\n\n## What we watch for\n\n- unclear scope\n- no content owner\n- tooling decisions made too early\n- no environment strategy\n\nThe fix is simple in principle and hard in practice: document the smallest viable release, lock the decision cadence, and keep the delivery surface narrow until the system is stable.",
-      "featuredImage": "/uploads/blog-placeholder.jpg",
+      "content": "# Why agency projects fail in the first 30 days\n\nA project rarely fails because of one dramatic mistake. It usually drifts because the team has not defined what success means, who owns decisions, or what the first production release must include.\n\n## What we watch for first\n\n- unclear scope boundaries between teams\n- no content owner for public copy or CMS fields\n- tooling decisions made too early just to feel sophisticated\n- environment assumptions left undocumented\n\n## The real issue is usually coordination\n\nWhen product, design, and engineering are working from different definitions of the release, everyone becomes busy without actually reducing risk.\n\nThe fix is simple in principle and hard in practice: document the smallest viable release, lock the decision cadence, and keep the delivery surface narrow until the system is stable.\n\n## What changes outcomes\n\nA strong first month usually has four things:\n\n1. a written release target\n2. one owner for content decisions\n3. environment notes before launch week\n4. weekly checkpoints tied to actual user-facing output\n\nThat discipline is not glamorous, but it is what turns an agency build into something a product team can trust.",
+      "featuredImage": "/uploads/blog-delivery-systems.svg",
       "category": "Delivery",
-      "tags": ["delivery", "agency", "planning"],
+      "tags": [
+        "delivery",
+        "agency",
+        "planning"
+      ],
       "seoTitle": "Why agency projects fail in the first 30 days",
       "seoDescription": "A practical breakdown of the early decisions that make software delivery succeed or stall.",
       "isPublished": true,
@@ -96,16 +114,60 @@
       "slug": "what-a-real-admin-panel-needs-at-phase-one",
       "title": "What a real admin panel needs at phase one",
       "excerpt": "Phase one admin tools should make content changes safe, not impressive.",
-      "content": "# What a real admin panel needs at phase one\n\nA phase one admin system does not need every possible workflow. It needs a clear model for content, enough structure to avoid mistakes, and a path to scale without rewriting the dashboard later.\n\n## Useful first features\n\n- authentication\n- content editing\n- media management\n- audit trail\n- publish controls\n\nThat is enough to start operating the site like a real product instead of a brochure.",
-      "featuredImage": "/uploads/admin-placeholder.jpg",
+      "content": "# What a real admin panel needs at phase one\n\nA phase one admin system does not need every possible workflow. It needs a clear model for content, enough structure to avoid mistakes, and a path to scale without rewriting the dashboard later.\n\n## Useful first features\n\n- authentication with clear ownership\n- content editing for the actual launch pages\n- media management with predictable naming\n- activity trail for high-risk actions\n- publish controls that keep drafts separate from live content\n\n## What to avoid early\n\nDo not confuse option count with maturity. A dense admin interface with weak structure creates more mistakes, not fewer.\n\nThe first version should help a team safely update homepage copy, projects, blog content, and media. That is enough to start operating the site like a real product instead of a brochure.\n\n## The handoff test\n\nIf a new operator can sign in, understand the content model, and publish a safe change without asking for engineering help, the phase one admin is doing its job.",
+      "featuredImage": "/uploads/blog-admin-workflow.svg",
       "category": "Admin Systems",
-      "tags": ["admin", "cms", "architecture"],
+      "tags": [
+        "admin",
+        "cms",
+        "architecture"
+      ],
       "seoTitle": "What a real admin panel needs at phase one",
       "seoDescription": "A straightforward checklist for the first version of an internal CMS.",
       "isPublished": true,
       "publishedAt": "2026-05-21T00:00:00.000Z",
       "createdAt": "2026-05-21T00:00:00.000Z",
       "updatedAt": "2026-05-21T00:00:00.000Z"
+    },
+    {
+      "id": "blog-ship-trust",
+      "slug": "shipping-trust-before-shipping-more-features",
+      "title": "Shipping trust before shipping more features",
+      "excerpt": "A credible first release is usually defined by clarity, performance, and operational confidence more than feature count.",
+      "content": "# Shipping trust before shipping more features\n\nThe strongest early releases are often the ones that say no the most. They are smaller, but they feel more dependable because the interface is calm, the copy is clear, and the workflows do not surprise people.\n\n## What trust looks like in software\n\nTrust is visible in small things:\n\n- page structure that feels intentional\n- copy that explains what will happen next\n- forms that ask only for what matters\n- admin tools that expose the real content model\n- predictable error handling and logged actions\n\n## Why teams miss it\n\nFeature pressure usually pushes teams to add more before they stabilize the current path. That creates a product surface that is technically broader and experientially weaker.\n\nA better strategy is to ship one solid workflow, document it, and then extend from a stable base. That approach scales better for both customer-facing systems and internal operations software.",
+      "featuredImage": "/uploads/blog-product-trust.svg",
+      "category": "Product Strategy",
+      "tags": [
+        "product",
+        "ux",
+        "delivery"
+      ],
+      "seoTitle": "Shipping trust before shipping more features",
+      "seoDescription": "Why credible releases are usually built on clarity and operational confidence, not maximum feature count.",
+      "isPublished": true,
+      "publishedAt": "2026-05-23T00:00:00.000Z",
+      "createdAt": "2026-05-23T00:00:00.000Z",
+      "updatedAt": "2026-05-23T00:00:00.000Z"
+    },
+    {
+      "id": "blog-content-ops",
+      "slug": "content-operations-are-part-of-the-product",
+      "title": "Content operations are part of the product",
+      "excerpt": "If the team cannot safely update copy, imagery, or project proof without engineering intervention, the product is not actually finished.",
+      "content": "# Content operations are part of the product\n\nA polished site can still fail operationally if every change depends on a developer. That creates delay, risk, and a quiet incentive to stop improving the content entirely.\n\n## Content is an operating layer\n\nFor marketing sites, portals, and admin-driven product surfaces, content operations should be treated like infrastructure.\n\nThat means:\n\n- clear ownership of fields and sections\n- predictable image handling\n- safe edit and publish flows\n- metadata support for search and sharing\n- a handoff model future collaborators can understand\n\n## Why this matters early\n\nThe first version of the content system does not need to be large. It needs to be legible. A simple CMS with the right boundaries creates more long-term leverage than a visually impressive surface with no operational path behind it.",
+      "featuredImage": "/uploads/blog-content-operations.svg",
+      "category": "Content Systems",
+      "tags": [
+        "content",
+        "cms",
+        "operations"
+      ],
+      "seoTitle": "Content operations are part of the product",
+      "seoDescription": "Why editable content, metadata, and operational clarity should be part of the product architecture from the beginning.",
+      "isPublished": true,
+      "publishedAt": "2026-05-25T00:00:00.000Z",
+      "createdAt": "2026-05-25T00:00:00.000Z",
+      "updatedAt": "2026-05-25T00:00:00.000Z"
     }
   ],
   "projects": [
@@ -115,10 +177,19 @@
       "title": "Client portal redesign for a remote services team",
       "category": "Portal",
       "problem": "The team needed a cleaner way to manage onboarding, project updates, and document handoff without adding support overhead.",
-      "solution": "We structured a dashboard-first portal with a content layer, role-aware navigation, and a predictable workflow for updates.",
-      "stack": ["Next.js", "Tailwind CSS", "Prisma", "PostgreSQL", "Auth.js"],
-      "screenshots": ["/uploads/project-portal-1.jpg", "/uploads/project-portal-2.jpg"],
-      "results": "Reduced repetitive status messages and created one source of truth for client communication.",
+      "solution": "We structured a dashboard-first portal with a content layer, role-aware navigation, document checkpoints, and a predictable workflow for updates so the team could reduce status friction without losing context.",
+      "stack": [
+        "Next.js",
+        "Tailwind CSS",
+        "Prisma",
+        "PostgreSQL",
+        "Auth.js"
+      ],
+      "screenshots": [
+        "/uploads/project-portal-1.svg",
+        "/uploads/project-portal-2.svg"
+      ],
+      "results": "Reduced repetitive status messages, improved onboarding consistency, and created one source of truth for client communication.",
       "featured": true,
       "isPublished": true,
       "createdAt": "2026-05-18T00:00:00.000Z",
@@ -130,19 +201,71 @@
       "title": "Internal automation console for operations",
       "category": "Automation",
       "problem": "Manual data moves were slowing the team down and creating inconsistent records across tools.",
-      "solution": "We designed a console with controlled operations, clear logs, and a system that could expand into workflow automation later.",
-      "stack": ["Next.js", "API Routes", "Prisma", "Zod", "Vercel"],
-      "screenshots": ["/uploads/project-automation-1.jpg"],
-      "results": "Cut repetitive manual steps and made operational state easier to inspect.",
-      "featured": false,
+      "solution": "We designed a console with controlled operations, clear logs, approval-minded workflows, and a system that could expand into workflow automation later without losing auditability.",
+      "stack": [
+        "Next.js",
+        "API Routes",
+        "Prisma",
+        "Zod",
+        "Vercel"
+      ],
+      "screenshots": [
+        "/uploads/project-automation-1.svg",
+        "/uploads/project-automation-2.svg"
+      ],
+      "results": "Cut repetitive manual steps, improved visibility into operational state, and created a safer path for future automation expansion.",
+      "featured": true,
       "isPublished": true,
       "createdAt": "2026-05-19T00:00:00.000Z",
       "updatedAt": "2026-05-19T00:00:00.000Z"
+    },
+    {
+      "id": "project-phase-one-platform",
+      "slug": "phase-one-saas-foundation",
+      "title": "Phase one SaaS foundation for a B2B operations product",
+      "category": "Platform",
+      "problem": "The team needed a first public release that could support real customer onboarding, internal admin control, and future subscription workflows without rewriting the base architecture.",
+      "solution": "We built a multi-tenant-ready product shell with auth, role boundaries, structured admin editing, and a release path that separated immediate launch needs from later billing and reporting layers.",
+      "stack": [
+        "Next.js",
+        "Supabase",
+        "Auth.js",
+        "TypeScript",
+        "Tailwind CSS"
+      ],
+      "screenshots": [
+        "/uploads/project-platform-1.svg",
+        "/uploads/project-platform-2.svg"
+      ],
+      "results": "Created a credible first release for demos and onboarding while preserving a clean path toward full SaaS operations in later phases.",
+      "featured": true,
+      "isPublished": true,
+      "createdAt": "2026-05-22T00:00:00.000Z",
+      "updatedAt": "2026-05-22T00:00:00.000Z"
     }
   ],
-  "messages": [],
+  "messages": [
+    {
+      "id": "88ddb181-588d-4135-82e7-4d3a104959ec",
+      "status": "new",
+      "createdAt": "2026-06-25T12:02:16.775Z",
+      "name": "Lakshit Mathur",
+      "email": "lakshit@example.com",
+      "company": "CodeTelemetryLabs",
+      "projectType": "Web development",
+      "budget": "$10k - $25k",
+      "message": "Need a production-grade marketing site and admin workflow with clean handoff notes."
+    }
+  ],
   "media": [],
   "activity": [
+    {
+      "id": "f080f563-5a75-42ca-86a5-15126eeee301",
+      "kind": "message",
+      "title": "New inquiry received",
+      "detail": "Lakshit Mathur - Web development",
+      "createdAt": "2026-06-25T12:02:16.775Z"
+    },
     {
       "id": "activity-seed-1",
       "kind": "seed",

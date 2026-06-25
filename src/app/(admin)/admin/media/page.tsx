@@ -7,10 +7,11 @@ import { filenameFromUrl } from "@/lib/utils"
 export default async function AdminMediaPage({
   searchParams,
 }: {
-  searchParams?: { uploaded?: string }
+  searchParams?: Promise<{ uploaded?: string }>
 }) {
   const media = await listMedia()
-  const uploaded = searchParams?.uploaded === "1"
+  const resolvedSearchParams = await searchParams
+  const uploaded = resolvedSearchParams?.uploaded === "1"
 
   return (
     <div className="space-y-8">

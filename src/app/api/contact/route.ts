@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation"
 import { z } from "zod"
 import { createMessage } from "@/lib/cms"
+import { sendContactNotification } from "@/lib/contact-email"
 
 const contactSchema = z.object({
   name: z.string().min(2),
@@ -26,6 +27,13 @@ export async function POST(request: Request) {
     return Response.json({ error: "Invalid submission" }, { status: 400 })
   }
 
-  await createMessage(parsed.data)
+  const message = await createMessage(parsed.data)
+
+  try {
+    await sendContactNotification(message)
+  } catch (error) {
+    console.error("Failed to send contact notification", error)
+  }
+
   redirect("/contact?sent=1")
 }

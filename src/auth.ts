@@ -7,8 +7,30 @@ const credentialsSchema = z.object({
   password: z.string().min(1),
 })
 
+const DEFAULT_ADMIN_EMAIL = "admin@codetelemetrylabs.com"
+const DEFAULT_ADMIN_PASSWORD = "admin1234"
+const DEV_PLACEHOLDER_PASSWORDS = new Set(["change-this-password"])
+
 function firstNonEmpty(...values: Array<string | undefined>) {
   return values.find((value) => value?.trim())?.trim()
+}
+
+function resolveAdminEmail() {
+  return firstNonEmpty(process.env.ADMIN_EMAIL) ?? DEFAULT_ADMIN_EMAIL
+}
+
+function resolveAdminPassword() {
+  const configuredPassword = firstNonEmpty(process.env.ADMIN_PASSWORD)
+
+  if (!configuredPassword) {
+    return DEFAULT_ADMIN_PASSWORD
+  }
+
+  if (process.env.NODE_ENV !== "production" && DEV_PLACEHOLDER_PASSWORDS.has(configuredPassword)) {
+    return DEFAULT_ADMIN_PASSWORD
+  }
+
+  return configuredPassword
 }
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
@@ -28,8 +50,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const parsed = credentialsSchema.safeParse(credentials)
         if (!parsed.success) return null
 
-        const adminEmail = firstNonEmpty(process.env.ADMIN_EMAIL) ?? "admin@codetelemetrylabs.com"
-        const adminPassword = firstNonEmpty(process.env.ADMIN_PASSWORD) ?? "admin1234"
+        const adminEmail = resolveAdminEmail()
+        const adminPassword = resolveAdminPassword()
 
         if (
           parsed.data.email.toLowerCase() !== adminEmail?.toLowerCase() ||

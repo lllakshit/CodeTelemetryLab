@@ -94,6 +94,7 @@ export function AdminLoginForm({
         <input
           name="email"
           type="email"
+          autoComplete="email"
           required
           defaultValue={initialEmail ?? ""}
           className="rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-blue-400/40"
@@ -105,6 +106,7 @@ export function AdminLoginForm({
         <input
           name="password"
           type="password"
+          autoComplete="current-password"
           required
           defaultValue={initialPassword ?? ""}
           className="rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-blue-400/40"
