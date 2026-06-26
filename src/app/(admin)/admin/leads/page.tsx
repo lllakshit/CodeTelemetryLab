@@ -129,10 +129,12 @@ export default async function AdminLeadsPage({
                   <summary className="cursor-pointer font-semibold text-slate-950">Submission metadata</summary>
                   <div className="mt-4 grid min-w-0 gap-3 sm:grid-cols-2">
                     <Info label="IP address" value={lead.ipAddress} compact />
-                    <Info label="Referrer" value={lead.referrer} compact />
+                    <Info label="Landing URL" value={lead.referrer} compact />
                     <Info label="UTM source" value={lead.utmSource} />
                     <Info label="UTM medium" value={lead.utmMedium} />
                     <Info label="UTM campaign" value={lead.utmCampaign} />
+                    <Info label="UTM term" value={lead.utmTerm} />
+                    <Info label="UTM content" value={lead.utmContent} />
                     <Info label="User agent" value={lead.userAgent} compact />
                   </div>
                 </details>

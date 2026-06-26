@@ -3,8 +3,10 @@ import { mkdir, writeFile } from "node:fs/promises"
 import path from "node:path"
 import { NextResponse } from "next/server"
 import { z } from "zod"
+import { auth } from "@/auth"
 import { addMediaAsset } from "@/lib/cms"
 import { createSupabaseAdminClient, getSupabaseConfig, SUPABASE_MEDIA_BUCKET } from "@/lib/supabase"
+import { requestOrigin } from "@/lib/utils"
 
 const uploadSchema = z.object({
   name: z.string().min(2),
@@ -13,7 +15,7 @@ const uploadSchema = z.object({
 
 const publicUploadsDir = path.join(process.cwd(), "public", "uploads")
 
-function extensionForMime(mimeType: string) {
+function extensionForMime(mimeType: string, filename?: string) {
   switch (mimeType) {
     case "image/png":
       return "png"
@@ -25,7 +27,35 @@ function extensionForMime(mimeType: string) {
     case "image/jpg":
       return "jpg"
     default:
-      return "bin"
+      break
+  }
+
+  const ext = filename?.split(".").pop()?.toLowerCase()
+  if (ext && ["png", "webp", "gif", "jpg", "jpeg"].includes(ext)) {
+    return ext === "jpeg" ? "jpg" : ext
+  }
+
+  return "bin"
+}
+
+function mimeTypeForFile(file: File) {
+  if (file.type.startsWith("image/")) {
+    return file.type
+  }
+
+  const ext = file.name.split(".").pop()?.toLowerCase()
+  switch (ext) {
+    case "png":
+      return "image/png"
+    case "webp":
+      return "image/webp"
+    case "gif":
+      return "image/gif"
+    case "jpg":
+    case "jpeg":
+      return "image/jpeg"
+    default:
+      return file.type || "application/octet-stream"
   }
 }
 
@@ -35,7 +65,7 @@ function wantsJson(request: Request) {
 }
 
 function redirectToMedia(request: Request, search: string) {
-  return NextResponse.redirect(new URL(`/admin/media${search}`, request.url))
+  return NextResponse.redirect(new URL(`/admin/media${search}`, requestOrigin(request)))
 }
 
 function mediaError(request: Request, code: string, message: string, status = 400) {
@@ -52,24 +82,28 @@ function storageConfigMessage() {
 
 async function ensureMediaBucket() {
   const supabase = createSupabaseAdminClient()
-  const { data, error } = await supabase.storage.listBuckets()
 
-  if (error) throw error
+  try {
+    const { data, error } = await supabase.storage.listBuckets()
+    if (error) throw error
 
-  const bucket = data?.find((entry) => entry.name === SUPABASE_MEDIA_BUCKET)
-  if (!bucket) {
-    const { error: createError } = await supabase.storage.createBucket(SUPABASE_MEDIA_BUCKET, {
-      public: true,
-    })
-    if (createError) throw createError
-    return supabase
-  }
+    const bucket = data?.find((entry) => entry.name === SUPABASE_MEDIA_BUCKET)
+    if (!bucket) {
+      const { error: createError } = await supabase.storage.createBucket(SUPABASE_MEDIA_BUCKET, {
+        public: true,
+      })
+      if (createError) throw createError
+      return supabase
+    }
 
-  if (!bucket.public) {
-    const { error: updateError } = await supabase.storage.updateBucket(SUPABASE_MEDIA_BUCKET, {
-      public: true,
-    })
-    if (updateError) throw updateError
+    if (!bucket.public) {
+      const { error: updateError } = await supabase.storage.updateBucket(SUPABASE_MEDIA_BUCKET, {
+        public: true,
+      })
+      if (updateError) throw updateError
+    }
+  } catch (error) {
+    console.warn("Media bucket check skipped; attempting direct upload.", error)
   }
 
   return supabase
@@ -77,12 +111,13 @@ async function ensureMediaBucket() {
 
 async function uploadToSupabase(file: File) {
   const supabase = await ensureMediaBucket()
-  const ext = extensionForMime(file.type)
+  const mimeType = mimeTypeForFile(file)
+  const ext = extensionForMime(mimeType, file.name)
   const storagePath = `uploads/${randomUUID()}.${ext}`
   const bytes = Buffer.from(await file.arrayBuffer())
 
   const { error: uploadError } = await supabase.storage.from(SUPABASE_MEDIA_BUCKET).upload(storagePath, bytes, {
-    contentType: file.type,
+    contentType: mimeType,
     upsert: false,
   })
   if (uploadError) throw uploadError
@@ -93,11 +128,13 @@ async function uploadToSupabase(file: File) {
     url: publicUrl.publicUrl,
     storageBucket: SUPABASE_MEDIA_BUCKET,
     storagePath,
+    mimeType,
   }
 }
 
 async function uploadToLocal(file: File) {
-  const ext = extensionForMime(file.type)
+  const mimeType = mimeTypeForFile(file)
+  const ext = extensionForMime(mimeType, file.name)
   const filename = `${randomUUID()}.${ext}`
   const destination = path.join(publicUploadsDir, filename)
   const bytes = Buffer.from(await file.arrayBuffer())
@@ -109,10 +146,16 @@ async function uploadToLocal(file: File) {
     url: `/uploads/${filename}`,
     storageBucket: null,
     storagePath: `uploads/${filename}`,
+    mimeType,
   }
 }
 
 export async function POST(request: Request) {
+  const session = await auth()
+  if (!session) {
+    return mediaError(request, "unauthorized", "Sign in to upload assets.", 401)
+  }
+
   try {
     const formData = await request.formData()
     const parsed = uploadSchema.safeParse({
@@ -125,7 +168,8 @@ export async function POST(request: Request) {
       return mediaError(request, "missing", "Choose an image, asset name, and alt text before uploading.")
     }
 
-    if (!file.type.startsWith("image/")) {
+    const mimeType = mimeTypeForFile(file)
+    if (!mimeType.startsWith("image/")) {
       return mediaError(request, "type", "Only image uploads are supported here.")
     }
 
@@ -155,7 +199,7 @@ export async function POST(request: Request) {
       url: uploadResult.url,
       storageBucket: uploadResult.storageBucket,
       storagePath: uploadResult.storagePath,
-      mimeType: file.type,
+      mimeType: uploadResult.mimeType,
       size: file.size,
     })
 
