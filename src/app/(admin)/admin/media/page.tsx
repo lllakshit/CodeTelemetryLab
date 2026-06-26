@@ -26,10 +26,10 @@ export default async function AdminMediaPage({
       ? "Choose an image, asset name, and alt text before uploading."
       : error === "type"
         ? "Only image uploads are supported here."
-        : error === "storage"
-          ? "Vercel needs Supabase storage configured before uploads can persist in production."
+        : error === "storage" || error === "storage-config"
+          ? "Configure NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in Vercel, then create a public media-assets bucket in Supabase."
           : error === "upload"
-            ? "The upload failed before the asset could be saved. Check the Vercel logs and Supabase keys."
+            ? "The upload failed before the asset could be saved. Check the Vercel function logs and Supabase storage settings."
             : null
 
   return (

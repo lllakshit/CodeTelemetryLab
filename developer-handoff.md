@@ -278,9 +278,10 @@ Production should always use real environment variables:
 - `ADMIN_PASSWORD`
 - `NEXTAUTH_SECRET`
 
-Deployment URL for this project:
+Production site URL:
 
-- `https://code-telemetry-lab.vercel.app`
+- set `NEXT_PUBLIC_SITE_URL` and `NEXTAUTH_URL` to the primary custom domain in Vercel
+- do not hardcode `vercel.app` in metadata or canonical URLs
 
 Local test URLs:
 
@@ -316,9 +317,18 @@ The media page posts to `/api/media`.
 That route:
 
 - validates file and metadata
-- writes the file to `public/uploads`
+- writes to Supabase Storage in production
+- falls back to local `public/uploads` only during local development
 - records the asset in the CMS store
 - redirects back to `/admin/media?uploaded=1`
+
+Production media uploads require:
+
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- a public `media-assets` bucket in Supabase
+
+If uploads fail on Vercel, check the function logs first. The most common failure is an incomplete storage config rather than a UI issue.
 
 ## 10) How to Start Development
 
@@ -343,18 +353,20 @@ npm run prisma:studio
 
 Copy `.env.example` to `.env.local` and set:
 
+- `NEXT_PUBLIC_SITE_URL` to the primary custom domain
+- `NEXTAUTH_URL` to the same production domain in Vercel and `http://localhost:3000` locally
 - `DATABASE_URL`
 - `NEXTAUTH_SECRET`
-- `NEXTAUTH_URL` should be `https://code-telemetry-lab.vercel.app` in Vercel and `http://localhost:3000` locally
 - `ADMIN_EMAIL`
 - `ADMIN_PASSWORD`
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - `SUPABASE_SERVICE_ROLE_KEY`
-- `UPLOAD_DIR`
 - `RESEND_API_KEY`
 - `CONTACT_NOTIFICATION_FROM`
 - `CONTACT_NOTIFICATION_TO`
+
+Keep `SUPABASE_URL` / `SUPABASE_ANON_KEY` aliases in sync only if a deployment already depends on them.
 
 Recommended production contact inbox:
 

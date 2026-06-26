@@ -1,6 +1,21 @@
+function normalizeSiteUrl(value: string | undefined) {
+  const trimmed = value?.trim().replace(/\/$/, "")
+  if (!trimmed) return null
+  if (/^https?:\/\//i.test(trimmed)) return trimmed
+  if (
+    trimmed.startsWith("localhost") ||
+    trimmed.startsWith("127.") ||
+    trimmed.startsWith("0.0.0.0")
+  ) {
+    return `http://${trimmed}`
+  }
+  return `https://${trimmed}`
+}
+
 export const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
-  process.env.NEXTAUTH_URL?.replace(/\/$/, "") ||
+  normalizeSiteUrl(process.env.NEXT_PUBLIC_SITE_URL) ||
+  normalizeSiteUrl(process.env.NEXTAUTH_URL) ||
+  normalizeSiteUrl(process.env.VERCEL_PROJECT_PRODUCTION_URL) ||
   "https://codetelemetrylab.me"
 
 export const organizationJsonLd = {
