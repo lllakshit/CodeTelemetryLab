@@ -129,6 +129,38 @@ create table if not exists public.activity_logs (
   created_at timestamptz not null default now()
 );
 
+insert into storage.buckets (id, name, public)
+values ('media-assets', 'media-assets', true)
+on conflict (id) do update
+set
+  name = excluded.name,
+  public = excluded.public;
+
+drop policy if exists "Public read media-assets" on storage.objects;
+create policy "Public read media-assets"
+on storage.objects
+for select
+using (bucket_id = 'media-assets');
+
+drop policy if exists "Service role insert media-assets" on storage.objects;
+create policy "Service role insert media-assets"
+on storage.objects
+for insert
+with check (bucket_id = 'media-assets' and auth.role() = 'service_role');
+
+drop policy if exists "Service role update media-assets" on storage.objects;
+create policy "Service role update media-assets"
+on storage.objects
+for update
+using (bucket_id = 'media-assets' and auth.role() = 'service_role')
+with check (bucket_id = 'media-assets' and auth.role() = 'service_role');
+
+drop policy if exists "Service role delete media-assets" on storage.objects;
+create policy "Service role delete media-assets"
+on storage.objects
+for delete
+using (bucket_id = 'media-assets' and auth.role() = 'service_role');
+
 drop trigger if exists set_homepage_content_updated_at on public.homepage_content;
 create trigger set_homepage_content_updated_at
 before update on public.homepage_content

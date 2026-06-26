@@ -46,6 +46,10 @@ function mediaError(request: Request, code: string, message: string, status = 40
   return redirectToMedia(request, `?error=${code}`)
 }
 
+function storageConfigMessage() {
+  return "Configure NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in Vercel, then create a public 'media-assets' bucket in Supabase."
+}
+
 async function ensureMediaBucket() {
   const supabase = createSupabaseAdminClient()
   const { data, error } = await supabase.storage.listBuckets()
@@ -126,14 +130,23 @@ export async function POST(request: Request) {
     }
 
     const supabaseConfig = getSupabaseConfig()
-    const uploadResult = supabaseConfig.isConfigured
+    const canUseSupabaseStorage = Boolean(supabaseConfig.url && supabaseConfig.secretKey)
+    const isVercelDeployment = Boolean(process.env.VERCEL)
+
+    if (isVercelDeployment && !canUseSupabaseStorage) {
+      return mediaError(
+        request,
+        "storage-config",
+        storageConfigMessage(),
+      )
+    }
+
+    const uploadResult = canUseSupabaseStorage
       ? await uploadToSupabase(file)
-      : process.env.VERCEL
-        ? null
-        : await uploadToLocal(file)
+      : await uploadToLocal(file)
 
     if (!uploadResult) {
-      return mediaError(request, "storage", "Vercel needs Supabase storage configured before uploads can persist in production.")
+      return mediaError(request, "storage", storageConfigMessage())
     }
 
     const asset = await addMediaAsset({
@@ -153,6 +166,11 @@ export async function POST(request: Request) {
     return redirectToMedia(request, "?uploaded=1")
   } catch (error) {
     console.error("Media upload failed", error)
-    return mediaError(request, "upload", "The upload failed before the asset could be saved.", 500)
+    return mediaError(
+      request,
+      "upload",
+      "The upload failed before the asset could be saved. Check the Vercel function logs and Supabase storage settings.",
+      500,
+    )
   }
 }

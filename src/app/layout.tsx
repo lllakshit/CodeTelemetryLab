@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { IBM_Plex_Mono, Plus_Jakarta_Sans } from "next/font/google"
 import "./globals.css"
+import { SITE_URL } from "@/lib/seo"
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   variable: "--font-plus-jakarta-sans",
@@ -14,7 +15,7 @@ const ibmPlexMono = IBM_Plex_Mono({
 })
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://code-telemetry-lab.vercel.app"),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "CodeTelemetryLabs",
     template: "%s | CodeTelemetryLabs",
@@ -33,7 +34,7 @@ export const metadata: Metadata = {
     title: "CodeTelemetryLabs",
     description:
       "Premium software engineering and automation for startups, agencies, and product teams.",
-    url: "https://code-telemetry-lab.vercel.app",
+    url: SITE_URL,
     siteName: "CodeTelemetryLabs",
     images: ["/og-image.svg"],
     type: "website",
