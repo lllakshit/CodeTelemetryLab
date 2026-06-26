@@ -1,5 +1,6 @@
 import { z } from "zod"
 import type { Lead } from "@/lib/store"
+import { absoluteUrl } from "@/lib/seo"
 import { getClientIp } from "@/lib/rate-limit"
 
 const optionalText = z.preprocess((value) => cleanOptionalText(value), z.string().max(400).optional().nullable())
@@ -28,8 +29,21 @@ export const leadCaptureSchema = z.object({
   utmCampaign: optionalText,
   utmTerm: optionalText,
   utmContent: optionalText,
+  referrer: z.preprocess((value) => cleanOptionalText(value, 2000), z.string().max(2000).optional().nullable()),
   fax: z.preprocess((value) => cleanText(value), z.string().optional()),
 })
+
+export type LeadAttribution = {
+  utmSource?: string
+  utmMedium?: string
+  utmCampaign?: string
+  utmTerm?: string
+  utmContent?: string
+  landingPageUrl?: string
+  serviceInterestedIn?: string
+}
+
+const ATTRIBUTION_QUERY_KEYS = new Set(["error", "sent"])
 
 export type LeadCaptureInput = z.infer<typeof leadCaptureSchema>
 
@@ -53,8 +67,60 @@ export function parseLeadFormData(formData: FormData) {
     utmCampaign: formData.get("utmCampaign"),
     utmTerm: formData.get("utmTerm"),
     utmContent: formData.get("utmContent"),
+    referrer: formData.get("referrer") ?? formData.get("landingPageUrl"),
     fax: formData.get("fax"),
   })
+}
+
+function readSearchParam(
+  params: Record<string, string | string[] | undefined> | undefined,
+  keys: string[],
+) {
+  if (!params) return undefined
+
+  for (const key of keys) {
+    const value = params[key]
+    if (typeof value === "string" && value.trim()) {
+      return value.trim()
+    }
+  }
+
+  return undefined
+}
+
+export function attributionFromSearchParams(
+  params: Record<string, string | string[] | undefined> | undefined,
+): LeadAttribution {
+  return {
+    utmSource: readSearchParam(params, ["utm_source", "utmSource"]),
+    utmMedium: readSearchParam(params, ["utm_medium", "utmMedium"]),
+    utmCampaign: readSearchParam(params, ["utm_campaign", "utmCampaign"]),
+    utmTerm: readSearchParam(params, ["utm_term", "utmTerm"]),
+    utmContent: readSearchParam(params, ["utm_content", "utmContent"]),
+    serviceInterestedIn: readSearchParam(params, [
+      "service",
+      "serviceInterestedIn",
+      "projectType",
+      "project_type",
+    ]),
+    landingPageUrl: buildContactLandingUrl(params),
+  }
+}
+
+export function buildContactLandingUrl(
+  params: Record<string, string | string[] | undefined> | undefined,
+) {
+  const query = new URLSearchParams()
+
+  for (const [key, value] of Object.entries(params ?? {})) {
+    if (ATTRIBUTION_QUERY_KEYS.has(key)) continue
+    if (typeof value === "string" && value.trim()) {
+      query.set(key, value.trim())
+    }
+  }
+
+  const queryString = query.toString()
+  return `${absoluteUrl("/contact")}${queryString ? `?${queryString}` : ""}`
 }
 
 export function parseLeadJson(value: unknown) {
@@ -66,7 +132,7 @@ export function leadFromCapture(input: LeadCaptureInput, request: Request): Para
     ...input,
     ipAddress: getClientIp(request),
     userAgent: request.headers.get("user-agent"),
-    referrer: request.headers.get("referer"),
+    referrer: input.referrer ?? request.headers.get("referer"),
   }
 }
 

@@ -16,7 +16,7 @@ export const SITE_URL =
   normalizeSiteUrl(process.env.NEXT_PUBLIC_SITE_URL) ||
   normalizeSiteUrl(process.env.NEXTAUTH_URL) ||
   normalizeSiteUrl(process.env.VERCEL_PROJECT_PRODUCTION_URL) ||
-  "https://codetelemetrylab.me"
+  "https://www.codetelemetrylab.me"
 
 export const organizationJsonLd = {
   "@context": "https://schema.org",

@@ -3,6 +3,7 @@ import { CheckCircle2, Mail, MapPin } from "lucide-react"
 import { BrandIllustration } from "@/components/brand-illustration"
 import { SectionHeading } from "@/components/section-heading"
 import { CONTACT_DISPLAY_EMAIL } from "@/lib/contact"
+import { attributionFromSearchParams } from "@/lib/lead-capture"
 
 export const metadata: Metadata = {
   title: "Contact",
@@ -19,11 +20,13 @@ const responseNotes = [
 export default async function ContactPage({
   searchParams,
 }: {
-  searchParams?: Promise<{ error?: string; sent?: string }>
+  searchParams?: Promise<Record<string, string | string[] | undefined>>
 }) {
   const resolvedSearchParams = await searchParams
   const sent = resolvedSearchParams?.sent === "1"
   const invalidSubmission = resolvedSearchParams?.error === "invalid"
+  const attribution = attributionFromSearchParams(resolvedSearchParams)
+  const defaultProjectType = attribution.serviceInterestedIn ?? ""
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
@@ -96,6 +99,16 @@ export default async function ContactPage({
           className="rounded-[2rem] border border-slate-200 bg-white p-6 lg:p-8"
         >
           <input type="hidden" name="source" value="contact-page" />
+          {attribution.landingPageUrl ? (
+            <input type="hidden" name="referrer" value={attribution.landingPageUrl} />
+          ) : null}
+          {attribution.utmSource ? <input type="hidden" name="utmSource" value={attribution.utmSource} /> : null}
+          {attribution.utmMedium ? <input type="hidden" name="utmMedium" value={attribution.utmMedium} /> : null}
+          {attribution.utmCampaign ? (
+            <input type="hidden" name="utmCampaign" value={attribution.utmCampaign} />
+          ) : null}
+          {attribution.utmTerm ? <input type="hidden" name="utmTerm" value={attribution.utmTerm} /> : null}
+          {attribution.utmContent ? <input type="hidden" name="utmContent" value={attribution.utmContent} /> : null}
           <label className="hidden">
             Leave this field blank
             <input name="fax" tabIndex={-1} autoComplete="off" />
@@ -150,7 +163,7 @@ export default async function ContactPage({
                 name="projectType"
                 required
                 className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-950 outline-none transition focus:border-blue-400/40 focus:bg-white"
-                defaultValue=""
+                defaultValue={defaultProjectType}
               >
                 <option value="" disabled>
                   Select a project type

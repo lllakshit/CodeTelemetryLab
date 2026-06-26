@@ -14,6 +14,17 @@ export function slugify(value: string) {
     .replace(/^-+|-+$/g, "")
 }
 
+export function requestOrigin(request: Request) {
+  const forwardedHost = request.headers.get("x-forwarded-host")
+  const forwardedProto = request.headers.get("x-forwarded-proto") ?? "https"
+
+  if (forwardedHost) {
+    return `${forwardedProto}://${forwardedHost}`
+  }
+
+  return new URL(request.url).origin
+}
+
 export function filenameFromUrl(value: string) {
   const cleaned = value.split("#")[0]?.split("?")[0] ?? value
 
