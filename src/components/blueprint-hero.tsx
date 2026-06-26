@@ -42,7 +42,7 @@ export function BlueprintHero({ className }: BlueprintHeroProps) {
           Content architecture, systems, and launch surfaces
         </text>
         <text x="96" y="498" fill="#2563EB" fontSize="13" fontFamily="JetBrains Mono, monospace" opacity="0.9">
-          SVG-first / Admin-ready / SEO-conscious
+          SVG-first / Operations-ready / SEO-conscious
         </text>
       </svg>
     </div>

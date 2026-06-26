@@ -10,13 +10,13 @@ import { cn } from "@/lib/utils"
 export const metadata: Metadata = {
   title: "Premium Software Engineering Agency",
   description:
-    "CodeTelemetryLabs builds premium agency websites, admin systems, and content-rich product surfaces with SEO-ready structure and SVG-first visuals.",
+    "CodeTelemetryLabs builds premium agency websites, client portals, automation systems, and content-rich product surfaces with SEO-ready structure.",
 }
 
 const trustPoints = [
   "Built for USA and Canada remote collaboration",
   "Structured delivery instead of generic template work",
-  "Content and admin flows designed to scale",
+  "Content and operations workflows designed to scale",
 ]
 
 const principles = [
@@ -33,7 +33,7 @@ const principles = [
   {
     icon: Code2,
     title: "Engineering depth",
-    description: "The foundation includes auth, data handling, and a CMS path so the site can evolve into a platform.",
+    description: "The foundation includes secure workflows, data handling, and a content path so the site can evolve into a platform.",
   },
   {
     icon: Database,
@@ -328,10 +328,10 @@ export default async function HomePage() {
                 Book a call
               </Link>
               <Link
-                href="/admin/login"
+                href="/projects"
                 className="inline-flex items-center justify-center rounded-full border border-white/20 bg-transparent px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
               >
-                Admin access
+                View case studies
               </Link>
             </div>
           </div>
@@ -342,8 +342,8 @@ export default async function HomePage() {
         <div className="grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
           <SectionHeading
             eyebrow="Recent writing"
-            title="Blog content is ready for a CMS workflow."
-            description="The blog system supports MDX content, categories, tags, SEO metadata, and a featured image field."
+            title="Writing that supports real buying decisions."
+            description="The blog system covers engineering, delivery, SEO, performance, and product operations with useful internal links."
           />
           <div className="divide-y divide-slate-200">
             {blogs.slice(0, 2).map((blog) => (

@@ -75,6 +75,40 @@ create table if not exists public.messages (
   created_at timestamptz not null default now()
 );
 
+create table if not exists public.leads (
+  id uuid primary key default gen_random_uuid(),
+  full_name text not null,
+  company_name text,
+  email text not null,
+  phone text,
+  country text,
+  budget text,
+  timeline text,
+  service_interested_in text not null,
+  subject text,
+  message text not null,
+  preferred_contact_method text,
+  website_url text,
+  ip_address text,
+  user_agent text,
+  referrer text,
+  source text,
+  utm_source text,
+  utm_medium text,
+  utm_campaign text,
+  utm_term text,
+  utm_content text,
+  status text not null default 'New',
+  notes text,
+  assigned_team_member text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists leads_status_idx on public.leads(status);
+create index if not exists leads_service_idx on public.leads(service_interested_in);
+create index if not exists leads_created_at_idx on public.leads(created_at desc);
+
 create table if not exists public.media_assets (
   id uuid primary key default gen_random_uuid(),
   name text not null,
@@ -108,4 +142,9 @@ for each row execute function public.set_updated_at();
 drop trigger if exists set_projects_updated_at on public.projects;
 create trigger set_projects_updated_at
 before update on public.projects
+for each row execute function public.set_updated_at();
+
+drop trigger if exists set_leads_updated_at on public.leads;
+create trigger set_leads_updated_at
+before update on public.leads
 for each row execute function public.set_updated_at();

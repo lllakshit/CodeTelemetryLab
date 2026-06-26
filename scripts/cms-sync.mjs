@@ -95,6 +95,42 @@ async function main() {
     "projects",
   )
 
+  await upsertOrThrow(
+    supabase.from("leads").upsert(
+      (store.leads ?? []).map((lead) => ({
+        id: lead.id,
+        full_name: lead.fullName,
+        company_name: lead.companyName ?? null,
+        email: lead.email,
+        phone: lead.phone ?? null,
+        country: lead.country ?? null,
+        budget: lead.budget ?? null,
+        timeline: lead.timeline ?? null,
+        service_interested_in: lead.serviceInterestedIn,
+        subject: lead.subject ?? null,
+        message: lead.message,
+        preferred_contact_method: lead.preferredContactMethod ?? null,
+        website_url: lead.websiteUrl ?? null,
+        ip_address: lead.ipAddress ?? null,
+        user_agent: lead.userAgent ?? null,
+        referrer: lead.referrer ?? null,
+        source: lead.source ?? null,
+        utm_source: lead.utmSource ?? null,
+        utm_medium: lead.utmMedium ?? null,
+        utm_campaign: lead.utmCampaign ?? null,
+        utm_term: lead.utmTerm ?? null,
+        utm_content: lead.utmContent ?? null,
+        status: lead.status,
+        notes: lead.notes ?? null,
+        assigned_team_member: lead.assignedTeamMember ?? null,
+        created_at: lead.createdAt,
+        updated_at: lead.updatedAt,
+      })),
+      { onConflict: "id" },
+    ),
+    "leads",
+  )
+
   console.log("CMS content synced to Supabase.")
 }
 

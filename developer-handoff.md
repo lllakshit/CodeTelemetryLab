@@ -25,10 +25,12 @@ The repository already includes a working Phase 1 foundation:
 - blog CRUD
 - project CRUD
 - homepage CMS editing
+- lead capture and lead management
 - media upload/delete UI
 - contact form API
+- SEO routes for sitemap, robots, and RSS/feed
 - Prisma schema for PostgreSQL
-- file-backed CMS store for immediate local use
+- Supabase-ready CMS layer with a file-backed store fallback for immediate local use
 
 ### Public pages
 
@@ -52,12 +54,16 @@ The repository already includes a working Phase 1 foundation:
 - `/admin/projects/new`
 - `/admin/projects/[id]`
 - `/admin/homepage`
+- `/admin/leads`
 - `/admin/media`
 
 ### API routes
 
 - `/api/auth/[...nextauth]`
 - `/api/contact`
+- `/api/leads`
+- `/api/leads/[id]`
+- `/api/leads/export`
 - `/api/media`
 
 ## 3) Current Tech Stack
@@ -68,22 +74,31 @@ The repository already includes a working Phase 1 foundation:
 - Framer Motion for minimal animation
 - Auth.js / NextAuth
 - Prisma schema for PostgreSQL
-- file-backed CMS store for phase one
+- Supabase admin client support with JSON fallback
+- Zod validation for contact and lead capture
 
 ## 4) Current Design Direction
 
 Design language:
 
-- dark, premium, restrained
+- light, premium, restrained
 - blue/cyan accent only
 - strong typography
 - calm spacing
 - structured cards and grids
+- subtle technical/blueprint visual language
 - no loud gradients
 - no fake futuristic visuals
 - no cartoon SaaS aesthetic
 
 The site should feel like a real engineering company, closer in tone to modern enterprise brands than a startup template.
+
+Important current design note:
+
+- the public site was refreshed to a light professional frontend direction
+- the admin has also been moved away from the old dark theme
+- the admin should feel like a clean backend management workspace, visually consistent with the public site but optimized for editing, review, and operations
+- public-facing pages should not expose links or references to the admin area
 
 ## 5) What the Frontend Is Doing
 
@@ -117,7 +132,7 @@ The dashboard shows:
 
 - total blogs
 - total projects
-- total messages
+- total leads/messages
 - recent activity
 
 ### Blog management
@@ -162,6 +177,26 @@ The homepage editor supports:
 
 The current admin editor stores repeating content as line-based text input to keep phase one simple and predictable.
 
+### Lead management
+
+The admin lead workspace supports:
+
+- listing captured inquiries
+- filtering by search, status, service, and date range
+- updating lead status
+- assigning an internal owner
+- saving internal notes
+- deleting/archiving leads
+- CSV export
+
+Lead management files to know first:
+
+- [`src/app/(admin)/admin/leads/page.tsx`](./src/app/(admin)/admin/leads/page.tsx)
+- [`src/app/api/leads/route.ts`](./src/app/api/leads/route.ts)
+- [`src/app/api/leads/[id]/route.ts`](./src/app/api/leads/[id]/route.ts)
+- [`src/app/api/leads/export/route.ts`](./src/app/api/leads/export/route.ts)
+- [`src/lib/lead-capture.ts`](./src/lib/lead-capture.ts)
+
 ### Media library
 
 The media library supports:
@@ -175,9 +210,21 @@ The media library supports:
 
 There are two data layers:
 
-### A. File-backed CMS store
+### A. Supabase-ready CMS layer
 
-Current runtime source of truth:
+The main read/write facade is:
+
+- [`src/lib/cms.ts`](./src/lib/cms.ts)
+
+It can use Supabase tables when Supabase environment variables are configured. If Supabase is missing or required tables are unavailable locally, it falls back to the JSON store.
+
+Supabase schema is in:
+
+- [`supabase/schema.sql`](./supabase/schema.sql)
+
+### B. File-backed CMS store
+
+Current local fallback source of truth:
 
 - [`data/cms-store.json`](./data/cms-store.json)
 - read/write helpers in [`src/lib/store.ts`](./src/lib/store.ts)
@@ -185,7 +232,7 @@ Current runtime source of truth:
 
 This exists so the app can work immediately without waiting for a database.
 
-### B. Prisma schema
+### C. Prisma schema
 
 Prisma is already defined in:
 
@@ -197,14 +244,15 @@ Models already exist for:
 - blog posts
 - projects
 - messages
+- leads
 - media assets
 - activity logs
 
 Important note:
 
 - the Prisma schema is ready
-- the runtime CMS still uses the JSON store
-- next phase should switch read/write functions to PostgreSQL once `DATABASE_URL` is wired in
+- the runtime CMS facade currently supports Supabase first and JSON fallback
+- next phase should make the production database choice explicit and remove ambiguity between Prisma/PostgreSQL and Supabase if needed
 
 ## 8) Authentication and Admin Access
 
@@ -249,9 +297,17 @@ The contact page posts to `/api/contact`.
 That route:
 
 - validates form input with Zod
-- creates a message record in the CMS store
+- creates a lead record and mirrored legacy message record through the CMS layer
 - can send an inbox notification when Resend env vars are configured
 - redirects back to `/contact?sent=1`
+- redirects browser validation failures back to `/contact?error=invalid` instead of exposing raw JSON
+
+Contact capture details:
+
+- parser and payload mapping live in [`src/lib/lead-capture.ts`](./src/lib/lead-capture.ts)
+- optional blank fields are normalized before validation
+- missing service falls back to `General project inquiry`
+- name, email, and message are still required for a useful lead
 
 ### Media upload
 
@@ -292,6 +348,9 @@ Copy `.env.example` to `.env.local` and set:
 - `NEXTAUTH_URL` should be `https://code-telemetry-lab.vercel.app` in Vercel and `http://localhost:3000` locally
 - `ADMIN_EMAIL`
 - `ADMIN_PASSWORD`
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`
 - `UPLOAD_DIR`
 - `RESEND_API_KEY`
 - `CONTACT_NOTIFICATION_FROM`
@@ -313,6 +372,13 @@ When continuing work, follow this order:
 6. run build
 7. verify the flow in a browser
 
+For contact/lead work specifically:
+
+1. submit `/contact` through the actual browser form
+2. verify redirect to `/contact?sent=1`
+3. verify the new inquiry appears in `/admin/leads`
+4. remove any test leads from `data/cms-store.json` or the active database after verification
+
 Do not jump straight into visual changes without checking whether the data model or admin workflow needs to change too.
 
 ## 12) Working Rules For Codex
@@ -327,14 +393,16 @@ When Codex continues this repo, it should stay consistent with these rules:
 - keep admin forms simple and predictable
 - revalidate routes after mutations
 - avoid duplicating content between components and data sources
+- keep all public pages free of visible admin links or admin references
+- make admin pages mobile responsive, especially forms, filters, tables/cards, and action panels
 
 ## 13) Recommended Next Work
 
 The next developer should probably do one of these:
 
-### Option 1: Move CMS to PostgreSQL
+### Option 1: Finalize production persistence
 
-Replace the JSON store in `src/lib/cms.ts` with Prisma-backed reads/writes.
+Choose and document the production persistence path clearly. The code currently has Prisma schema, Supabase schema/client support, and JSON fallback. Avoid running two database strategies indefinitely.
 
 ### Option 2: Improve admin UX
 
@@ -344,6 +412,7 @@ Add:
 - markdown toolbar for blog content
 - better validation and error states
 - autosave or draft support
+- richer lead timeline/history and assignment workflow
 
 ### Option 3: Refine public pages
 
@@ -371,11 +440,17 @@ Add:
 - [`src/app/(site)/blog/page.tsx`](./src/app/(site)/blog/page.tsx)
 - [`src/app/(site)/contact/page.tsx`](./src/app/(site)/contact/page.tsx)
 - [`src/app/(admin)/admin/dashboard/page.tsx`](./src/app/(admin)/admin/dashboard/page.tsx)
+- [`src/app/(admin)/admin/leads/page.tsx`](./src/app/(admin)/admin/leads/page.tsx)
 - [`src/app/(admin)/admin/actions.ts`](./src/app/(admin)/admin/actions.ts)
+- [`src/app/api/contact/route.ts`](./src/app/api/contact/route.ts)
+- [`src/app/api/leads/route.ts`](./src/app/api/leads/route.ts)
+- [`src/lib/lead-capture.ts`](./src/lib/lead-capture.ts)
 - [`src/lib/cms.ts`](./src/lib/cms.ts)
 - [`src/lib/store.ts`](./src/lib/store.ts)
+- [`src/lib/admin-ui.ts`](./src/lib/admin-ui.ts)
 - [`src/auth.ts`](./src/auth.ts)
 - [`prisma/schema.prisma`](./prisma/schema.prisma)
+- [`supabase/schema.sql`](./supabase/schema.sql)
 
 ## 15) Current State Summary
 
@@ -384,7 +459,29 @@ As of this handoff:
 - the site is already built and working locally
 - the public pages render correctly
 - the admin login and protected dashboard work
+- the admin theme has been refreshed to match the light public-site direction
+- the Leads admin page is implemented and responsive across mobile/tablet/desktop
+- public-facing admin references have been removed from the frontend navigation/footer scan
+- contact form submissions have been verified through the real browser form and create backend leads
+- invalid browser contact submissions redirect to `/contact?error=invalid` with a friendly page message
 - lint and production build pass
-- the next major milestone is switching persistence from the JSON store to Prisma/PostgreSQL
+- the next major milestone is finalizing the production persistence strategy and deploying with real environment variables
 
 Keep the implementation disciplined. The main risk on this project is drifting into a generic template or adding unnecessary complexity before the core content workflow is stable.
+
+## 16) Latest Verification Notes
+
+Most recent local verification completed on June 26, 2026:
+
+- `npm run lint` passed
+- `npm run build` passed
+- `http://localhost:3000/contact` returned HTTP 200
+- real browser contact submission redirected to `/contact?sent=1`
+- backend lead count increased during contact-form verification
+- temporary Codex/Playwright test leads were removed after verification
+- responsive overflow audit across public and admin routes at mobile, tablet, and desktop widths returned no horizontal overflow issues
+
+Local URLs currently useful for QA:
+
+- public contact form: `http://localhost:3000/contact`
+- admin leads: `http://localhost:3000/admin/leads`

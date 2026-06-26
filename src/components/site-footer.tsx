@@ -57,9 +57,6 @@ export function SiteFooter() {
         <div className="mt-12 flex flex-col gap-4 border-t border-slate-200 pt-6 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between">
           <p>CodeTelemetryLabs. All rights reserved.</p>
           <div className="flex gap-4">
-            <Link href="/admin/login" className="transition hover:text-slate-950">
-              Admin
-            </Link>
             <Link href="/contact" className="transition hover:text-slate-950">
               Request proposal
             </Link>

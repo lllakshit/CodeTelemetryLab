@@ -5,6 +5,7 @@ import Link from "next/link"
 import { BrandIllustration } from "@/components/brand-illustration"
 import { SectionHeading } from "@/components/section-heading"
 import { getProjectBySlug, listProjects } from "@/lib/cms"
+import { absoluteUrl, organizationJsonLd } from "@/lib/seo"
 
 function getVariant(slug: string) {
   if (slug.includes("portal")) return "portal" as const
@@ -24,6 +25,22 @@ export async function generateMetadata({
   return {
     title: project.title,
     description: project.problem,
+    alternates: {
+      canonical: `/projects/${project.slug}`,
+    },
+    openGraph: {
+      title: project.title,
+      description: project.problem,
+      url: absoluteUrl(`/projects/${project.slug}`),
+      type: "article",
+      images: ["/og-image.svg"],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: project.title,
+      description: project.problem,
+      images: ["/og-image.svg"],
+    },
   }
 }
 
@@ -43,9 +60,24 @@ export default async function ProjectDetailPage({
   if (!project) notFound()
 
   const variant = getVariant(project.slug)
+  const projectJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "CreativeWork",
+    name: project.title,
+    description: project.problem,
+    about: project.category,
+    creator: organizationJsonLd,
+    url: absoluteUrl(`/projects/${project.slug}`),
+    keywords: project.stack.join(", "),
+  }
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:px-8">
+      <script
+        type="application/ld+json"
+        suppressHydrationWarning
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(projectJsonLd) }}
+      />
       <Link href="/projects" className="inline-flex items-center gap-2 text-sm font-medium text-slate-700 transition hover:text-slate-950">
         <ArrowLeft className="h-4 w-4" />
         Back to projects

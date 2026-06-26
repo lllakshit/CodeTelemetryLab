@@ -72,6 +72,36 @@ model Message {
   createdAt   DateTime @default(now())
 }
 
+model Lead {
+  id                     String   @id @default(cuid())
+  fullName               String
+  companyName            String?
+  email                  String
+  phone                  String?
+  country                String?
+  budget                 String?
+  timeline               String?
+  serviceInterestedIn    String
+  subject                String?
+  message                String
+  preferredContactMethod String?
+  websiteUrl             String?
+  ipAddress              String?
+  userAgent              String?
+  referrer               String?
+  source                 String?
+  utmSource              String?
+  utmMedium              String?
+  utmCampaign            String?
+  utmTerm                String?
+  utmContent             String?
+  status                 String   @default("New")
+  notes                  String?
+  assignedTeamMember     String?
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+}
+
 model MediaAsset {
   id        String   @id @default(cuid())
   name      String

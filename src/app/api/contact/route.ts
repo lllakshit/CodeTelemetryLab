@@ -1,39 +1,51 @@
 import { redirect } from "next/navigation"
-import { z } from "zod"
-import { createMessage } from "@/lib/cms"
+import { createLead } from "@/lib/cms"
 import { sendContactNotification } from "@/lib/contact-email"
-
-const contactSchema = z.object({
-  name: z.string().min(2),
-  email: z.string().email(),
-  company: z.string().optional().default(""),
-  projectType: z.string().min(2),
-  budget: z.string().min(1),
-  message: z.string().min(10),
-})
+import { leadFromCapture, leadPayload, parseLeadFormData } from "@/lib/lead-capture"
+import { getClientIp, isRateLimited } from "@/lib/rate-limit"
 
 export async function POST(request: Request) {
+  const clientIp = getClientIp(request)
+  if (isRateLimited(`contact:${clientIp}`, 5)) {
+    return Response.json({ error: "Too many submissions. Please try again later." }, { status: 429 })
+  }
+
   const formData = await request.formData()
-  const parsed = contactSchema.safeParse({
-    name: formData.get("name"),
-    email: formData.get("email"),
-    company: formData.get("company"),
-    projectType: formData.get("projectType"),
-    budget: formData.get("budget"),
-    message: formData.get("message"),
-  })
+  const parsed = parseLeadFormData(formData)
 
   if (!parsed.success) {
+    console.warn("Invalid contact submission", parsed.error.flatten().fieldErrors)
+    if (prefersHtml(request)) {
+      redirect("/contact?error=invalid")
+    }
+
     return Response.json({ error: "Invalid submission" }, { status: 400 })
   }
 
-  const message = await createMessage(parsed.data)
+  if (parsed.data.fax) {
+    redirect("/contact?sent=1")
+  }
+
+  const leadInput = leadPayload(leadFromCapture(parsed.data, request))
+  const lead = await createLead(leadInput)
 
   try {
-    await sendContactNotification(message)
+    await sendContactNotification({
+      name: lead.fullName,
+      email: lead.email,
+      company: lead.companyName,
+      projectType: lead.serviceInterestedIn,
+      budget: lead.budget ?? "Not specified",
+      message: lead.message,
+    })
   } catch (error) {
     console.error("Failed to send contact notification", error)
   }
 
   redirect("/contact?sent=1")
+}
+
+function prefersHtml(request: Request) {
+  const accept = request.headers.get("accept") ?? ""
+  return accept.includes("text/html")
 }

@@ -10,9 +10,12 @@ import {
 import {
   readStore,
   updateStore,
+  normalizeStore,
   type ActivityLog,
   type BlogPost,
   type HomeContent,
+  type Lead,
+  type LeadStatus,
   type MediaAsset,
   type Message,
   type Project,
@@ -28,6 +31,7 @@ const TABLES = {
   blogs: "blog_posts",
   projects: "projects",
   messages: "messages",
+  leads: "leads",
   media: "media_assets",
   activity: "activity_logs",
 } as const
@@ -96,6 +100,36 @@ type MessageRow = {
   created_at: string
 }
 
+type LeadRow = {
+  id: string
+  full_name: string
+  company_name: string | null
+  email: string
+  phone: string | null
+  country: string | null
+  budget: string | null
+  timeline: string | null
+  service_interested_in: string
+  subject: string | null
+  message: string
+  preferred_contact_method: string | null
+  website_url: string | null
+  ip_address: string | null
+  user_agent: string | null
+  referrer: string | null
+  source: string | null
+  utm_source: string | null
+  utm_medium: string | null
+  utm_campaign: string | null
+  utm_term: string | null
+  utm_content: string | null
+  status: string
+  notes: string | null
+  assigned_team_member: string | null
+  created_at: string
+  updated_at: string
+}
+
 type MediaRow = {
   id: string
   name: string
@@ -106,6 +140,14 @@ type MediaRow = {
   mime_type: string | null
   size: number | null
   created_at: string
+}
+
+type LeadFilters = {
+  search?: string
+  status?: string
+  service?: string
+  from?: string
+  to?: string
 }
 
 type ActivityRow = {
@@ -126,6 +168,12 @@ function asStringArray(value: unknown) {
 
 function asArray<T>(value: unknown, mapper: (item: any) => T): T[] {
   return Array.isArray(value) ? value.map(mapper) : []
+}
+
+function nullableString(value: unknown) {
+  if (value == null) return null
+  const text = String(value).trim()
+  return text ? text : null
 }
 
 function sortNewest<T extends { createdAt?: string; updatedAt?: string; publishedAt?: string | null }>(
@@ -353,6 +401,113 @@ function fromMessageRow(row: MessageRow): Message {
   }
 }
 
+function toLeadRow(input: Partial<Lead> & {
+  fullName: string
+  email: string
+  serviceInterestedIn: string
+  message: string
+}): LeadRow {
+  const timestamp = nowIso()
+
+  return {
+    id: input.id ?? randomUUID(),
+    full_name: input.fullName,
+    company_name: input.companyName ?? null,
+    email: input.email,
+    phone: input.phone ?? null,
+    country: input.country ?? null,
+    budget: input.budget ?? null,
+    timeline: input.timeline ?? null,
+    service_interested_in: input.serviceInterestedIn,
+    subject: input.subject ?? null,
+    message: input.message,
+    preferred_contact_method: input.preferredContactMethod ?? null,
+    website_url: input.websiteUrl ?? null,
+    ip_address: input.ipAddress ?? null,
+    user_agent: input.userAgent ?? null,
+    referrer: input.referrer ?? null,
+    source: input.source ?? null,
+    utm_source: input.utmSource ?? null,
+    utm_medium: input.utmMedium ?? null,
+    utm_campaign: input.utmCampaign ?? null,
+    utm_term: input.utmTerm ?? null,
+    utm_content: input.utmContent ?? null,
+    status: input.status ?? "New",
+    notes: input.notes ?? null,
+    assigned_team_member: input.assignedTeamMember ?? null,
+    created_at: input.createdAt ?? timestamp,
+    updated_at: timestamp,
+  }
+}
+
+function fromLeadRow(row: LeadRow): Lead {
+  return {
+    id: row.id,
+    fullName: row.full_name,
+    companyName: row.company_name,
+    email: row.email,
+    phone: row.phone,
+    country: row.country,
+    budget: row.budget,
+    timeline: row.timeline,
+    serviceInterestedIn: row.service_interested_in,
+    subject: row.subject,
+    message: row.message,
+    preferredContactMethod: row.preferred_contact_method,
+    websiteUrl: row.website_url,
+    ipAddress: row.ip_address,
+    userAgent: row.user_agent,
+    referrer: row.referrer,
+    source: row.source,
+    utmSource: row.utm_source,
+    utmMedium: row.utm_medium,
+    utmCampaign: row.utm_campaign,
+    utmTerm: row.utm_term,
+    utmContent: row.utm_content,
+    status: row.status as LeadStatus,
+    notes: row.notes,
+    assignedTeamMember: row.assigned_team_member,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  }
+}
+
+function filterLeads(leads: Lead[], filters?: LeadFilters) {
+  if (!filters) return leads
+
+  const search = filters.search?.trim().toLowerCase()
+  const status = filters.status?.trim()
+  const service = filters.service?.trim().toLowerCase()
+  const fromTime = filters.from ? new Date(filters.from).getTime() : null
+  const toTime = filters.to ? new Date(`${filters.to}T23:59:59.999Z`).getTime() : null
+
+  return leads.filter((lead) => {
+    const createdTime = new Date(lead.createdAt).getTime()
+    const searchHaystack = [
+      lead.fullName,
+      lead.companyName,
+      lead.email,
+      lead.phone,
+      lead.country,
+      lead.serviceInterestedIn,
+      lead.subject,
+      lead.message,
+      lead.source,
+    ]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase()
+
+    return (
+      (!search || searchHaystack.includes(search)) &&
+      (!status || lead.status === status) &&
+      (!service || lead.serviceInterestedIn.toLowerCase().includes(service)) &&
+      (!fromTime || createdTime >= fromTime) &&
+      (!toTime || createdTime <= toTime)
+    )
+  })
+}
+
 function toMediaRow(input: Omit<MediaAsset, "id" | "createdAt">): MediaRow {
   return {
     id: randomUUID(),
@@ -414,7 +569,7 @@ async function ensureSupabaseSeeded() {
     return
   }
 
-  const store = seed as CmsStore
+  const store = normalizeStore(seed as Partial<CmsStore>)
   const homepage = await supabaseClient.from(TABLES.homepage).upsert(toHomeRow(store.homepage), {
     onConflict: "key",
   })
@@ -445,6 +600,11 @@ async function ensureSupabaseSeeded() {
     { onConflict: "id" },
   )
   if (messages.error) throw messages.error
+
+  const leads = await supabaseClient.from(TABLES.leads).upsert(store.leads.map(toLeadRow), {
+    onConflict: "id",
+  })
+  if (leads.error) throw leads.error
 
   const media = await supabaseClient.from(TABLES.media).upsert(
     store.media.map((asset) => ({
@@ -892,6 +1052,202 @@ export async function createMessage(input: Omit<Message, "id" | "createdAt" | "s
   return fromMessageRow(row)
 }
 
+export async function listLeads(filters?: LeadFilters) {
+  if (!isSupabaseReady()) {
+    return fallbackFromStore((store) => sortNewest(filterLeads(store.leads, filters)))
+  }
+
+  try {
+    await ensureSupabaseSeeded()
+    const { data, error } = await supabaseClient.from(TABLES.leads).select("*")
+    if (error) throw error
+    return sortNewest(filterLeads((data ?? []).map((row) => fromLeadRow(row as LeadRow)), filters))
+  } catch (error) {
+    if (isMissingSupabaseTableError(error)) {
+      return fallbackFromStore((store) => sortNewest(filterLeads(store.leads, filters)))
+    }
+    throw error
+  }
+}
+
+export async function getLeadById(id: string) {
+  if (!isSupabaseReady()) {
+    return fallbackFromStore((store) => store.leads.find((lead) => lead.id === id) ?? null)
+  }
+
+  try {
+    await ensureSupabaseSeeded()
+    const { data, error } = await supabaseClient.from(TABLES.leads).select("*").eq("id", id).maybeSingle()
+    if (error) throw error
+    return data ? fromLeadRow(data as LeadRow) : null
+  } catch (error) {
+    if (isMissingSupabaseTableError(error)) {
+      return fallbackFromStore((store) => store.leads.find((lead) => lead.id === id) ?? null)
+    }
+    throw error
+  }
+}
+
+export async function createLead(
+  input: Partial<Lead> & {
+    fullName: string
+    email: string
+    serviceInterestedIn: string
+    message: string
+  },
+) {
+  if (await shouldUseStoreFallback()) {
+    const timestamp = nowIso()
+    const lead: Lead = {
+      id: input.id ?? randomUUID(),
+      fullName: input.fullName,
+      companyName: input.companyName ?? null,
+      email: input.email,
+      phone: input.phone ?? null,
+      country: input.country ?? null,
+      budget: input.budget ?? null,
+      timeline: input.timeline ?? null,
+      serviceInterestedIn: input.serviceInterestedIn,
+      subject: input.subject ?? "Project inquiry",
+      message: input.message,
+      preferredContactMethod: input.preferredContactMethod ?? "Email",
+      websiteUrl: input.websiteUrl ?? null,
+      ipAddress: input.ipAddress ?? null,
+      userAgent: input.userAgent ?? null,
+      referrer: input.referrer ?? null,
+      source: input.source ?? "contact-form",
+      utmSource: input.utmSource ?? null,
+      utmMedium: input.utmMedium ?? null,
+      utmCampaign: input.utmCampaign ?? null,
+      utmTerm: input.utmTerm ?? null,
+      utmContent: input.utmContent ?? null,
+      status: input.status ?? "New",
+      notes: input.notes ?? null,
+      assignedTeamMember: input.assignedTeamMember ?? null,
+      createdAt: input.createdAt ?? timestamp,
+      updatedAt: timestamp,
+    }
+
+    await updateStore((draft) => {
+      draft.leads.unshift(lead)
+      draft.messages.unshift({
+        id: lead.id,
+        name: lead.fullName,
+        email: lead.email,
+        company: lead.companyName,
+        projectType: lead.serviceInterestedIn,
+        budget: lead.budget ?? "Not specified",
+        message: lead.message,
+        status: "new",
+        createdAt: lead.createdAt,
+      })
+      draft.activity.unshift({
+        id: randomUUID(),
+        kind: "lead",
+        title: "New lead received",
+        detail: `${lead.fullName} - ${lead.serviceInterestedIn}`,
+        createdAt: timestamp,
+      })
+      return draft
+    })
+
+    return lead
+  }
+
+  const row = toLeadRow(input)
+  const { error } = await supabaseClient.from(TABLES.leads).insert(row)
+  if (error) throw error
+
+  await addActivity("lead", "New lead received", `${row.full_name} - ${row.service_interested_in}`)
+  return fromLeadRow(row)
+}
+
+export async function updateLead(
+  id: string,
+  input: Partial<Pick<Lead, "status" | "notes" | "assignedTeamMember">>,
+) {
+  if (await shouldUseStoreFallback()) {
+    const timestamp = nowIso()
+    let updated: Lead | null = null
+
+    await updateStore((draft) => {
+      draft.leads = draft.leads.map((lead) => {
+        if (lead.id !== id) return lead
+        updated = {
+          ...lead,
+          status: input.status ?? lead.status,
+          notes: input.notes ?? lead.notes ?? null,
+          assignedTeamMember: input.assignedTeamMember ?? lead.assignedTeamMember ?? null,
+          updatedAt: timestamp,
+        }
+        return updated
+      })
+      if (updated) {
+        draft.activity.unshift({
+          id: randomUUID(),
+          kind: "lead",
+          title: "Lead updated",
+          detail: `${updated.fullName} - ${updated.status}`,
+          createdAt: timestamp,
+        })
+      }
+      return draft
+    })
+
+    return updated
+  }
+
+  const payload = {
+    status: input.status,
+    notes: input.notes ?? null,
+    assigned_team_member: input.assignedTeamMember ?? null,
+    updated_at: nowIso(),
+  }
+
+  const { data, error } = await supabaseClient
+    .from(TABLES.leads)
+    .update(payload)
+    .eq("id", id)
+    .select("*")
+    .maybeSingle()
+  if (error) throw error
+
+  const lead = data ? fromLeadRow(data as LeadRow) : null
+  if (lead) {
+    await addActivity("lead", "Lead updated", `${lead.fullName} - ${lead.status}`)
+  }
+
+  return lead
+}
+
+export async function deleteLead(id: string) {
+  if (await shouldUseStoreFallback()) {
+    await updateStore((draft) => {
+      const existing = draft.leads.find((lead) => lead.id === id)
+      draft.leads = draft.leads.filter((lead) => lead.id !== id)
+      if (existing) {
+        draft.activity.unshift({
+          id: randomUUID(),
+          kind: "lead",
+          title: "Lead archived",
+          detail: existing.fullName,
+          createdAt: nowIso(),
+        })
+      }
+      return draft
+    })
+    return
+  }
+
+  await ensureSupabaseSeeded()
+  const existing = await getLeadById(id)
+  const { error } = await supabaseClient.from(TABLES.leads).delete().eq("id", id)
+  if (error) throw error
+  if (existing) {
+    await addActivity("lead", "Lead archived", existing.fullName)
+  }
+}
+
 export async function listMedia() {
   if (!isSupabaseReady()) {
     return fallbackFromStore((store) => sortNewest(store.media))
@@ -1001,10 +1357,11 @@ export async function listActivity() {
 }
 
 export async function getDashboardMetrics() {
-  const [blogs, projects, messages, activity] = await Promise.all([
+  const [blogs, projects, messages, leads, activity] = await Promise.all([
     listBlogPosts(),
     listProjects(),
     listMessages(),
+    listLeads(),
     listActivity(),
   ])
 
@@ -1012,6 +1369,7 @@ export async function getDashboardMetrics() {
     blogs: blogs.length,
     projects: projects.length,
     messages: messages.length,
+    leads: leads.length,
     activity: activity.slice(0, 6),
   }
 }

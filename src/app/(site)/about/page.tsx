@@ -21,7 +21,7 @@ const values = [
   },
   {
     title: "Quality standard",
-    text: "Clear typography, disciplined spacing, predictable data flow, and admin surfaces that match the public site quality.",
+    text: "Clear typography, disciplined spacing, predictable data flow, and operational tools that match the public site quality.",
   },
 ]
 
@@ -39,7 +39,7 @@ const workflow = [
   {
     label: "03",
     title: "Handoff with structure",
-    text: "We leave behind documentation, environment notes, and an admin path that future collaborators can actually operate.",
+    text: "We leave behind documentation, environment notes, and a clear operating path that future collaborators can actually use.",
   },
 ]
 
@@ -97,7 +97,7 @@ export default function AboutPage() {
               Calm process, serious delivery, and no template-shop posturing.
             </h2>
             <p className="mt-4 text-sm leading-7 text-slate-300">
-              That means realistic timelines, practical architecture choices, and surfaces that can evolve into admin systems, portals, or internal tooling without being rebuilt from zero.
+              That means realistic timelines, practical architecture choices, and surfaces that can evolve into portals, operations tools, or internal systems without being rebuilt from zero.
             </p>
           </div>
           <Link

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import { signIn } from "next-auth/react"
+import { adminAccentButton, adminInputClassName } from "@/lib/admin-ui"
 
 async function submitCredentials({
   email,
@@ -90,44 +91,40 @@ export function AdminLoginForm({
       }}
     >
       <label className="grid gap-2 text-sm">
-        <span className="text-slate-300">Admin email</span>
+        <span className="font-medium text-slate-700">Admin email</span>
         <input
           name="email"
           type="email"
           autoComplete="email"
           required
           defaultValue={initialEmail ?? ""}
-          className="rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-blue-400/40"
+          className={adminInputClassName()}
           placeholder="admin@codetelemetrylabs.com"
         />
       </label>
       <label className="grid gap-2 text-sm">
-        <span className="text-slate-300">Password</span>
+        <span className="font-medium text-slate-700">Password</span>
         <input
           name="password"
           type="password"
           autoComplete="current-password"
           required
           defaultValue={initialPassword ?? ""}
-          className="rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-blue-400/40"
+          className={adminInputClassName()}
           placeholder="Admin password"
         />
       </label>
       {initialEmail || initialPassword ? (
-        <p className="rounded-2xl border border-blue-400/20 bg-blue-500/10 px-4 py-3 text-sm text-blue-100">
+        <p className="rounded-[1.25rem] border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-700">
           Local dev shortcut detected. Credentials from the URL have been prefilled.
         </p>
       ) : null}
       {localError ? (
-        <p className="rounded-2xl border border-rose-400/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-100">
+        <p className="rounded-[1.25rem] border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
           {localError}
         </p>
       ) : null}
-      <button
-        type="submit"
-        disabled={loading}
-        className="inline-flex w-full items-center justify-center rounded-full bg-blue-500 px-6 py-3 text-sm font-semibold text-white transition hover:bg-cyan-500 disabled:cursor-not-allowed disabled:opacity-70"
-      >
+      <button type="submit" disabled={loading} className={`${adminAccentButton} w-full disabled:cursor-not-allowed disabled:opacity-70`}>
         {loading ? "Signing in..." : "Sign in"}
       </button>
     </form>

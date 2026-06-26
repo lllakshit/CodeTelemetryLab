@@ -8,6 +8,7 @@ export const siteNav = [
 
 export const adminNav = [
   { href: "/admin/dashboard", label: "Dashboard" },
+  { href: "/admin/leads", label: "Leads" },
   { href: "/admin/blogs", label: "Blogs" },
   { href: "/admin/projects", label: "Projects" },
   { href: "/admin/homepage", label: "Homepage" },

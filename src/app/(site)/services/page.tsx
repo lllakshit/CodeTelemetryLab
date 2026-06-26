@@ -7,7 +7,7 @@ import { getHomeContent } from "@/lib/cms"
 export const metadata: Metadata = {
   title: "Services",
   description:
-    "Explore CodeTelemetryLabs service offerings for agency websites, admin systems, software delivery, and SEO-ready content experiences.",
+    "Explore CodeTelemetryLabs service offerings for agency websites, client portals, software delivery, and SEO-ready content experiences.",
 }
 
 const deliverables = [
@@ -15,7 +15,7 @@ const deliverables = [
   "Information architecture",
   "Responsive implementation",
   "Database and API setup",
-  "Admin-ready content model",
+  "Operations-ready content model",
   "Launch support and handoff",
 ]
 

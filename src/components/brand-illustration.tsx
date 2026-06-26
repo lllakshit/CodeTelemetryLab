@@ -14,7 +14,7 @@ const variantLabels = {
   },
   blog: {
     eyebrow: "Editorial system",
-    caption: "Content architecture designed for SEO, admin updates, and product credibility.",
+    caption: "Content architecture designed for SEO, publishing workflows, and product credibility.",
   },
   portal: {
     eyebrow: "Portal surface",
@@ -26,7 +26,7 @@ const variantLabels = {
   },
   platform: {
     eyebrow: "Platform foundation",
-    caption: "Multi-tenant structure, admin controls, and delivery discipline built into the surface.",
+    caption: "Multi-tenant structure, operational controls, and delivery discipline built into the surface.",
   },
 } as const
 

@@ -9,7 +9,7 @@ import { listBlogPosts } from "@/lib/cms"
 export const metadata: Metadata = {
   title: "Blog",
   description:
-    "Read CodeTelemetryLabs articles on engineering systems, agency delivery, admin workflows, SEO structure, and product thinking.",
+    "Read CodeTelemetryLabs articles on engineering systems, agency delivery, operations workflows, SEO structure, and product thinking.",
 }
 
 export default async function BlogPage() {
@@ -23,7 +23,7 @@ export default async function BlogPage() {
         <SectionHeading
           eyebrow="Blog"
           title="Writing that supports the engineering brand with real operating substance."
-          description="The editorial system is designed for SEO, admin updates, and product credibility, not filler content."
+          description="The editorial system is designed for SEO, publishing operations, and product credibility, not filler content."
           level={1}
         />
         <BrandIllustration variant="blog" />

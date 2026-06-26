@@ -3,8 +3,8 @@
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 import { z } from "zod"
-import { deleteBlogPost, deleteMediaAsset, deleteProject, getBlogPostById, getHomeContent, getProjectById, saveBlogPost, saveHomeContent, saveProject } from "@/lib/cms"
-import type { HomeContent } from "@/lib/store"
+import { deleteBlogPost, deleteLead, deleteMediaAsset, deleteProject, getBlogPostById, getHomeContent, getProjectById, saveBlogPost, saveHomeContent, saveProject, updateLead } from "@/lib/cms"
+import { leadStatuses, type HomeContent } from "@/lib/store"
 
 function csvList(value: FormDataEntryValue | null) {
   return String(value ?? "")
@@ -246,4 +246,42 @@ export async function deleteMediaAction(formData: FormData) {
   revalidatePath("/admin/media")
   revalidatePath("/admin/dashboard")
   redirect("/admin/media")
+}
+
+const leadUpdateSchema = z.object({
+  id: z.string().min(1),
+  status: z.enum(leadStatuses),
+  notes: z.string().optional().default(""),
+  assignedTeamMember: z.string().optional().default(""),
+})
+
+export async function updateLeadAction(formData: FormData) {
+  const parsed = leadUpdateSchema.safeParse({
+    id: formData.get("id"),
+    status: formData.get("status"),
+    notes: formData.get("notes"),
+    assignedTeamMember: formData.get("assignedTeamMember"),
+  })
+
+  if (!parsed.success) {
+    throw new Error("Invalid lead update")
+  }
+
+  await updateLead(parsed.data.id, {
+    status: parsed.data.status,
+    notes: parsed.data.notes,
+    assignedTeamMember: parsed.data.assignedTeamMember,
+  })
+  revalidatePath("/admin/leads")
+  revalidatePath("/admin/dashboard")
+  redirect("/admin/leads")
+}
+
+export async function deleteLeadAction(formData: FormData) {
+  const id = String(formData.get("id") ?? "")
+  if (!id) throw new Error("Missing lead id")
+  await deleteLead(id)
+  revalidatePath("/admin/leads")
+  revalidatePath("/admin/dashboard")
+  redirect("/admin/leads")
 }

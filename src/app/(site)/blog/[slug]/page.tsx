@@ -11,6 +11,7 @@ import { BrandIllustration } from "@/components/brand-illustration"
 import { SectionHeading } from "@/components/section-heading"
 import { getBlogPostBySlug, listBlogPosts } from "@/lib/cms"
 import { mdxComponents } from "@/components/mdx-components"
+import { absoluteUrl, organizationJsonLd } from "@/lib/seo"
 
 function stripLeadingHeading(content: string, title: string) {
   const normalized = content.trimStart()
@@ -42,6 +43,24 @@ export async function generateMetadata({
   return {
     title: post.seoTitle || post.title,
     description: post.seoDescription || post.excerpt,
+    alternates: {
+      canonical: `/blog/${post.slug}`,
+    },
+    openGraph: {
+      title: post.seoTitle || post.title,
+      description: post.seoDescription || post.excerpt,
+      url: absoluteUrl(`/blog/${post.slug}`),
+      type: "article",
+      publishedTime: post.publishedAt ?? undefined,
+      modifiedTime: post.updatedAt,
+      images: post.featuredImage ? [post.featuredImage] : ["/og-image.svg"],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.seoTitle || post.title,
+      description: post.seoDescription || post.excerpt,
+      images: post.featuredImage ? [post.featuredImage] : ["/og-image.svg"],
+    },
   }
 }
 
@@ -61,6 +80,22 @@ export default async function BlogDetailPage({
   if (!post) notFound()
 
   const readTime = estimateReadTime(post.content)
+  const articleJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: post.title,
+    description: post.seoDescription || post.excerpt,
+    image: post.featuredImage ? absoluteUrl(post.featuredImage) : absoluteUrl("/og-image.svg"),
+    datePublished: post.publishedAt,
+    dateModified: post.updatedAt,
+    author: {
+      "@type": "Organization",
+      name: organizationJsonLd.name,
+      url: organizationJsonLd.url,
+    },
+    publisher: organizationJsonLd,
+    mainEntityOfPage: absoluteUrl(`/blog/${post.slug}`),
+  }
 
   const { content } = await compileMDX({
     source: stripLeadingHeading(post.content, post.title),
@@ -75,6 +110,11 @@ export default async function BlogDetailPage({
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:px-8">
+      <script
+        type="application/ld+json"
+        suppressHydrationWarning
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+      />
       <Link href="/blog" className="inline-flex items-center gap-2 text-sm font-medium text-slate-700 transition hover:text-slate-950">
         <ArrowLeft className="h-4 w-4" />
         Back to writing

@@ -7,7 +7,7 @@ import { CONTACT_DISPLAY_EMAIL } from "@/lib/contact"
 export const metadata: Metadata = {
   title: "Contact",
   description:
-    "Send CodeTelemetryLabs a project brief to discuss agency websites, admin systems, content workflows, or product engineering work.",
+    "Send CodeTelemetryLabs a project brief to discuss agency websites, portals, content workflows, or product engineering work.",
 }
 
 const responseNotes = [
@@ -19,10 +19,11 @@ const responseNotes = [
 export default async function ContactPage({
   searchParams,
 }: {
-  searchParams?: Promise<{ sent?: string }>
+  searchParams?: Promise<{ error?: string; sent?: string }>
 }) {
   const resolvedSearchParams = await searchParams
   const sent = resolvedSearchParams?.sent === "1"
+  const invalidSubmission = resolvedSearchParams?.error === "invalid"
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
@@ -42,6 +43,12 @@ export default async function ContactPage({
             <CheckCircle2 className="h-4 w-4" />
             Your inquiry was received. We will review it and reply in your inbox.
           </div>
+        </div>
+      ) : null}
+
+      {invalidSubmission ? (
+        <div className="mt-8 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          Please add a valid email, your name, and a short message so we can route the inquiry correctly.
         </div>
       ) : null}
 
@@ -88,6 +95,11 @@ export default async function ContactPage({
           method="post"
           className="rounded-[2rem] border border-slate-200 bg-white p-6 lg:p-8"
         >
+          <input type="hidden" name="source" value="contact-page" />
+          <label className="hidden">
+            Leave this field blank
+            <input name="fax" tabIndex={-1} autoComplete="off" />
+          </label>
           <div className="grid gap-5 sm:grid-cols-2">
             <label className="grid gap-2 text-sm">
               <span className="text-slate-700">Name</span>
@@ -117,7 +129,23 @@ export default async function ContactPage({
               />
             </label>
             <label className="grid gap-2 text-sm">
-              <span className="text-slate-700">Project type</span>
+              <span className="text-slate-700">Phone</span>
+              <input
+                name="phone"
+                className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-blue-400/40 focus:bg-white"
+                placeholder="Best number for follow-up"
+              />
+            </label>
+            <label className="grid gap-2 text-sm">
+              <span className="text-slate-700">Country</span>
+              <input
+                name="country"
+                className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-blue-400/40 focus:bg-white"
+                placeholder="United States, Canada, or your region"
+              />
+            </label>
+            <label className="grid gap-2 text-sm">
+              <span className="text-slate-700">Service interested in</span>
               <select
                 name="projectType"
                 required
@@ -151,6 +179,51 @@ export default async function ContactPage({
                 <option>$25k - $50k</option>
                 <option>$50k+</option>
               </select>
+            </label>
+            <label className="grid gap-2 text-sm">
+              <span className="text-slate-700">Timeline</span>
+              <select
+                name="timeline"
+                className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-950 outline-none transition focus:border-blue-400/40 focus:bg-white"
+                defaultValue=""
+              >
+                <option value="" disabled>
+                  Select a launch window
+                </option>
+                <option>As soon as possible</option>
+                <option>2-4 weeks</option>
+                <option>1-2 months</option>
+                <option>3+ months</option>
+                <option>Exploring options</option>
+              </select>
+            </label>
+            <label className="grid gap-2 text-sm">
+              <span className="text-slate-700">Preferred contact</span>
+              <select
+                name="preferredContactMethod"
+                className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-950 outline-none transition focus:border-blue-400/40 focus:bg-white"
+                defaultValue="Email"
+              >
+                <option>Email</option>
+                <option>Phone</option>
+                <option>Video call</option>
+              </select>
+            </label>
+            <label className="grid gap-2 text-sm">
+              <span className="text-slate-700">Website URL</span>
+              <input
+                name="websiteUrl"
+                className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-blue-400/40 focus:bg-white"
+                placeholder="https://company.com"
+              />
+            </label>
+            <label className="grid gap-2 text-sm sm:col-span-2">
+              <span className="text-slate-700">Subject</span>
+              <input
+                name="subject"
+                className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-blue-400/40 focus:bg-white"
+                placeholder="Example: SaaS MVP rebuild with lead workflow"
+              />
             </label>
             <label className="grid gap-2 text-sm sm:col-span-2">
               <span className="text-slate-700">Message</span>
