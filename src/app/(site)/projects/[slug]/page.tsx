@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import Image from "next/image"
 import { notFound } from "next/navigation"
 import { ArrowLeft, ArrowRight } from "lucide-react"
 import Link from "next/link"
@@ -21,6 +22,7 @@ export async function generateMetadata({
   const { slug } = await params
   const project = await getProjectBySlug(slug)
   if (!project) return {}
+  const leadScreenshot = project.screenshots[0] || "/og-image.svg"
 
   return {
     title: project.title,
@@ -33,13 +35,13 @@ export async function generateMetadata({
       description: project.problem,
       url: absoluteUrl(`/projects/${project.slug}`),
       type: "article",
-      images: ["/og-image.svg"],
+      images: [leadScreenshot],
     },
     twitter: {
       card: "summary_large_image",
       title: project.title,
       description: project.problem,
-      images: ["/og-image.svg"],
+      images: [leadScreenshot],
     },
   }
 }
@@ -60,6 +62,7 @@ export default async function ProjectDetailPage({
   if (!project) notFound()
 
   const variant = getVariant(project.slug)
+  const leadScreenshot = project.screenshots[0] ?? null
   const projectJsonLd = {
     "@context": "https://schema.org",
     "@type": "CreativeWork",
@@ -94,11 +97,42 @@ export default async function ProjectDetailPage({
             ))}
           </div>
         </div>
-        <BrandIllustration variant={variant} />
+        {leadScreenshot ? (
+          <div className="overflow-hidden rounded-[2rem] border border-slate-200 bg-slate-50 shadow-[0_14px_40px_rgba(15,23,42,0.06)]">
+            <Image
+              src={leadScreenshot}
+              alt={project.title}
+              width={1400}
+              height={840}
+              className="h-full w-full object-cover"
+            />
+          </div>
+        ) : (
+          <BrandIllustration variant={variant} />
+        )}
       </div>
 
       <div className="mt-12 grid gap-8 lg:grid-cols-[0.64fr_0.36fr]">
         <div className="space-y-6">
+          {project.screenshots.length ? (
+            <section className="rounded-[2rem] border border-slate-200 bg-white p-6 lg:p-8">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-blue-700">Screenshots</p>
+              <div className="mt-5 grid gap-4 md:grid-cols-2">
+                {project.screenshots.map((screenshot, index) => (
+                  <div key={`${screenshot}-${index}`} className="overflow-hidden rounded-[1.5rem] border border-slate-200 bg-slate-50">
+                    <Image
+                      src={screenshot}
+                      alt={`${project.title} screenshot ${index + 1}`}
+                      width={1200}
+                      height={720}
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                ))}
+              </div>
+            </section>
+          ) : null}
+
           <section className="rounded-[2rem] border border-slate-200 bg-white p-6 lg:p-8">
             <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-blue-700">Solution</p>
             <p className="mt-4 text-sm leading-8 text-slate-700">{project.solution}</p>

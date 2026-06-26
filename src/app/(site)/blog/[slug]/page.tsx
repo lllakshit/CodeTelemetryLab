@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import Image from "next/image"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import { compileMDX } from "next-mdx-remote/rsc"
@@ -144,6 +145,17 @@ export default async function BlogDetailPage({
 
       <div className="mt-12 grid gap-10 lg:grid-cols-[0.72fr_0.28fr]">
         <article className="rounded-[2rem] border border-slate-200 bg-white p-6 lg:p-8">
+          {post.featuredImage ? (
+            <div className="mb-8 overflow-hidden rounded-[1.75rem] border border-slate-200 bg-slate-50">
+              <Image
+                src={post.featuredImage}
+                alt={post.title}
+                width={1400}
+                height={840}
+                className="h-full w-full object-cover"
+              />
+            </div>
+          ) : null}
           <div className="max-w-none">{content}</div>
         </article>
 

@@ -1,13 +1,17 @@
 import { randomUUID } from "node:crypto"
-import { redirect } from "next/navigation"
+import { mkdir, writeFile } from "node:fs/promises"
+import path from "node:path"
+import { NextResponse } from "next/server"
 import { z } from "zod"
 import { addMediaAsset } from "@/lib/cms"
-import { createSupabaseAdminClient, SUPABASE_MEDIA_BUCKET } from "@/lib/supabase"
+import { createSupabaseAdminClient, getSupabaseConfig, SUPABASE_MEDIA_BUCKET } from "@/lib/supabase"
 
 const uploadSchema = z.object({
   name: z.string().min(2),
   alt: z.string().min(2),
 })
+
+const publicUploadsDir = path.join(process.cwd(), "public", "uploads")
 
 function extensionForMime(mimeType: string) {
   switch (mimeType) {
@@ -23,6 +27,23 @@ function extensionForMime(mimeType: string) {
     default:
       return "bin"
   }
+}
+
+function wantsJson(request: Request) {
+  const url = new URL(request.url)
+  return url.searchParams.get("return") === "json" || request.headers.get("accept")?.includes("application/json")
+}
+
+function redirectToMedia(request: Request, search: string) {
+  return NextResponse.redirect(new URL(`/admin/media${search}`, request.url))
+}
+
+function mediaError(request: Request, code: string, message: string, status = 400) {
+  if (wantsJson(request)) {
+    return NextResponse.json({ error: message, code }, { status })
+  }
+
+  return redirectToMedia(request, `?error=${code}`)
 }
 
 async function ensureMediaBucket() {
@@ -50,18 +71,7 @@ async function ensureMediaBucket() {
   return supabase
 }
 
-export async function POST(request: Request) {
-  const formData = await request.formData()
-  const parsed = uploadSchema.safeParse({
-    name: formData.get("name"),
-    alt: formData.get("alt"),
-  })
-
-  const file = formData.get("file")
-  if (!parsed.success || !(file instanceof File) || file.size === 0) {
-    return Response.json({ error: "Upload requires a file, name, and alt text." }, { status: 400 })
-  }
-
+async function uploadToSupabase(file: File) {
   const supabase = await ensureMediaBucket()
   const ext = extensionForMime(file.type)
   const storagePath = `uploads/${randomUUID()}.${ext}`
@@ -75,15 +85,74 @@ export async function POST(request: Request) {
 
   const { data: publicUrl } = supabase.storage.from(SUPABASE_MEDIA_BUCKET).getPublicUrl(storagePath)
 
-  await addMediaAsset({
-    name: parsed.data.name,
-    alt: parsed.data.alt,
+  return {
     url: publicUrl.publicUrl,
     storageBucket: SUPABASE_MEDIA_BUCKET,
     storagePath,
-    mimeType: file.type,
-    size: file.size,
-  })
+  }
+}
 
-  redirect("/admin/media?uploaded=1")
+async function uploadToLocal(file: File) {
+  const ext = extensionForMime(file.type)
+  const filename = `${randomUUID()}.${ext}`
+  const destination = path.join(publicUploadsDir, filename)
+  const bytes = Buffer.from(await file.arrayBuffer())
+
+  await mkdir(publicUploadsDir, { recursive: true })
+  await writeFile(destination, bytes)
+
+  return {
+    url: `/uploads/${filename}`,
+    storageBucket: null,
+    storagePath: `uploads/${filename}`,
+  }
+}
+
+export async function POST(request: Request) {
+  try {
+    const formData = await request.formData()
+    const parsed = uploadSchema.safeParse({
+      name: formData.get("name"),
+      alt: formData.get("alt"),
+    })
+
+    const file = formData.get("file")
+    if (!parsed.success || !(file instanceof File) || file.size === 0) {
+      return mediaError(request, "missing", "Choose an image, asset name, and alt text before uploading.")
+    }
+
+    if (!file.type.startsWith("image/")) {
+      return mediaError(request, "type", "Only image uploads are supported here.")
+    }
+
+    const supabaseConfig = getSupabaseConfig()
+    const uploadResult = supabaseConfig.isConfigured
+      ? await uploadToSupabase(file)
+      : process.env.VERCEL
+        ? null
+        : await uploadToLocal(file)
+
+    if (!uploadResult) {
+      return mediaError(request, "storage", "Vercel needs Supabase storage configured before uploads can persist in production.")
+    }
+
+    const asset = await addMediaAsset({
+      name: parsed.data.name,
+      alt: parsed.data.alt,
+      url: uploadResult.url,
+      storageBucket: uploadResult.storageBucket,
+      storagePath: uploadResult.storagePath,
+      mimeType: file.type,
+      size: file.size,
+    })
+
+    if (wantsJson(request)) {
+      return NextResponse.json({ asset }, { status: 201 })
+    }
+
+    return redirectToMedia(request, "?uploaded=1")
+  } catch (error) {
+    console.error("Media upload failed", error)
+    return mediaError(request, "upload", "The upload failed before the asset could be saved.", 500)
+  }
 }

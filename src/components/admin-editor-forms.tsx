@@ -1,4 +1,5 @@
 import { deleteBlogAction, deleteProjectAction, saveBlogAction, saveHomepageAction, saveProjectAction } from "@/app/(admin)/admin/actions"
+import { BlogMediaEditorFields } from "@/components/blog-media-editor-fields"
 import {
   adminAccentButton,
   adminCheckboxCard,
@@ -10,7 +11,9 @@ import {
   adminSurfaceSoft,
   adminTextareaClassName,
 } from "@/lib/admin-ui"
-import type { BlogPost, HomeContent, Project } from "@/lib/store"
+import { listMedia } from "@/lib/cms"
+import type { BlogPost, HomeContent, MediaAsset, Project } from "@/lib/store"
+import { filenameFromUrl } from "@/lib/utils"
 
 function Field({
   label,
@@ -54,7 +57,62 @@ function lineValue<T>(items: T[], mapper: (item: T) => string) {
   return items.map(mapper).join("\n")
 }
 
-export function BlogEditorForm({ post }: { post?: BlogPost | null }) {
+function MediaReferencePanel({
+  title,
+  description,
+  assets,
+}: {
+  title: string
+  description: string
+  assets: MediaAsset[]
+}) {
+  if (!assets.length) {
+    return (
+      <FormSection
+        title={title}
+        description={description}
+      >
+        <p className="text-sm leading-6 text-slate-500">
+          Upload images in the media library first. Their URLs and markdown snippets will appear here for quick reuse.
+        </p>
+      </FormSection>
+    )
+  }
+
+  return (
+    <FormSection title={title} description={description}>
+      <div className="grid gap-4 lg:grid-cols-2">
+        {assets.slice(0, 6).map((asset) => (
+          <article key={asset.id} className="rounded-[1.5rem] border border-[rgba(10,19,23,0.08)] bg-white p-4">
+            <div className="aspect-[16/10] overflow-hidden rounded-[1rem] border border-[rgba(10,19,23,0.08)] bg-slate-50">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={asset.url} alt={asset.alt} className="h-full w-full object-cover" />
+            </div>
+            <div className="mt-4 space-y-3">
+              <div>
+                <p className="text-sm font-semibold text-slate-950">{asset.name}</p>
+                <p className="mt-1 text-sm text-slate-600">{asset.alt}</p>
+                <p className="mt-1 text-xs text-slate-500">{filenameFromUrl(asset.url)}</p>
+              </div>
+              <div className="rounded-[1rem] bg-slate-50 p-3">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-500">Direct URL</p>
+                <p className="mt-2 break-all text-xs text-slate-700">{asset.url}</p>
+              </div>
+              <div className="rounded-[1rem] bg-slate-50 p-3">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-500">Markdown</p>
+                <p className="mt-2 break-all text-xs text-slate-700">{`![${asset.alt}](${asset.url})`}</p>
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+    </FormSection>
+  )
+}
+
+export async function BlogEditorForm({ post }: { post?: BlogPost | null }) {
+  const media = await listMedia()
+
   return (
     <form action={saveBlogAction} className={`${adminSurface} space-y-6 p-4 sm:p-6`}>
       <input type="hidden" name="id" defaultValue={post?.id ?? ""} />
@@ -74,9 +132,6 @@ export function BlogEditorForm({ post }: { post?: BlogPost | null }) {
           </Field>
           <Field label="Tags" hint="Comma separated">
             <input name="tags" defaultValue={post?.tags.join(", ") ?? ""} className={adminInputClassName()} />
-          </Field>
-          <Field label="Featured image URL">
-            <input name="featuredImage" defaultValue={post?.featuredImage ?? ""} className={adminInputClassName()} />
           </Field>
           <Field label="Publish">
             <label className={adminCheckboxCard}>
@@ -108,14 +163,11 @@ export function BlogEditorForm({ post }: { post?: BlogPost | null }) {
           </Field>
         </div>
       </FormSection>
-      <FormSection
-        title="Article body"
-        description="Write the long-form content here. The content field is ready for markdown and MDX-style formatting."
-      >
-        <Field label="Content" hint="MDX-ready content body">
-          <textarea name="content" defaultValue={post?.content ?? ""} required rows={16} className={adminTextareaClassName("min-h-[24rem]")} />
-        </Field>
-      </FormSection>
+      <BlogMediaEditorFields
+        assets={media}
+        initialFeaturedImage={post?.featuredImage ?? ""}
+        initialContent={post?.content ?? ""}
+      />
       <div className="flex flex-col gap-4 border-t border-[rgba(10,19,23,0.08)] px-2 pt-2 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm leading-6 text-slate-500">The blog body supports MDX-style formatting and markdown elements.</p>
         <button type="submit" className={adminAccentButton}>
@@ -135,7 +187,9 @@ export function BlogDeleteButton({ id }: { id: string }) {
   )
 }
 
-export function ProjectEditorForm({ project }: { project?: Project | null }) {
+export async function ProjectEditorForm({ project }: { project?: Project | null }) {
+  const media = await listMedia()
+
   return (
     <form action={saveProjectAction} className={`${adminSurface} space-y-6 p-4 sm:p-6`}>
       <input type="hidden" name="id" defaultValue={project?.id ?? ""} />
@@ -156,7 +210,7 @@ export function ProjectEditorForm({ project }: { project?: Project | null }) {
           <Field label="Stack" hint="Comma separated">
             <input name="stack" defaultValue={project?.stack.join(", ") ?? ""} className={adminInputClassName()} />
           </Field>
-          <Field label="Screenshots" hint="Comma separated URLs">
+          <Field label="Screenshots" hint="Comma separated URLs from the media library or any public image source">
             <input name="screenshots" defaultValue={project?.screenshots.join(", ") ?? ""} className={adminInputClassName()} />
           </Field>
           <div className="grid gap-5 sm:grid-cols-2">
@@ -191,6 +245,11 @@ export function ProjectEditorForm({ project }: { project?: Project | null }) {
           </Field>
         </div>
       </FormSection>
+      <MediaReferencePanel
+        title="Media library reference"
+        description="Paste uploaded image URLs into the screenshot field to create a public project gallery."
+        assets={media}
+      />
       <div className="flex flex-col gap-4 border-t border-[rgba(10,19,23,0.08)] px-2 pt-2 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm leading-6 text-slate-500">
           Use commas for stack and screenshot values. The UI will render them as pills and cards.

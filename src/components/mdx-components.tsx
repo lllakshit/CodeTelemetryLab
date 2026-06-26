@@ -51,4 +51,12 @@ export const mdxComponents = {
   code: (props: ComponentPropsWithoutRef<"code">) => (
     <code {...props} className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-sm text-blue-700" />
   ),
+  img: (props: ComponentPropsWithoutRef<"img">) => (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      {...props}
+      alt={props.alt ?? ""}
+      className="mt-8 w-full rounded-[1.75rem] border border-slate-200 bg-slate-50 object-cover shadow-[0_14px_40px_rgba(15,23,42,0.06)]"
+    />
+  ),
 }

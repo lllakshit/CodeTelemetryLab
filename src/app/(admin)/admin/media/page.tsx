@@ -14,11 +14,23 @@ import { filenameFromUrl } from "@/lib/utils"
 export default async function AdminMediaPage({
   searchParams,
 }: {
-  searchParams?: Promise<{ uploaded?: string }>
+  searchParams?: Promise<{ uploaded?: string; error?: string }>
 }) {
   const media = await listMedia()
   const resolvedSearchParams = await searchParams
   const uploaded = resolvedSearchParams?.uploaded === "1"
+  const error = resolvedSearchParams?.error
+
+  const errorMessage =
+    error === "missing"
+      ? "Choose an image, asset name, and alt text before uploading."
+      : error === "type"
+        ? "Only image uploads are supported here."
+        : error === "storage"
+          ? "Vercel needs Supabase storage configured before uploads can persist in production."
+          : error === "upload"
+            ? "The upload failed before the asset could be saved. Check the Vercel logs and Supabase keys."
+            : null
 
   return (
     <div className="space-y-8">
@@ -31,6 +43,12 @@ export default async function AdminMediaPage({
       {uploaded ? (
         <div className="rounded-[1.5rem] border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
           Asset uploaded successfully.
+        </div>
+      ) : null}
+
+      {errorMessage ? (
+        <div className="rounded-[1.5rem] border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+          {errorMessage}
         </div>
       ) : null}
 
@@ -69,6 +87,11 @@ export default async function AdminMediaPage({
           <Upload className="h-4 w-4" />
           Upload asset
         </button>
+        <p className="mt-4 text-sm leading-6 text-slate-500">
+          Uploaded image URLs can be pasted into blog featured images, embedded in blog markdown with
+          <code className="mx-1 rounded bg-slate-100 px-1.5 py-0.5 text-xs text-slate-700">![Alt text](image-url)</code>
+          , or used in project screenshot fields.
+        </p>
       </form>
 
       <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
@@ -85,6 +108,16 @@ export default async function AdminMediaPage({
                 <p className="mt-2 text-xs text-slate-500">
                   {asset.storagePath ? asset.storagePath : filenameFromUrl(asset.url)}
                 </p>
+              </div>
+              <div className="space-y-2 rounded-[1.25rem] bg-slate-50 p-3">
+                <div>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-500">Direct URL</p>
+                  <p className="mt-2 break-all text-xs text-slate-700">{asset.url}</p>
+                </div>
+                <div>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-500">Markdown</p>
+                  <p className="mt-2 break-all text-xs text-slate-700">{`![${asset.alt}](${asset.url})`}</p>
+                </div>
               </div>
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <a

@@ -1,8 +1,8 @@
 import type { Metadata } from "next"
+import Image from "next/image"
 import Link from "next/link"
 import { ArrowRight, CheckCircle2, Code2, Database, Layers3, ShieldCheck, Sparkles } from "lucide-react"
 import { HeroPulse } from "@/components/hero-pulse"
-import { BlueprintHero } from "@/components/blueprint-hero"
 import { SectionHeading } from "@/components/section-heading"
 import { getHomeContent, listBlogPosts, listProjects } from "@/lib/cms"
 import { cn } from "@/lib/utils"
@@ -99,7 +99,19 @@ export default async function HomePage() {
           <div className="relative">
             <div className="absolute inset-x-10 top-8 h-44 rounded-full bg-blue-500/12 blur-3xl" />
             <div className="relative overflow-hidden rounded-[2rem] border border-slate-200/90 bg-white p-5 shadow-[0_14px_40px_rgba(15,23,42,0.06)]">
-              <BlueprintHero className="overflow-hidden rounded-[1.8rem] border border-slate-200 bg-slate-50 p-4" />
+              <div className="relative overflow-hidden rounded-[1.8rem] border border-slate-200 bg-[linear-gradient(180deg,#f7fbff,#edf5ff)] p-3">
+                <div className="absolute inset-x-10 top-0 h-16 rounded-full bg-blue-500/10 blur-3xl" />
+                <div className="relative overflow-hidden rounded-[1.45rem] border border-white/70 bg-white shadow-[0_18px_40px_rgba(59,130,246,0.12)]">
+                  <Image
+                    src="/uploads/dashboard-image.png"
+                    alt="CodeTelemetryLabs dashboard interface preview"
+                    width={1372}
+                    height={830}
+                    priority
+                    className="h-auto w-full object-cover"
+                  />
+                </div>
+              </div>
 
               <div className="mt-4 grid gap-4 border-t border-slate-200 pt-4 sm:grid-cols-2">
                 <div className="rounded-[1.75rem] bg-slate-50 p-5">

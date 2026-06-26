@@ -30,6 +30,11 @@ export default async function AdminBlogsPage() {
                   <span className={post.isPublished ? "rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700" : "rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700"}>
                     {post.isPublished ? "Published" : "Draft"}
                   </span>
+                  {post.source === "content" ? (
+                    <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
+                      Content file
+                    </span>
+                  ) : null}
                 </div>
                 <h3 className="mt-4 text-2xl font-semibold text-slate-950">{post.title}</h3>
                 <p className="mt-3 text-sm leading-7 text-slate-600">{post.excerpt}</p>
@@ -45,14 +50,23 @@ export default async function AdminBlogsPage() {
                 </p>
               </div>
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                <Link
-                  href={`/admin/blogs/${post.id}`}
-                  className={adminGhostButton}
-                >
-                  Edit
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-                <BlogDeleteButton id={post.id} />
+                {post.source === "content" ? (
+                  <Link href={`/blog/${post.slug}`} className={adminGhostButton}>
+                    View
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                ) : (
+                  <>
+                    <Link
+                      href={`/admin/blogs/${post.id}`}
+                      className={adminGhostButton}
+                    >
+                      Edit
+                      <ArrowRight className="h-4 w-4" />
+                    </Link>
+                    <BlogDeleteButton id={post.id} />
+                  </>
+                )}
               </div>
             </div>
           </article>

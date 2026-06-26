@@ -5,18 +5,27 @@ function firstDefined(...values: Array<string | undefined>) {
 }
 
 export function getSupabaseConfig() {
-  const url = firstDefined(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.API_URL)
+  const url = firstDefined(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.SUPABASE_URL,
+    process.env.API_URL,
+  )
   const publishableKey = firstDefined(
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    process.env.SUPABASE_ANON_KEY,
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
     process.env.my_publishable_key,
   )
-  const secretKey = firstDefined(process.env.my_secret_key, process.env.SUPABASE_SERVICE_ROLE_KEY)
+  const secretKey = firstDefined(
+    process.env.SUPABASE_SERVICE_ROLE_KEY,
+    process.env.my_secret_key,
+  )
 
   return {
     url,
     publishableKey,
     secretKey,
-    isConfigured: Boolean(url && publishableKey && secretKey),
+    isConfigured: Boolean(url && secretKey),
   }
 }
 

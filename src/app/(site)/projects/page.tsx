@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import Image from "next/image"
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import { SectionHeading } from "@/components/section-heading"
@@ -38,6 +39,17 @@ export default async function ProjectsPage() {
             </div>
 
             <div>
+              {project.screenshots[0] ? (
+                <div className="mb-5 overflow-hidden rounded-[1.5rem] border border-slate-200 bg-slate-50">
+                  <Image
+                    src={project.screenshots[0]}
+                    alt={project.title}
+                    width={1200}
+                    height={720}
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+              ) : null}
               <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">Problem</p>
               <p className="mt-3 text-sm leading-7 text-slate-600">{project.problem}</p>
               <div className="mt-5">

@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto"
 import { isAfter, parseISO } from "date-fns"
 import seed from "../../data/cms-store.json"
+import { getContentBlogPostBySlug, listContentBlogPosts } from "@/lib/content-blog"
 import { slugify } from "@/lib/utils"
 import {
   createSupabaseAdminClient,
@@ -184,6 +185,14 @@ function sortNewest<T extends { createdAt?: string; updatedAt?: string; publishe
     const bDate = new Date(b.publishedAt || b.updatedAt || b.createdAt || 0).getTime()
     return bDate - aDate
   })
+}
+
+function mergeBlogSources(cmsPosts: BlogPost[], contentPosts: BlogPost[]) {
+  const cmsSlugs = new Set(cmsPosts.map((post) => post.slug))
+  return [
+    ...cmsPosts.map((post) => ({ ...post, source: post.source ?? "cms" as const })),
+    ...contentPosts.filter((post) => !cmsSlugs.has(post.slug)),
+  ]
 }
 
 function isMissingSupabaseTableError(error: unknown) {
@@ -692,10 +701,12 @@ export async function saveHomeContent(input: HomeContent) {
 }
 
 export async function listBlogPosts(options?: { publishedOnly?: boolean }) {
+  const contentPosts = await listContentBlogPosts()
+
   if (!isSupabaseReady()) {
     return fallbackFromStore((store) => {
       const posts = options?.publishedOnly ? store.blogs.filter((post) => post.isPublished) : store.blogs
-      return sortNewest(posts)
+      return sortNewest(mergeBlogSources(posts, contentPosts))
     })
   }
 
@@ -706,12 +717,12 @@ export async function listBlogPosts(options?: { publishedOnly?: boolean }) {
 
     const posts = (data ?? []).map((row) => fromBlogRow(row as BlogRow))
     const filtered = options?.publishedOnly ? posts.filter((post) => post.isPublished) : posts
-    return sortNewest(filtered)
+    return sortNewest(mergeBlogSources(filtered, contentPosts))
   } catch (error) {
     if (isMissingSupabaseTableError(error)) {
       return fallbackFromStore((store) => {
         const posts = options?.publishedOnly ? store.blogs.filter((post) => post.isPublished) : store.blogs
-        return sortNewest(posts)
+        return sortNewest(mergeBlogSources(posts, contentPosts))
       })
     }
     throw error
@@ -720,23 +731,30 @@ export async function listBlogPosts(options?: { publishedOnly?: boolean }) {
 
 export async function getBlogPostBySlug(slug: string) {
   if (!isSupabaseReady()) {
-    return fallbackFromStore((store) => store.blogs.find((post) => post.slug === slug) ?? null)
+    const store = await readStore()
+    return store.blogs.find((post) => post.slug === slug) ?? await getContentBlogPostBySlug(slug)
   }
 
   try {
     await ensureSupabaseSeeded()
     const { data, error } = await supabaseClient.from(TABLES.blogs).select("*").eq("slug", slug).maybeSingle()
     if (error) throw error
-    return data ? fromBlogRow(data as BlogRow) : null
+    return data ? fromBlogRow(data as BlogRow) : await getContentBlogPostBySlug(slug)
   } catch (error) {
     if (isMissingSupabaseTableError(error)) {
-      return fallbackFromStore((store) => store.blogs.find((post) => post.slug === slug) ?? null)
+      const store = await readStore()
+      return store.blogs.find((post) => post.slug === slug) ?? await getContentBlogPostBySlug(slug)
     }
     throw error
   }
 }
 
 export async function getBlogPostById(id: string) {
+  if (id.startsWith("content:")) {
+    const slug = id.replace(/^content:/, "")
+    return getContentBlogPostBySlug(slug)
+  }
+
   if (!isSupabaseReady()) {
     return fallbackFromStore((store) => store.blogs.find((post) => post.id === id) ?? null)
   }

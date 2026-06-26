@@ -1,7 +1,7 @@
 export const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
   process.env.NEXTAUTH_URL?.replace(/\/$/, "") ||
-  "https://code-telemetry-lab.vercel.app"
+  "https://codetelemetrylab.me"
 
 export const organizationJsonLd = {
   "@context": "https://schema.org",

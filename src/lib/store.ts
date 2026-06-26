@@ -56,6 +56,11 @@ export type BlogPost = {
   publishedAt?: string | null
   createdAt: string
   updatedAt: string
+  source?: "cms" | "content"
+  readingTime?: string | null
+  primaryKeyword?: string | null
+  searchIntent?: string | null
+  targetAudience?: string | null
 }
 
 export type Project = {
