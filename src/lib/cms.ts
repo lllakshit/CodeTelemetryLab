@@ -37,6 +37,8 @@ const TABLES = {
   activity: "activity_logs",
 } as const
 
+type CmsTableName = (typeof TABLES)[keyof typeof TABLES]
+
 type HomepageRow = {
   key: string
   hero_eyebrow: string
@@ -215,6 +217,29 @@ function isSupabaseReady() {
   return Boolean(supabase)
 }
 
+function isVercelRuntime() {
+  return Boolean(process.env.VERCEL)
+}
+
+async function hasSupabaseTable(table: CmsTableName) {
+  if (!isSupabaseReady()) return false
+
+  const { error } = await supabaseClient.from(table).select("id", {
+    count: "exact",
+    head: true,
+  })
+
+  if (error) {
+    if (isMissingSupabaseTableError(error)) {
+      return false
+    }
+
+    throw error
+  }
+
+  return true
+}
+
 async function shouldUseStoreFallback() {
   if (!isSupabaseReady()) return true
 
@@ -227,6 +252,31 @@ async function shouldUseStoreFallback() {
     }
     throw error
   }
+}
+
+async function shouldUseStoreFallbackForWrite(table: CmsTableName) {
+  if (!isSupabaseReady()) {
+    if (isVercelRuntime()) {
+      throw new Error(
+        "Supabase server credentials are missing in this Vercel deployment. Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in Vercel.",
+      )
+    }
+
+    return true
+  }
+
+  const tableExists = await hasSupabaseTable(table)
+  if (tableExists) {
+    return false
+  }
+
+  if (isVercelRuntime()) {
+    throw new Error(
+      `Supabase table "${table}" is unavailable in this Vercel deployment. Apply supabase/schema.sql to the connected Supabase project before using admin write actions.`,
+    )
+  }
+
+  return true
 }
 
 function toHomeRow(homepage: HomeContent): HomepageRow {
@@ -676,7 +726,7 @@ export async function getHomeContent(): Promise<HomeContent> {
 }
 
 export async function saveHomeContent(input: HomeContent) {
-  if (await shouldUseStoreFallback()) {
+  if (await shouldUseStoreFallbackForWrite(TABLES.homepage)) {
     const store = await updateStore((draft) => {
       draft.homepage = input
       draft.activity.unshift({
@@ -786,7 +836,7 @@ export async function saveBlogPost(
     slug?: string
   },
 ) {
-  if (await shouldUseStoreFallback()) {
+  if (await shouldUseStoreFallbackForWrite(TABLES.blogs)) {
     const timestamp = nowIso()
     const id = input.id ?? randomUUID()
     const slug = slugify(input.slug || input.title)
@@ -838,7 +888,7 @@ export async function saveBlogPost(
 }
 
 export async function deleteBlogPost(id: string) {
-  if (await shouldUseStoreFallback()) {
+  if (await shouldUseStoreFallbackForWrite(TABLES.blogs)) {
     await updateStore((draft) => {
       const existing = draft.blogs.find((post) => post.id === id)
       draft.blogs = draft.blogs.filter((post) => post.id !== id)
@@ -942,7 +992,7 @@ export async function saveProject(
     slug?: string
   },
 ) {
-  if (await shouldUseStoreFallback()) {
+  if (await shouldUseStoreFallbackForWrite(TABLES.projects)) {
     const id = input.id ?? randomUUID()
     const timestamp = nowIso()
     const project: Project = {
@@ -992,7 +1042,7 @@ export async function saveProject(
 }
 
 export async function deleteProject(id: string) {
-  if (await shouldUseStoreFallback()) {
+  if (await shouldUseStoreFallbackForWrite(TABLES.projects)) {
     await updateStore((draft) => {
       const existing = draft.projects.find((project) => project.id === id)
       draft.projects = draft.projects.filter((project) => project.id !== id)
@@ -1038,7 +1088,7 @@ export async function listMessages() {
 }
 
 export async function createMessage(input: Omit<Message, "id" | "createdAt" | "status">) {
-  if (await shouldUseStoreFallback()) {
+  if (await shouldUseStoreFallbackForWrite(TABLES.messages)) {
     const timestamp = nowIso()
     const message: Message = {
       id: randomUUID(),
@@ -1114,7 +1164,7 @@ export async function createLead(
     message: string
   },
 ) {
-  if (await shouldUseStoreFallback()) {
+  if (await shouldUseStoreFallbackForWrite(TABLES.leads)) {
     const timestamp = nowIso()
     const lead: Lead = {
       id: input.id ?? randomUUID(),
@@ -1184,7 +1234,7 @@ export async function updateLead(
   id: string,
   input: Partial<Pick<Lead, "status" | "notes" | "assignedTeamMember">>,
 ) {
-  if (await shouldUseStoreFallback()) {
+  if (await shouldUseStoreFallbackForWrite(TABLES.leads)) {
     const timestamp = nowIso()
     let updated: Lead | null = null
 
@@ -1239,7 +1289,7 @@ export async function updateLead(
 }
 
 export async function deleteLead(id: string) {
-  if (await shouldUseStoreFallback()) {
+  if (await shouldUseStoreFallbackForWrite(TABLES.leads)) {
     await updateStore((draft) => {
       const existing = draft.leads.find((lead) => lead.id === id)
       draft.leads = draft.leads.filter((lead) => lead.id !== id)
@@ -1272,7 +1322,11 @@ export async function listMedia() {
   }
 
   try {
-    await ensureSupabaseSeeded()
+    const mediaTableExists = await hasSupabaseTable(TABLES.media)
+    if (!mediaTableExists) {
+      return fallbackFromStore((store) => sortNewest(store.media))
+    }
+
     const { data, error } = await supabaseClient.from(TABLES.media).select("*")
     if (error) throw error
     return sortNewest((data ?? []).map((row) => fromMediaRow(row as MediaRow)))
@@ -1287,7 +1341,7 @@ export async function listMedia() {
 export async function addMediaAsset(
   input: Omit<MediaAsset, "id" | "createdAt">,
 ) {
-  if (await shouldUseStoreFallback()) {
+  if (await shouldUseStoreFallbackForWrite(TABLES.media)) {
     const timestamp = nowIso()
     const asset: MediaAsset = {
       id: randomUUID(),
@@ -1319,7 +1373,7 @@ export async function addMediaAsset(
 }
 
 export async function deleteMediaAsset(id: string) {
-  if (await shouldUseStoreFallback()) {
+  if (await shouldUseStoreFallbackForWrite(TABLES.media)) {
     await updateStore((draft) => {
       const existing = draft.media.find((asset) => asset.id === id)
       draft.media = draft.media.filter((asset) => asset.id !== id)

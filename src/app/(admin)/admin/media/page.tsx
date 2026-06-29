@@ -26,6 +26,8 @@ export default async function AdminMediaPage({
       ? "Choose an image, asset name, and alt text before uploading."
       : error === "type"
         ? "Only image uploads are supported here."
+        : error === "cms-schema"
+          ? "Supabase media tables are unavailable for this deployment. Apply supabase/schema.sql to the connected Supabase project."
         : error === "storage" || error === "storage-config"
           ? "Configure NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in Vercel, then create a public media-assets bucket in Supabase."
           : error === "unauthorized"

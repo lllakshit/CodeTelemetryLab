@@ -210,6 +210,17 @@ export async function POST(request: Request) {
     return redirectToMedia(request, "?uploaded=1")
   } catch (error) {
     console.error("Media upload failed", error)
+
+    const detail = error instanceof Error ? error.message : ""
+    if (detail.includes("Apply supabase/schema.sql")) {
+      return mediaError(
+        request,
+        "cms-schema",
+        "Supabase media tables are unavailable for this deployment. Apply supabase/schema.sql to the connected Supabase project.",
+        500,
+      )
+    }
+
     return mediaError(
       request,
       "upload",
