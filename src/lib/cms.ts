@@ -8,6 +8,7 @@ import {
   getSupabaseConfig,
   SUPABASE_MEDIA_BUCKET,
 } from "@/lib/supabase"
+import { notifyLeadCreated } from "@/lib/mobile-push"
 import {
   readStore,
   updateStore,
@@ -1219,6 +1220,7 @@ export async function createLead(
       return draft
     })
 
+    await notifyLeadCreated(lead)
     return lead
   }
 
@@ -1227,7 +1229,9 @@ export async function createLead(
   if (error) throw error
 
   await addActivity("lead", "New lead received", `${row.full_name} - ${row.service_interested_in}`)
-  return fromLeadRow(row)
+  const lead = fromLeadRow(row)
+  await notifyLeadCreated(lead)
+  return lead
 }
 
 export async function updateLead(
