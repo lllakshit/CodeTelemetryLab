@@ -209,17 +209,45 @@ function isMissingSupabaseTableError(error: unknown) {
   )
 }
 
+function isRecoverableSupabaseReadError(error: unknown) {
+  if (isMissingSupabaseTableError(error)) return true
+  if (!error || typeof error !== "object") return false
+
+  const maybeError = error as {
+    cause?: unknown
+    code?: string
+    message?: string
+  }
+  const cause = maybeError.cause as { code?: string; message?: string } | undefined
+  const message = [maybeError.message, cause?.message].filter(Boolean).join(" ")
+  const hasEmptySupabaseError = maybeError.message === "" && (maybeError.code === "" || maybeError.code == null)
+
+  return (
+    hasEmptySupabaseError ||
+    maybeError.code === "ENOTFOUND" ||
+    cause?.code === "ENOTFOUND" ||
+    message.includes("ENOTFOUND") ||
+    message.includes("getaddrinfo") ||
+    message.includes("fetch failed")
+  )
+}
+
 async function fallbackFromStore<T>(selector: (store: CmsStore) => T) {
   const store = await readStore()
   return selector(store)
 }
 
 function isSupabaseReady() {
+  if (isNextProductionBuild()) return false
   return Boolean(supabase)
 }
 
 function isVercelRuntime() {
   return Boolean(process.env.VERCEL)
+}
+
+function isNextProductionBuild() {
+  return process.env.NEXT_PHASE === "phase-production-build"
 }
 
 async function hasSupabaseTable(table: CmsTableName) {
@@ -248,7 +276,7 @@ async function shouldUseStoreFallback() {
     await ensureSupabaseSeeded()
     return false
   } catch (error) {
-    if (isMissingSupabaseTableError(error)) {
+    if (isRecoverableSupabaseReadError(error)) {
       return true
     }
     throw error
@@ -719,7 +747,7 @@ export async function getHomeContent(): Promise<HomeContent> {
     if (!data) return (seed as CmsStore).homepage
     return fromHomeRow(data as HomepageRow)
   } catch (error) {
-    if (isMissingSupabaseTableError(error)) {
+    if (isRecoverableSupabaseReadError(error)) {
       return fallbackFromStore((store) => store.homepage)
     }
     throw error
@@ -770,7 +798,7 @@ export async function listBlogPosts(options?: { publishedOnly?: boolean }) {
     const filtered = options?.publishedOnly ? posts.filter((post) => post.isPublished) : posts
     return sortNewest(mergeBlogSources(filtered, contentPosts))
   } catch (error) {
-    if (isMissingSupabaseTableError(error)) {
+    if (isRecoverableSupabaseReadError(error)) {
       return fallbackFromStore((store) => {
         const posts = options?.publishedOnly ? store.blogs.filter((post) => post.isPublished) : store.blogs
         return sortNewest(mergeBlogSources(posts, contentPosts))
@@ -792,7 +820,7 @@ export async function getBlogPostBySlug(slug: string) {
     if (error) throw error
     return data ? fromBlogRow(data as BlogRow) : await getContentBlogPostBySlug(slug)
   } catch (error) {
-    if (isMissingSupabaseTableError(error)) {
+    if (isRecoverableSupabaseReadError(error)) {
       const store = await readStore()
       return store.blogs.find((post) => post.slug === slug) ?? await getContentBlogPostBySlug(slug)
     }
@@ -816,7 +844,7 @@ export async function getBlogPostById(id: string) {
     if (error) throw error
     return data ? fromBlogRow(data as BlogRow) : null
   } catch (error) {
-    if (isMissingSupabaseTableError(error)) {
+    if (isRecoverableSupabaseReadError(error)) {
       return fallbackFromStore((store) => store.blogs.find((post) => post.id === id) ?? null)
     }
     throw error
@@ -933,7 +961,7 @@ export async function listProjects(options?: { publishedOnly?: boolean }) {
     const filtered = options?.publishedOnly ? projects.filter((project) => project.isPublished) : projects
     return sortNewest(filtered)
   } catch (error) {
-    if (isMissingSupabaseTableError(error)) {
+    if (isRecoverableSupabaseReadError(error)) {
       return fallbackFromStore((store) => {
         const projects = options?.publishedOnly ? store.projects.filter((project) => project.isPublished) : store.projects
         return sortNewest(projects)
@@ -954,7 +982,7 @@ export async function getProjectBySlug(slug: string) {
     if (error) throw error
     return data ? fromProjectRow(data as ProjectRow) : null
   } catch (error) {
-    if (isMissingSupabaseTableError(error)) {
+    if (isRecoverableSupabaseReadError(error)) {
       return fallbackFromStore((store) => store.projects.find((project) => project.slug === slug) ?? null)
     }
     throw error
@@ -972,7 +1000,7 @@ export async function getProjectById(id: string) {
     if (error) throw error
     return data ? fromProjectRow(data as ProjectRow) : null
   } catch (error) {
-    if (isMissingSupabaseTableError(error)) {
+    if (isRecoverableSupabaseReadError(error)) {
       return fallbackFromStore((store) => store.projects.find((project) => project.id === id) ?? null)
     }
     throw error

@@ -23,3 +23,5 @@ mobile/.flutter-plugins-dependencies
 mobile/.packages
 mobile/android/local.properties
 mobile/build/
+.vercel
+.env*
