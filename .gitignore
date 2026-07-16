@@ -25,3 +25,5 @@ mobile/android/local.properties
 mobile/build/
 .vercel
 .env*
+.cover-work/
+supabase/.temp/

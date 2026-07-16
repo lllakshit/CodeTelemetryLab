@@ -14,6 +14,8 @@ import { getBlogPostBySlug, listBlogPosts } from "@/lib/cms"
 import { mdxComponents } from "@/components/mdx-components"
 import { absoluteUrl, organizationJsonLd } from "@/lib/seo"
 
+export const dynamic = "force-dynamic"
+
 function stripLeadingHeading(content: string, title: string) {
   const normalized = content.trimStart()
   const leadingHeading = `# ${title}`.trim()
@@ -146,15 +148,34 @@ export default async function BlogDetailPage({
       <div className="mt-12 grid gap-10 lg:grid-cols-[0.72fr_0.28fr]">
         <article className="rounded-[2rem] border border-slate-200 bg-white p-6 lg:p-8">
           {post.featuredImage ? (
-            <div className="mb-8 overflow-hidden rounded-[1.75rem] border border-slate-200 bg-slate-50">
-              <Image
-                src={post.featuredImage}
-                alt={post.title}
-                width={1400}
-                height={840}
-                className="h-full w-full object-cover"
-              />
-            </div>
+            <figure className="mb-8 overflow-hidden rounded-[1.75rem] border border-slate-200 bg-slate-50">
+              <Image src={post.featuredImage} alt={post.title} width={1400} height={840} className="h-full w-full object-cover" />
+              {post.featuredImageAttribution ? (
+                <figcaption className="border-t border-slate-200 bg-white px-4 py-3 text-xs leading-5 text-slate-500">
+                  Image:{" "}
+                  {post.featuredImageSourceUrl ? (
+                    <a href={post.featuredImageSourceUrl} className="font-medium text-slate-700 underline decoration-slate-300 underline-offset-2">
+                      {post.featuredImageAttribution}
+                    </a>
+                  ) : (
+                    <span>{post.featuredImageAttribution}</span>
+                  )}
+                  {post.featuredImageLicense ? (
+                    <>
+                      {" "}
+                      under{" "}
+                      {post.featuredImageLicenseUrl ? (
+                        <a href={post.featuredImageLicenseUrl} className="font-medium text-slate-700 underline decoration-slate-300 underline-offset-2">
+                          {post.featuredImageLicense}
+                        </a>
+                      ) : (
+                        <span>{post.featuredImageLicense}</span>
+                      )}
+                    </>
+                  ) : null}
+                </figcaption>
+              ) : null}
+            </figure>
           ) : null}
           <div className="max-w-none">{content}</div>
         </article>

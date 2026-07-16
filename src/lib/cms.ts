@@ -66,6 +66,10 @@ type BlogRow = {
   excerpt: string
   content: string
   featured_image: string | null
+  featured_image_attribution: string | null
+  featured_image_source_url: string | null
+  featured_image_license: string | null
+  featured_image_license_url: string | null
   category: string
   tags: unknown
   seo_title: string | null
@@ -178,6 +182,13 @@ function nullableString(value: unknown) {
   if (value == null) return null
   const text = String(value).trim()
   return text ? text : null
+}
+
+function isUuid(value: unknown) {
+  return (
+    typeof value === "string" &&
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value)
+  )
 }
 
 function sortNewest<T extends { createdAt?: string; updatedAt?: string; publishedAt?: string | null }>(
@@ -368,6 +379,10 @@ function toBlogRow(post: Partial<BlogPost> & {
   tags: string[]
   isPublished: boolean
   featuredImage?: string | null
+  featuredImageAttribution?: string | null
+  featuredImageSourceUrl?: string | null
+  featuredImageLicense?: string | null
+  featuredImageLicenseUrl?: string | null
   seoTitle?: string | null
   seoDescription?: string | null
   slug?: string
@@ -376,12 +391,16 @@ function toBlogRow(post: Partial<BlogPost> & {
   const publishedAt = post.isPublished ? post.publishedAt || timestamp : null
 
   return {
-    id: post.id ?? randomUUID(),
+    id: typeof post.id === "string" && isUuid(post.id) ? post.id : randomUUID(),
     slug: slugify(post.slug || post.title),
     title: post.title,
     excerpt: post.excerpt,
     content: post.content,
     featured_image: post.featuredImage ?? null,
+    featured_image_attribution: post.featuredImageAttribution ?? null,
+    featured_image_source_url: post.featuredImageSourceUrl ?? null,
+    featured_image_license: post.featuredImageLicense ?? null,
+    featured_image_license_url: post.featuredImageLicenseUrl ?? null,
     category: post.category,
     tags: post.tags,
     seo_title: post.seoTitle ?? null,
@@ -401,6 +420,10 @@ function fromBlogRow(row: BlogRow): BlogPost {
     excerpt: row.excerpt,
     content: row.content,
     featuredImage: row.featured_image,
+    featuredImageAttribution: row.featured_image_attribution,
+    featuredImageSourceUrl: row.featured_image_source_url,
+    featuredImageLicense: row.featured_image_license,
+    featuredImageLicenseUrl: row.featured_image_license_url,
     category: row.category,
     tags: asStringArray(row.tags),
     seoTitle: row.seo_title,
@@ -427,7 +450,7 @@ function toProjectRow(project: Partial<Project> & {
   const timestamp = nowIso()
 
   return {
-    id: project.id ?? randomUUID(),
+    id: typeof project.id === "string" && isUuid(project.id) ? project.id : randomUUID(),
     slug: slugify(project.slug || project.title),
     title: project.title,
     category: project.category,
@@ -664,12 +687,12 @@ async function ensureSupabaseSeeded() {
   if (homepage.error) throw homepage.error
 
   const blogs = await supabaseClient.from(TABLES.blogs).upsert(store.blogs.map(toBlogRow), {
-    onConflict: "id",
+    onConflict: "slug",
   })
   if (blogs.error) throw blogs.error
 
   const projects = await supabaseClient.from(TABLES.projects).upsert(store.projects.map(toProjectRow), {
-    onConflict: "id",
+    onConflict: "slug",
   })
   if (projects.error) throw projects.error
 
