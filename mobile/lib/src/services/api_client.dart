@@ -91,7 +91,7 @@ class ApiClient {
   }
 
   Map<String, String> _headers({bool includeJson = true}) {
-    final headers = <String, String>{};
+    final headers = <String, String>{'Accept': 'application/json'};
     if (includeJson) {
       headers['Content-Type'] = 'application/json';
     }
@@ -103,9 +103,32 @@ class ApiClient {
 
   Future<Map<String, dynamic>> _decodeResponse(http.Response response) async {
     final body = utf8.decode(response.bodyBytes);
-    final payload = body.isEmpty
-        ? <String, dynamic>{}
-        : jsonDecode(body) as Map<String, dynamic>;
+    final contentType = response.headers['content-type'] ?? '';
+    final isJson =
+        contentType.contains('application/json') ||
+        contentType.contains('+json');
+    final Map<String, dynamic> payload;
+
+    if (body.isEmpty) {
+      payload = <String, dynamic>{};
+    } else if (isJson) {
+      final decoded = jsonDecode(body);
+      if (decoded is Map<String, dynamic>) {
+        payload = decoded;
+      } else if (decoded is Map) {
+        payload = Map<String, dynamic>.from(decoded);
+      } else {
+        throw ApiException(
+          'Server returned JSON in an unexpected format.',
+          statusCode: response.statusCode,
+        );
+      }
+    } else {
+      throw ApiException(
+        _nonJsonResponseMessage(response, body),
+        statusCode: response.statusCode,
+      );
+    }
 
     if (response.statusCode >= 200 && response.statusCode < 300) {
       return payload;
@@ -116,6 +139,27 @@ class ApiClient {
           'Request failed with status ${response.statusCode}',
       statusCode: response.statusCode,
     );
+  }
+
+  String _nonJsonResponseMessage(http.Response response, String body) {
+    final location = response.headers['location'];
+    final compactBody = body.trim().replaceAll(RegExp(r'\s+'), ' ');
+    final looksLikeRedirect =
+        response.statusCode >= 300 && response.statusCode < 400 ||
+        compactBody.toLowerCase().startsWith('redirecting');
+
+    if (looksLikeRedirect) {
+      final destination = location == null ? '' : ' to $location';
+      return 'Server redirected$destination. Use the final HTTPS site URL as the Server URL.';
+    }
+
+    final preview = compactBody.length > 120
+        ? '${compactBody.substring(0, 120)}...'
+        : compactBody;
+
+    return preview.isEmpty
+        ? 'Server did not return JSON. Check that the Server URL points to this app.'
+        : 'Server did not return JSON. Check the Server URL. Response: $preview';
   }
 
   Future<LoginResponse> login({

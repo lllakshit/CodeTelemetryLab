@@ -68,6 +68,7 @@ ThemeData _buildTheme() {
 
   return ThemeData(
     useMaterial3: true,
+    fontFamily: 'Roboto',
     colorScheme: colorScheme,
     scaffoldBackgroundColor: const Color(0xFFF3F6FB),
     appBarTheme: const AppBarTheme(
@@ -132,7 +133,7 @@ class SessionController extends ChangeNotifier {
   bool busy = false;
   String? errorMessage;
   AppSession? session;
-  String serverBaseUrl = 'http://10.0.2.2:3000';
+  String serverBaseUrl = 'https://www.codetelemetrylab.me';
 
   Future<void> initialize() async {
     serverBaseUrl = await _store.readBaseUrl() ?? serverBaseUrl;
@@ -210,26 +211,49 @@ class SessionController extends ChangeNotifier {
   }
 
   static String normalizeBaseUrl(String value) {
-    final raw = value.trim();
+    final raw = value.trim().replaceFirst(RegExp(r'/+$'), '');
     if (raw.isEmpty) {
       throw const FormatException('Please enter the server URL.');
     }
 
-    final withScheme = raw.contains('://') ? raw : 'http://$raw';
+    final hasScheme = RegExp(r'^[A-Za-z][A-Za-z0-9+.-]*://').hasMatch(raw);
+    final withScheme = hasScheme ? raw : '${_defaultSchemeFor(raw)}://$raw';
     final uri = Uri.parse(withScheme);
+    if (uri.host.trim().isEmpty) {
+      throw const FormatException('Please enter a valid server URL.');
+    }
+
     final host = switch (uri.host) {
       'localhost' || '127.0.0.1' => '10.0.2.2',
       _ => uri.host,
     };
+    final scheme = _isLocalHost(host) ? uri.scheme : 'https';
 
     return uri
         .replace(
-          scheme: uri.scheme.isEmpty ? 'http' : uri.scheme,
+          scheme: scheme,
           host: host,
-          path: uri.path == '/' ? '' : uri.path,
+          path: '',
+          query: null,
+          fragment: null,
         )
         .toString()
         .replaceFirst(RegExp(r'/$'), '');
+  }
+
+  static String _defaultSchemeFor(String raw) {
+    final uri = Uri.parse('http://$raw');
+    return _isLocalHost(uri.host) ? 'http' : 'https';
+  }
+
+  static bool _isLocalHost(String host) {
+    final normalized = host.trim().toLowerCase();
+    return normalized == 'localhost' ||
+        normalized == '127.0.0.1' ||
+        normalized == '10.0.2.2' ||
+        normalized.startsWith('10.') ||
+        normalized.startsWith('192.168.') ||
+        RegExp(r'^172\.(1[6-9]|2[0-9]|3[0-1])\.').hasMatch(normalized);
   }
 }
 
@@ -329,7 +353,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           keyboardType: TextInputType.url,
                           decoration: const InputDecoration(
                             labelText: 'Server URL',
-                            hintText: 'http://10.0.2.2:3000',
+                            hintText: 'https://www.codetelemetrylab.me',
                           ),
                           validator: (value) =>
                               value == null || value.trim().isEmpty
@@ -369,7 +393,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             border: Border.all(color: const Color(0xFFE1E8F0)),
                           ),
                           child: const Text(
-                            'Tip: on the Android emulator, localhost is mapped to 10.0.2.2.',
+                            'Use the live HTTPS site for the APK. On the Android emulator, local Next.js is http://10.0.2.2:3000.',
                             style: TextStyle(
                               color: Color(0xFF536273),
                               height: 1.5,
