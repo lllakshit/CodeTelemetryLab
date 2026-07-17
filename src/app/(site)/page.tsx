@@ -373,6 +373,12 @@ export default async function HomePage() {
                 </Link>
               </article>
             ))}
+            <div className="pt-5">
+              <Link href="/blog" className="inline-flex items-center gap-2 text-sm font-semibold text-slate-950">
+                View all writing
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
           </div>
         </div>
       </section>
