@@ -10,9 +10,10 @@ import { listBlogPosts } from "@/lib/cms"
 const POSTS_PER_PAGE = 12
 
 export const metadata: Metadata = {
-  title: "Blog",
+  title: "Blog | AI, Software, SaaS & Automation Insights",
   description:
-    "Read CodeTelemetryLabs articles on engineering systems, agency delivery, operations workflows, SEO structure, and product thinking.",
+    "Buyer-intent articles on AI automation, SaaS, MVP development, React/Next.js, SEO, and hiring engineering partners—written to support qualified inquiries.",
+  alternates: { canonical: "/blog" },
 }
 
 function postMatchesSearch(

@@ -17,37 +17,65 @@ const ibmPlexMono = IBM_Plex_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "CodeTelemetryLabs",
+    default: "AI & Custom Software Development Agency | CodeTelemetryLabs",
     template: "%s | CodeTelemetryLabs",
   },
   description:
-    "Premium software engineering and automation for startups, agencies, and product teams.",
+    "CodeTelemetryLabs is an international software agency for AI development, automation, SaaS, MVP, and custom software. Serving US, Canada, UK, UAE, Australia, and India metros.",
   applicationName: "CodeTelemetryLabs",
+  keywords: [
+    "AI development company",
+    "AI automation agency",
+    "custom software development",
+    "SaaS development",
+    "MVP development",
+    "Next.js development",
+    "React development company",
+  ],
   alternates: {
     canonical: "/",
   },
   icons: {
     icon: [
       { url: "/favicon.ico" },
-      { url: "/icon.png", type: "image/png" },
+      { url: "/brand/ct-labs-mark.png", type: "image/png" },
     ],
-    apple: "/apple-icon.png",
+    apple: "/brand/ct-labs-mark.png",
   },
   openGraph: {
-    title: "CodeTelemetryLabs",
+    title: "AI & Custom Software Development Agency | CodeTelemetryLabs",
     description:
-      "Premium software engineering and automation for startups, agencies, and product teams.",
+      "AI development, automation, SaaS, MVP, and custom software for startups and product teams across the US, Canada, UK, UAE, Australia, and India.",
     url: SITE_URL,
     siteName: "CodeTelemetryLabs",
-    images: ["/og-image.svg"],
+    images: [
+      {
+        url: "/brand/ct-labs-logo.png",
+        width: 1536,
+        height: 1024,
+        alt: "CodeTelemetryLabs — Code. Automate. Elevate.",
+      },
+    ],
     type: "website",
+    locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
-    title: "CodeTelemetryLabs",
+    title: "AI & Custom Software Development Agency | CodeTelemetryLabs",
     description:
-      "Premium software engineering and automation for startups, agencies, and product teams.",
-    images: ["/og-image.svg"],
+      "AI development, automation, SaaS, MVP, and custom software for international product teams.",
+    images: ["/brand/ct-labs-logo.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
   },
 }
 

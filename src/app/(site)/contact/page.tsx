@@ -6,9 +6,10 @@ import { CONTACT_DISPLAY_EMAIL } from "@/lib/contact"
 import { attributionFromSearchParams } from "@/lib/lead-capture"
 
 export const metadata: Metadata = {
-  title: "Contact",
+  title: "Contact | Start an AI or Software Project",
   description:
-    "Send CodeTelemetryLabs a project brief to discuss agency websites, portals, content workflows, or product engineering work.",
+    "Send a project brief for AI development, automation, SaaS, MVP, or custom software. Structured intake with a real response within one business day.",
+  alternates: { canonical: "/contact" },
 }
 
 const responseNotes = [
@@ -26,7 +27,33 @@ export default async function ContactPage({
   const sent = resolvedSearchParams?.sent === "1"
   const invalidSubmission = resolvedSearchParams?.error === "invalid"
   const attribution = attributionFromSearchParams(resolvedSearchParams)
-  const defaultProjectType = attribution.serviceInterestedIn ?? ""
+  const serviceFromQuery =
+    typeof resolvedSearchParams?.service === "string" ? resolvedSearchParams.service : ""
+  const defaultProjectType = attribution.serviceInterestedIn || serviceFromQuery || ""
+  const projectTypeOptions = [
+    "AI Development",
+    "AI Automation",
+    "LLM Applications",
+    "AI Agents",
+    "Custom Software Development",
+    "SaaS Development",
+    "MVP Development",
+    "Full Stack Development",
+    "React Development",
+    "Next.js Development",
+    "Node.js Development",
+    "Python Development",
+    "Workflow Automation",
+    "CRM Development",
+    "API Development",
+    "Business Automation",
+    "Startup Product Development",
+    "Website Development",
+    "Enterprise Software",
+    "Web development",
+    "SaaS platform",
+    "Cloud infrastructure",
+  ]
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
@@ -163,17 +190,18 @@ export default async function ContactPage({
                 name="projectType"
                 required
                 className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-950 outline-none transition focus:border-blue-400/40 focus:bg-white"
-                defaultValue={defaultProjectType}
+                defaultValue={
+                  projectTypeOptions.includes(defaultProjectType) ? defaultProjectType : ""
+                }
               >
                 <option value="" disabled>
                   Select a project type
                 </option>
-                <option>Web development</option>
-                <option>SaaS platform</option>
-                <option>AI automation</option>
-                <option>API engineering</option>
-                <option>Technical documentation</option>
-                <option>Cloud infrastructure</option>
+                {projectTypeOptions.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
               </select>
             </label>
             <label className="grid gap-2 text-sm">
