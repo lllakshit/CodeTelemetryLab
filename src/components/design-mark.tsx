@@ -33,14 +33,14 @@ export function DesignMark({
       }
     >
       <span
-        className={`relative ${dimensions.box} shrink-0 overflow-hidden rounded-xl border border-slate-200 bg-black shadow-sm`}
+        className={`relative ${dimensions.box} shrink-0 overflow-hidden rounded-xl border border-slate-200 bg-white p-1 shadow-sm`}
       >
         <Image
-          src="/brand/ct-labs-mark.png"
+          src="/brand/ct-labs-mark-light.png"
           alt="CodeTelemetryLabs"
           width={dimensions.px}
           height={dimensions.px}
-          className="h-full w-full object-cover"
+          className="h-full w-full object-contain"
           priority={priority}
         />
       </span>
