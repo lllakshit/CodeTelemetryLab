@@ -5,9 +5,10 @@ import { BrandIllustration } from "@/components/brand-illustration"
 import { SectionHeading } from "@/components/section-heading"
 
 export const metadata: Metadata = {
-  title: "About",
+  title: "About | Engineering Partner for AI & Software Delivery",
   description:
-    "Learn how CodeTelemetryLabs approaches product delivery, handoff discipline, and premium software engineering for client-facing systems.",
+    "CodeTelemetryLabs is a remote-first software agency focused on AI, automation, SaaS, and custom product delivery with release discipline and clear handoff.",
+  alternates: { canonical: "/about" },
 }
 
 const values = [

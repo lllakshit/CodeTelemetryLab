@@ -8,15 +8,16 @@ import { getHomeContent, listBlogPosts, listProjects } from "@/lib/cms"
 import { cn } from "@/lib/utils"
 
 export const metadata: Metadata = {
-  title: "Premium Software Engineering Agency",
+  title: "AI Development, Automation & Custom Software Agency",
   description:
-    "CodeTelemetryLabs builds premium agency websites, client portals, automation systems, and content-rich product surfaces with SEO-ready structure.",
+    "Hire CodeTelemetryLabs for AI development, AI automation, SaaS, MVP, React/Next.js, and custom software. International delivery for US, Canada, UK, UAE, Australia, and India.",
+  alternates: { canonical: "/" },
 }
 
 const trustPoints = [
-  "Built for USA and Canada remote collaboration",
-  "Structured delivery instead of generic template work",
-  "Content and operations workflows designed to scale",
+  "US, Canada, UK, UAE, Australia & India delivery",
+  "Buyer-intent AI, SaaS, MVP, and custom software focus",
+  "Structured delivery instead of generic agency fluff",
 ]
 
 const principles = [

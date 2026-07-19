@@ -1,6 +1,7 @@
 export const siteNav = [
   { href: "/services", label: "Services" },
   { href: "/projects", label: "Projects" },
+  { href: "/locations", label: "Locations" },
   { href: "/about", label: "About" },
   { href: "/blog", label: "Blog" },
   { href: "/contact", label: "Contact" },

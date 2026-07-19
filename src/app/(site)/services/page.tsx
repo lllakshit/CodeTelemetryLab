@@ -3,11 +3,13 @@ import Link from "next/link"
 import { ArrowRight, CheckCircle2 } from "lucide-react"
 import { SectionHeading } from "@/components/section-heading"
 import { getHomeContent } from "@/lib/cms"
+import { seoServices } from "@/lib/seo-markets"
 
 export const metadata: Metadata = {
-  title: "Services",
+  title: "Software & AI Services | Development, Automation, SaaS, MVP",
   description:
-    "Explore CodeTelemetryLabs service offerings for agency websites, client portals, software delivery, and SEO-ready content experiences.",
+    "Commercial service pages for AI development, automation, LLM apps, SaaS, MVP, React, Next.js, Python, CRM, APIs, and enterprise software.",
+  alternates: { canonical: "/services" },
 }
 
 const deliverables = [
@@ -30,6 +32,22 @@ export default async function ServicesPage() {
         description="The scope is intentionally practical: build the product surface, make the content editable, and leave room for expansion."
         level={1}
       />
+
+      <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {seoServices.map((service) => (
+          <Link
+            key={service.slug}
+            href={`/services/${service.slug}`}
+            className="rounded-2xl border border-slate-200 bg-white p-5 transition hover:border-slate-400"
+          >
+            <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-blue-700">
+              {service.primaryKeyword}
+            </p>
+            <h2 className="mt-3 text-xl font-medium tracking-tight text-slate-950">{service.name}</h2>
+            <p className="mt-2 text-sm leading-6 text-slate-600">{service.description}</p>
+          </Link>
+        ))}
+      </div>
 
       <div className="mt-12 border-t border-slate-200">
         {home.services.map((service) => (
