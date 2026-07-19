@@ -8,6 +8,7 @@ import {
   getSupabaseConfig,
   SUPABASE_MEDIA_BUCKET,
 } from "@/lib/supabase"
+import { notifyLeadCreated } from "@/lib/mobile-push"
 import {
   readStore,
   updateStore,
@@ -37,6 +38,8 @@ const TABLES = {
   activity: "activity_logs",
 } as const
 
+type CmsTableName = (typeof TABLES)[keyof typeof TABLES]
+
 type HomepageRow = {
   key: string
   hero_eyebrow: string
@@ -63,6 +66,10 @@ type BlogRow = {
   excerpt: string
   content: string
   featured_image: string | null
+  featured_image_attribution: string | null
+  featured_image_source_url: string | null
+  featured_image_license: string | null
+  featured_image_license_url: string | null
   category: string
   tags: unknown
   seo_title: string | null
@@ -177,6 +184,13 @@ function nullableString(value: unknown) {
   return text ? text : null
 }
 
+function isUuid(value: unknown) {
+  return (
+    typeof value === "string" &&
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value)
+  )
+}
+
 function sortNewest<T extends { createdAt?: string; updatedAt?: string; publishedAt?: string | null }>(
   items: T[],
 ) {
@@ -206,13 +220,64 @@ function isMissingSupabaseTableError(error: unknown) {
   )
 }
 
+function isRecoverableSupabaseReadError(error: unknown) {
+  if (isMissingSupabaseTableError(error)) return true
+  if (!error || typeof error !== "object") return false
+
+  const maybeError = error as {
+    cause?: unknown
+    code?: string
+    message?: string
+  }
+  const cause = maybeError.cause as { code?: string; message?: string } | undefined
+  const message = [maybeError.message, cause?.message].filter(Boolean).join(" ")
+  const hasEmptySupabaseError = maybeError.message === "" && (maybeError.code === "" || maybeError.code == null)
+
+  return (
+    hasEmptySupabaseError ||
+    maybeError.code === "ENOTFOUND" ||
+    cause?.code === "ENOTFOUND" ||
+    message.includes("ENOTFOUND") ||
+    message.includes("getaddrinfo") ||
+    message.includes("fetch failed")
+  )
+}
+
 async function fallbackFromStore<T>(selector: (store: CmsStore) => T) {
   const store = await readStore()
   return selector(store)
 }
 
 function isSupabaseReady() {
+  if (isNextProductionBuild()) return false
   return Boolean(supabase)
+}
+
+function isVercelRuntime() {
+  return Boolean(process.env.VERCEL)
+}
+
+function isNextProductionBuild() {
+  return process.env.NEXT_PHASE === "phase-production-build"
+}
+
+async function hasSupabaseTable(table: CmsTableName) {
+  if (!isSupabaseReady()) return false
+
+  const { error } = await supabaseClient.from(table).select("id", {
+    count: "exact",
+    head: true,
+  })
+
+  if (error) {
+    if (isMissingSupabaseTableError(error)) {
+      return false
+    }
+
+    throw error
+  }
+
+  return true
 }
 
 async function shouldUseStoreFallback() {
@@ -222,11 +287,36 @@ async function shouldUseStoreFallback() {
     await ensureSupabaseSeeded()
     return false
   } catch (error) {
-    if (isMissingSupabaseTableError(error)) {
+    if (isRecoverableSupabaseReadError(error)) {
       return true
     }
     throw error
   }
+}
+
+async function shouldUseStoreFallbackForWrite(table: CmsTableName) {
+  if (!isSupabaseReady()) {
+    if (isVercelRuntime()) {
+      throw new Error(
+        "Supabase server credentials are missing in this Vercel deployment. Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in Vercel.",
+      )
+    }
+
+    return true
+  }
+
+  const tableExists = await hasSupabaseTable(table)
+  if (tableExists) {
+    return false
+  }
+
+  if (isVercelRuntime()) {
+    throw new Error(
+      `Supabase table "${table}" is unavailable in this Vercel deployment. Apply supabase/schema.sql to the connected Supabase project before using admin write actions.`,
+    )
+  }
+
+  return true
 }
 
 function toHomeRow(homepage: HomeContent): HomepageRow {
@@ -289,6 +379,10 @@ function toBlogRow(post: Partial<BlogPost> & {
   tags: string[]
   isPublished: boolean
   featuredImage?: string | null
+  featuredImageAttribution?: string | null
+  featuredImageSourceUrl?: string | null
+  featuredImageLicense?: string | null
+  featuredImageLicenseUrl?: string | null
   seoTitle?: string | null
   seoDescription?: string | null
   slug?: string
@@ -297,12 +391,16 @@ function toBlogRow(post: Partial<BlogPost> & {
   const publishedAt = post.isPublished ? post.publishedAt || timestamp : null
 
   return {
-    id: post.id ?? randomUUID(),
+    id: typeof post.id === "string" && isUuid(post.id) ? post.id : randomUUID(),
     slug: slugify(post.slug || post.title),
     title: post.title,
     excerpt: post.excerpt,
     content: post.content,
     featured_image: post.featuredImage ?? null,
+    featured_image_attribution: post.featuredImageAttribution ?? null,
+    featured_image_source_url: post.featuredImageSourceUrl ?? null,
+    featured_image_license: post.featuredImageLicense ?? null,
+    featured_image_license_url: post.featuredImageLicenseUrl ?? null,
     category: post.category,
     tags: post.tags,
     seo_title: post.seoTitle ?? null,
@@ -322,6 +420,10 @@ function fromBlogRow(row: BlogRow): BlogPost {
     excerpt: row.excerpt,
     content: row.content,
     featuredImage: row.featured_image,
+    featuredImageAttribution: row.featured_image_attribution,
+    featuredImageSourceUrl: row.featured_image_source_url,
+    featuredImageLicense: row.featured_image_license,
+    featuredImageLicenseUrl: row.featured_image_license_url,
     category: row.category,
     tags: asStringArray(row.tags),
     seoTitle: row.seo_title,
@@ -348,7 +450,7 @@ function toProjectRow(project: Partial<Project> & {
   const timestamp = nowIso()
 
   return {
-    id: project.id ?? randomUUID(),
+    id: typeof project.id === "string" && isUuid(project.id) ? project.id : randomUUID(),
     slug: slugify(project.slug || project.title),
     title: project.title,
     category: project.category,
@@ -585,12 +687,12 @@ async function ensureSupabaseSeeded() {
   if (homepage.error) throw homepage.error
 
   const blogs = await supabaseClient.from(TABLES.blogs).upsert(store.blogs.map(toBlogRow), {
-    onConflict: "id",
+    onConflict: "slug",
   })
   if (blogs.error) throw blogs.error
 
   const projects = await supabaseClient.from(TABLES.projects).upsert(store.projects.map(toProjectRow), {
-    onConflict: "id",
+    onConflict: "slug",
   })
   if (projects.error) throw projects.error
 
@@ -668,7 +770,7 @@ export async function getHomeContent(): Promise<HomeContent> {
     if (!data) return (seed as CmsStore).homepage
     return fromHomeRow(data as HomepageRow)
   } catch (error) {
-    if (isMissingSupabaseTableError(error)) {
+    if (isRecoverableSupabaseReadError(error)) {
       return fallbackFromStore((store) => store.homepage)
     }
     throw error
@@ -676,7 +778,7 @@ export async function getHomeContent(): Promise<HomeContent> {
 }
 
 export async function saveHomeContent(input: HomeContent) {
-  if (await shouldUseStoreFallback()) {
+  if (await shouldUseStoreFallbackForWrite(TABLES.homepage)) {
     const store = await updateStore((draft) => {
       draft.homepage = input
       draft.activity.unshift({
@@ -719,7 +821,7 @@ export async function listBlogPosts(options?: { publishedOnly?: boolean }) {
     const filtered = options?.publishedOnly ? posts.filter((post) => post.isPublished) : posts
     return sortNewest(mergeBlogSources(filtered, contentPosts))
   } catch (error) {
-    if (isMissingSupabaseTableError(error)) {
+    if (isRecoverableSupabaseReadError(error)) {
       return fallbackFromStore((store) => {
         const posts = options?.publishedOnly ? store.blogs.filter((post) => post.isPublished) : store.blogs
         return sortNewest(mergeBlogSources(posts, contentPosts))
@@ -741,7 +843,7 @@ export async function getBlogPostBySlug(slug: string) {
     if (error) throw error
     return data ? fromBlogRow(data as BlogRow) : await getContentBlogPostBySlug(slug)
   } catch (error) {
-    if (isMissingSupabaseTableError(error)) {
+    if (isRecoverableSupabaseReadError(error)) {
       const store = await readStore()
       return store.blogs.find((post) => post.slug === slug) ?? await getContentBlogPostBySlug(slug)
     }
@@ -765,7 +867,7 @@ export async function getBlogPostById(id: string) {
     if (error) throw error
     return data ? fromBlogRow(data as BlogRow) : null
   } catch (error) {
-    if (isMissingSupabaseTableError(error)) {
+    if (isRecoverableSupabaseReadError(error)) {
       return fallbackFromStore((store) => store.blogs.find((post) => post.id === id) ?? null)
     }
     throw error
@@ -786,7 +888,7 @@ export async function saveBlogPost(
     slug?: string
   },
 ) {
-  if (await shouldUseStoreFallback()) {
+  if (await shouldUseStoreFallbackForWrite(TABLES.blogs)) {
     const timestamp = nowIso()
     const id = input.id ?? randomUUID()
     const slug = slugify(input.slug || input.title)
@@ -838,7 +940,7 @@ export async function saveBlogPost(
 }
 
 export async function deleteBlogPost(id: string) {
-  if (await shouldUseStoreFallback()) {
+  if (await shouldUseStoreFallbackForWrite(TABLES.blogs)) {
     await updateStore((draft) => {
       const existing = draft.blogs.find((post) => post.id === id)
       draft.blogs = draft.blogs.filter((post) => post.id !== id)
@@ -882,7 +984,7 @@ export async function listProjects(options?: { publishedOnly?: boolean }) {
     const filtered = options?.publishedOnly ? projects.filter((project) => project.isPublished) : projects
     return sortNewest(filtered)
   } catch (error) {
-    if (isMissingSupabaseTableError(error)) {
+    if (isRecoverableSupabaseReadError(error)) {
       return fallbackFromStore((store) => {
         const projects = options?.publishedOnly ? store.projects.filter((project) => project.isPublished) : store.projects
         return sortNewest(projects)
@@ -903,7 +1005,7 @@ export async function getProjectBySlug(slug: string) {
     if (error) throw error
     return data ? fromProjectRow(data as ProjectRow) : null
   } catch (error) {
-    if (isMissingSupabaseTableError(error)) {
+    if (isRecoverableSupabaseReadError(error)) {
       return fallbackFromStore((store) => store.projects.find((project) => project.slug === slug) ?? null)
     }
     throw error
@@ -921,7 +1023,7 @@ export async function getProjectById(id: string) {
     if (error) throw error
     return data ? fromProjectRow(data as ProjectRow) : null
   } catch (error) {
-    if (isMissingSupabaseTableError(error)) {
+    if (isRecoverableSupabaseReadError(error)) {
       return fallbackFromStore((store) => store.projects.find((project) => project.id === id) ?? null)
     }
     throw error
@@ -942,7 +1044,7 @@ export async function saveProject(
     slug?: string
   },
 ) {
-  if (await shouldUseStoreFallback()) {
+  if (await shouldUseStoreFallbackForWrite(TABLES.projects)) {
     const id = input.id ?? randomUUID()
     const timestamp = nowIso()
     const project: Project = {
@@ -992,7 +1094,7 @@ export async function saveProject(
 }
 
 export async function deleteProject(id: string) {
-  if (await shouldUseStoreFallback()) {
+  if (await shouldUseStoreFallbackForWrite(TABLES.projects)) {
     await updateStore((draft) => {
       const existing = draft.projects.find((project) => project.id === id)
       draft.projects = draft.projects.filter((project) => project.id !== id)
@@ -1038,7 +1140,7 @@ export async function listMessages() {
 }
 
 export async function createMessage(input: Omit<Message, "id" | "createdAt" | "status">) {
-  if (await shouldUseStoreFallback()) {
+  if (await shouldUseStoreFallbackForWrite(TABLES.messages)) {
     const timestamp = nowIso()
     const message: Message = {
       id: randomUUID(),
@@ -1114,7 +1216,7 @@ export async function createLead(
     message: string
   },
 ) {
-  if (await shouldUseStoreFallback()) {
+  if (await shouldUseStoreFallbackForWrite(TABLES.leads)) {
     const timestamp = nowIso()
     const lead: Lead = {
       id: input.id ?? randomUUID(),
@@ -1169,6 +1271,7 @@ export async function createLead(
       return draft
     })
 
+    await notifyLeadCreated(lead)
     return lead
   }
 
@@ -1177,14 +1280,16 @@ export async function createLead(
   if (error) throw error
 
   await addActivity("lead", "New lead received", `${row.full_name} - ${row.service_interested_in}`)
-  return fromLeadRow(row)
+  const lead = fromLeadRow(row)
+  await notifyLeadCreated(lead)
+  return lead
 }
 
 export async function updateLead(
   id: string,
   input: Partial<Pick<Lead, "status" | "notes" | "assignedTeamMember">>,
 ) {
-  if (await shouldUseStoreFallback()) {
+  if (await shouldUseStoreFallbackForWrite(TABLES.leads)) {
     const timestamp = nowIso()
     let updated: Lead | null = null
 
@@ -1239,7 +1344,7 @@ export async function updateLead(
 }
 
 export async function deleteLead(id: string) {
-  if (await shouldUseStoreFallback()) {
+  if (await shouldUseStoreFallbackForWrite(TABLES.leads)) {
     await updateStore((draft) => {
       const existing = draft.leads.find((lead) => lead.id === id)
       draft.leads = draft.leads.filter((lead) => lead.id !== id)
@@ -1272,7 +1377,11 @@ export async function listMedia() {
   }
 
   try {
-    await ensureSupabaseSeeded()
+    const mediaTableExists = await hasSupabaseTable(TABLES.media)
+    if (!mediaTableExists) {
+      return fallbackFromStore((store) => sortNewest(store.media))
+    }
+
     const { data, error } = await supabaseClient.from(TABLES.media).select("*")
     if (error) throw error
     return sortNewest((data ?? []).map((row) => fromMediaRow(row as MediaRow)))
@@ -1287,7 +1396,7 @@ export async function listMedia() {
 export async function addMediaAsset(
   input: Omit<MediaAsset, "id" | "createdAt">,
 ) {
-  if (await shouldUseStoreFallback()) {
+  if (await shouldUseStoreFallbackForWrite(TABLES.media)) {
     const timestamp = nowIso()
     const asset: MediaAsset = {
       id: randomUUID(),
@@ -1319,7 +1428,7 @@ export async function addMediaAsset(
 }
 
 export async function deleteMediaAsset(id: string) {
-  if (await shouldUseStoreFallback()) {
+  if (await shouldUseStoreFallbackForWrite(TABLES.media)) {
     await updateStore((draft) => {
       const existing = draft.media.find((asset) => asset.id === id)
       draft.media = draft.media.filter((asset) => asset.id !== id)

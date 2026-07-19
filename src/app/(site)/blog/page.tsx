@@ -2,10 +2,12 @@ import type { Metadata } from "next"
 import Image from "next/image"
 import Link from "next/link"
 import { format } from "date-fns"
-import { ArrowRight, Search } from "lucide-react"
+import { ArrowLeft, ArrowRight, Search } from "lucide-react"
 import { BrandIllustration } from "@/components/brand-illustration"
 import { SectionHeading } from "@/components/section-heading"
 import { listBlogPosts } from "@/lib/cms"
+
+const POSTS_PER_PAGE = 12
 
 export const metadata: Metadata = {
   title: "Blog | AI, Software, SaaS & Automation Insights",
@@ -40,19 +42,40 @@ function postMatchesSearch(
   )
 }
 
+function getPageNumber(value: string | undefined) {
+  const page = Number.parseInt(value ?? "1", 10)
+  return Number.isFinite(page) && page > 0 ? page : 1
+}
+
 export default async function BlogPage({
   searchParams,
 }: {
-  searchParams?: Promise<{ q?: string; category?: string }>
+  searchParams?: Promise<{ q?: string; category?: string; page?: string }>
 }) {
   const posts = await listBlogPosts({ publishedOnly: true })
   const resolvedSearchParams = await searchParams
   const query = resolvedSearchParams?.q ?? ""
   const selectedCategory = resolvedSearchParams?.category ?? ""
+  const requestedPage = getPageNumber(resolvedSearchParams?.page)
   const categories = Array.from(new Set(posts.map((post) => post.category))).sort((a, b) => a.localeCompare(b))
   const visiblePosts = posts.filter((post) => postMatchesSearch(post, query, selectedCategory))
-  const leadPost = visiblePosts[0]
-  const remainingPosts = visiblePosts.slice(1)
+  const totalPages = Math.max(1, Math.ceil(visiblePosts.length / POSTS_PER_PAGE))
+  const currentPage = Math.min(requestedPage, totalPages)
+  const pageStart = (currentPage - 1) * POSTS_PER_PAGE
+  const paginatedPosts = visiblePosts.slice(pageStart, pageStart + POSTS_PER_PAGE)
+  const leadPost = paginatedPosts[0]
+  const remainingPosts = paginatedPosts.slice(1)
+  const showingStart = visiblePosts.length ? pageStart + 1 : 0
+  const showingEnd = Math.min(pageStart + paginatedPosts.length, visiblePosts.length)
+
+  function pageHref(page: number) {
+    const params = new URLSearchParams()
+    if (query) params.set("q", query)
+    if (selectedCategory) params.set("category", selectedCategory)
+    if (page > 1) params.set("page", String(page))
+    const queryString = params.toString()
+    return queryString ? `/blog?${queryString}` : "/blog"
+  }
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
@@ -106,10 +129,12 @@ export default async function BlogPage({
         </div>
       </form>
 
-      {query || selectedCategory ? (
+      {visiblePosts.length ? (
         <p className="mt-5 text-sm text-slate-600">
-          Showing {visiblePosts.length} article{visiblePosts.length === 1 ? "" : "s"}
-          {selectedCategory ? ` in ${selectedCategory}` : ""}.
+          Showing {showingStart}-{showingEnd} of {visiblePosts.length} article
+          {visiblePosts.length === 1 ? "" : "s"}
+          {selectedCategory ? ` in ${selectedCategory}` : ""}
+          {query ? ` matching "${query}"` : ""}.
         </p>
       ) : null}
 
@@ -198,6 +223,43 @@ export default async function BlogPage({
           </article>
         ))}
       </div>
+
+      {totalPages > 1 ? (
+        <nav
+          aria-label="Blog pagination"
+          className="mt-10 flex flex-col gap-4 border-t border-slate-200 pt-8 sm:flex-row sm:items-center sm:justify-between"
+        >
+          <p className="text-sm text-slate-600">
+            Page {currentPage} of {totalPages}
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <Link
+              href={pageHref(Math.max(1, currentPage - 1))}
+              aria-disabled={currentPage === 1}
+              className={`inline-flex h-11 items-center gap-2 rounded-xl border px-4 text-sm font-semibold transition ${
+                currentPage === 1
+                  ? "pointer-events-none border-slate-200 text-slate-300"
+                  : "border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-50"
+              }`}
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Previous
+            </Link>
+            <Link
+              href={pageHref(Math.min(totalPages, currentPage + 1))}
+              aria-disabled={currentPage === totalPages}
+              className={`inline-flex h-11 items-center gap-2 rounded-xl border px-4 text-sm font-semibold transition ${
+                currentPage === totalPages
+                  ? "pointer-events-none border-slate-200 text-slate-300"
+                  : "border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-50"
+              }`}
+            >
+              Next
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+        </nav>
+      ) : null}
 
       {!visiblePosts.length ? (
         <div className="mt-12 rounded-[1.5rem] border border-slate-200 bg-slate-50 p-8 text-center">

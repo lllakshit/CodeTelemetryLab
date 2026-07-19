@@ -53,7 +53,7 @@ async function main() {
   await upsertOrThrow(
     supabase.from("blog_posts").upsert(
       store.blogs.map((post) => ({
-        id: post.id,
+        ...(isUuid(post.id) ? { id: post.id } : {}),
         slug: post.slug,
         title: post.title,
         excerpt: post.excerpt,
@@ -68,7 +68,7 @@ async function main() {
         created_at: post.createdAt,
         updated_at: post.updatedAt,
       })),
-      { onConflict: "id" },
+      { onConflict: "slug" },
     ),
     "blog_posts",
   )
@@ -76,7 +76,7 @@ async function main() {
   await upsertOrThrow(
     supabase.from("projects").upsert(
       store.projects.map((project) => ({
-        id: project.id,
+        ...(isUuid(project.id) ? { id: project.id } : {}),
         slug: project.slug,
         title: project.title,
         category: project.category,
@@ -90,7 +90,7 @@ async function main() {
         created_at: project.createdAt,
         updated_at: project.updatedAt,
       })),
-      { onConflict: "id" },
+      { onConflict: "slug" },
     ),
     "projects",
   )
@@ -175,6 +175,10 @@ function parseEnv(raw) {
 
 function firstNonEmpty(...values) {
   return values.find((value) => value && value.trim())?.trim()
+}
+
+function isUuid(value) {
+  return typeof value === "string" && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value)
 }
 
 async function upsertOrThrow(queryPromise, label) {

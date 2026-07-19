@@ -48,6 +48,10 @@ export type BlogPost = {
   excerpt: string
   content: string
   featuredImage?: string | null
+  featuredImageAttribution?: string | null
+  featuredImageSourceUrl?: string | null
+  featuredImageLicense?: string | null
+  featuredImageLicenseUrl?: string | null
   category: string
   tags: string[]
   seoTitle?: string | null

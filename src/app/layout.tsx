@@ -36,8 +36,11 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   icons: {
-    icon: [{ url: "/brand/ct-labs-mark.png", type: "image/png" }],
-    apple: [{ url: "/brand/ct-labs-mark.png", type: "image/png" }],
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/brand/ct-labs-mark.png", type: "image/png" },
+    ],
+    apple: "/brand/ct-labs-mark.png",
   },
   openGraph: {
     title: "AI & Custom Software Development Agency | CodeTelemetryLabs",

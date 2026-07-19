@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "47209061705",
+    "project_id": "codetelemetrylab-18f22",
+    "storage_bucket": "codetelemetrylab-18f22.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:47209061705:android:c3903c3435d84c5a380e98",
+        "android_client_info": {
+          "package_name": "com.codetelemetrylabs.leads"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyChKW-0TvAOdbYIfkPE7fE7UdovIVZtXlI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
