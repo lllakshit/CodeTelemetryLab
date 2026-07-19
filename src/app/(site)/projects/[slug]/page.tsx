@@ -3,16 +3,10 @@ import Image from "next/image"
 import { notFound } from "next/navigation"
 import { ArrowLeft, ArrowRight } from "lucide-react"
 import Link from "next/link"
-import { BrandIllustration } from "@/components/brand-illustration"
 import { SectionHeading } from "@/components/section-heading"
 import { getProjectBySlug, listProjects } from "@/lib/cms"
 import { absoluteUrl, organizationJsonLd } from "@/lib/seo"
-
-function getVariant(slug: string) {
-  if (slug.includes("portal")) return "portal" as const
-  if (slug.includes("automation")) return "automation" as const
-  return "platform" as const
-}
+import { getProjectVisual, hasRealProjectScreenshot } from "@/lib/project-media"
 
 export async function generateMetadata({
   params,
@@ -22,7 +16,7 @@ export async function generateMetadata({
   const { slug } = await params
   const project = await getProjectBySlug(slug)
   if (!project) return {}
-  const leadScreenshot = project.screenshots[0] || "/og-image.svg"
+  const leadVisual = getProjectVisual(project)
 
   return {
     title: project.title,
@@ -35,13 +29,13 @@ export async function generateMetadata({
       description: project.problem,
       url: absoluteUrl(`/projects/${project.slug}`),
       type: "article",
-      images: [leadScreenshot],
+      images: [leadVisual.image],
     },
     twitter: {
       card: "summary_large_image",
       title: project.title,
       description: project.problem,
-      images: [leadScreenshot],
+      images: [leadVisual.image],
     },
   }
 }
@@ -61,8 +55,8 @@ export default async function ProjectDetailPage({
 
   if (!project) notFound()
 
-  const variant = getVariant(project.slug)
-  const leadScreenshot = project.screenshots[0] ?? null
+  const leadVisual = getProjectVisual(project)
+  const hasScreenshots = hasRealProjectScreenshot(project.screenshots)
   const projectJsonLd = {
     "@context": "https://schema.org",
     "@type": "CreativeWork",
@@ -72,6 +66,7 @@ export default async function ProjectDetailPage({
     creator: organizationJsonLd,
     url: absoluteUrl(`/projects/${project.slug}`),
     keywords: project.stack.join(", "),
+    image: leadVisual.image,
   }
 
   return (
@@ -97,38 +92,60 @@ export default async function ProjectDetailPage({
             ))}
           </div>
         </div>
-        {leadScreenshot ? (
-          <div className="overflow-hidden rounded-[2rem] border border-slate-200 bg-slate-50 shadow-[0_14px_40px_rgba(15,23,42,0.06)]">
+        <figure className="overflow-hidden rounded-[2rem] border border-slate-200 bg-slate-50 shadow-[0_14px_40px_rgba(15,23,42,0.06)]">
+          <div className="aspect-[5/3] overflow-hidden">
             <Image
-              src={leadScreenshot}
-              alt={project.title}
+              src={leadVisual.image}
+              alt={leadVisual.alt}
               width={1400}
               height={840}
               className="h-full w-full object-cover"
+              priority
+              sizes="(max-width: 1024px) 100vw, 55vw"
             />
           </div>
-        ) : (
-          <BrandIllustration variant={variant} />
-        )}
+          {leadVisual.isIllustrative && leadVisual.sourceUrl ? (
+            <figcaption className="bg-white px-5 py-3 text-xs text-slate-500">
+              Illustrative project visual ·{" "}
+              <a
+                href={leadVisual.sourceUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="font-medium text-slate-700 underline decoration-slate-300 underline-offset-2"
+              >
+                Unsplash
+              </a>
+            </figcaption>
+          ) : null}
+        </figure>
       </div>
 
       <div className="mt-12 grid gap-8 lg:grid-cols-[0.64fr_0.36fr]">
         <div className="space-y-6">
-          {project.screenshots.length ? (
+          {hasScreenshots ? (
             <section className="rounded-[2rem] border border-slate-200 bg-white p-6 lg:p-8">
               <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-blue-700">Screenshots</p>
               <div className="mt-5 grid gap-4 md:grid-cols-2">
-                {project.screenshots.map((screenshot, index) => (
-                  <div key={`${screenshot}-${index}`} className="overflow-hidden rounded-[1.5rem] border border-slate-200 bg-slate-50">
-                    <Image
-                      src={screenshot}
-                      alt={`${project.title} screenshot ${index + 1}`}
-                      width={1200}
-                      height={720}
-                      className="h-full w-full object-cover"
-                    />
-                  </div>
-                ))}
+                {project.screenshots
+                  .filter(
+                    (screenshot) =>
+                      !screenshot.includes("/og-image.svg") &&
+                      !screenshot.toLowerCase().includes("placeholder"),
+                  )
+                  .map((screenshot, index) => (
+                    <div
+                      key={`${screenshot}-${index}`}
+                      className="overflow-hidden rounded-[1.5rem] border border-slate-200 bg-slate-50"
+                    >
+                      <Image
+                        src={screenshot}
+                        alt={`${project.title} screenshot ${index + 1}`}
+                        width={1200}
+                        height={720}
+                        className="h-full w-full object-cover"
+                      />
+                    </div>
+                  ))}
               </div>
             </section>
           ) : null}
