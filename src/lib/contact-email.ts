@@ -25,7 +25,7 @@ export async function sendContactNotification(submission: ContactSubmission) {
 
   const html = `
     <div style="font-family: Arial, sans-serif; color: #0a1317; line-height: 1.6;">
-      <h1 style="font-size: 20px; margin-bottom: 16px;">New CodeTelemetryLabs inquiry</h1>
+      <h1 style="font-size: 20px; margin-bottom: 16px;">New CodeTelemetryLab inquiry</h1>
       <p style="margin: 0 0 8px;"><strong>Name:</strong> ${escapeHtml(submission.name)}</p>
       <p style="margin: 0 0 8px;"><strong>Email:</strong> ${escapeHtml(submission.email)}</p>
       <p style="margin: 0 0 8px;"><strong>Company:</strong> ${escapeHtml(companyLine)}</p>
@@ -39,7 +39,7 @@ export async function sendContactNotification(submission: ContactSubmission) {
   `.trim()
 
   const text = [
-    "New CodeTelemetryLabs inquiry",
+    "New CodeTelemetryLab inquiry",
     "",
     `Name: ${submission.name}`,
     `Email: ${submission.email}`,

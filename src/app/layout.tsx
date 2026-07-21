@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import { IBM_Plex_Mono, Plus_Jakarta_Sans } from "next/font/google"
 import "./globals.css"
-import { SITE_URL } from "@/lib/seo"
+import { BRAND_NAME, SITE_URL, absoluteUrl } from "@/lib/seo"
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   variable: "--font-plus-jakarta-sans",
@@ -17,13 +17,16 @@ const ibmPlexMono = IBM_Plex_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "AI & Custom Software Development Agency | CodeTelemetryLabs",
-    template: "%s | CodeTelemetryLabs",
+    default: `${BRAND_NAME} | AI & Custom Software Development Agency`,
+    template: `%s | ${BRAND_NAME}`,
   },
   description:
-    "CodeTelemetryLabs is an international software agency for AI development, automation, SaaS, MVP, and custom software. Serving US, Canada, UK, UAE, Australia, and India metros.",
-  applicationName: "CodeTelemetryLabs",
+    "CodeTelemetryLab is an international software agency for AI development, automation, SaaS, MVP, and custom software. Serving US, Canada, UK, UAE, Australia, and India metros.",
+  applicationName: BRAND_NAME,
   keywords: [
+    "CodeTelemetryLab",
+    "CodeTelemetry Lab",
+    "CodeTelemetry",
     "AI development company",
     "AI automation agency",
     "custom software development",
@@ -34,6 +37,9 @@ export const metadata: Metadata = {
   ],
   alternates: {
     canonical: "/",
+    types: {
+      "application/rss+xml": absoluteUrl("/feed.xml"),
+    },
   },
   icons: {
     icon: [
@@ -43,17 +49,17 @@ export const metadata: Metadata = {
     apple: "/brand/ct-labs-mark.png",
   },
   openGraph: {
-    title: "AI & Custom Software Development Agency | CodeTelemetryLabs",
+    title: `${BRAND_NAME} | AI & Custom Software Development Agency`,
     description:
       "AI development, automation, SaaS, MVP, and custom software for startups and product teams across the US, Canada, UK, UAE, Australia, and India.",
     url: SITE_URL,
-    siteName: "CodeTelemetryLabs",
+    siteName: BRAND_NAME,
     images: [
       {
         url: "/brand/ct-labs-logo.png",
         width: 1536,
         height: 1024,
-        alt: "CodeTelemetryLabs — Code. Automate. Elevate.",
+        alt: `${BRAND_NAME} — Code. Automate. Elevate.`,
       },
     ],
     type: "website",
@@ -61,7 +67,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "AI & Custom Software Development Agency | CodeTelemetryLabs",
+    title: `${BRAND_NAME} | AI & Custom Software Development Agency`,
     description:
       "AI development, automation, SaaS, MVP, and custom software for international product teams.",
     images: ["/brand/ct-labs-logo.png"],

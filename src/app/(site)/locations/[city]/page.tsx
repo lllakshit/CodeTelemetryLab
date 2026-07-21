@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!city) return {}
 
   const title = `Software & AI Development Company in ${city.name}`
-  const description = `CodeTelemetryLabs provides AI development, automation, SaaS, MVP, and custom software services for teams in ${city.name}, ${city.country}. Remote-first delivery with local market focus.`
+  const description = `CodeTelemetryLab provides AI development, automation, SaaS, MVP, and custom software services for teams in ${city.name}, ${city.country}. Remote-first delivery with local market focus.`
 
   return {
     title,
@@ -56,7 +56,7 @@ export default async function CityPage({ params }: PageProps) {
   const localBusinessLd = {
     "@context": "https://schema.org",
     "@type": "ProfessionalService",
-    name: `CodeTelemetryLabs — ${city.name}`,
+    name: `CodeTelemetryLab — ${city.name}`,
     url: absoluteUrl(`/locations/${city.slug}`),
     areaServed: {
       "@type": "City",
@@ -97,7 +97,7 @@ export default async function CityPage({ params }: PageProps) {
       <SectionHeading
         eyebrow={`${city.name} · ${city.country}`}
         title={`AI and software development partner for teams in ${city.name}.`}
-        description={`${city.localAngle} CodeTelemetryLabs helps startups, SaaS companies, and operators in ${city.name} ship AI, automation, and custom software with clear scope and delivery discipline.`}
+        description={`${city.localAngle} CodeTelemetryLab helps startups, SaaS companies, and operators in ${city.name} ship AI, automation, and custom software with clear scope and delivery discipline.`}
         level={1}
       />
 

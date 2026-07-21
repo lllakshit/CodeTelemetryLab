@@ -8,7 +8,12 @@ import { adminSurface, adminSurfaceSoft } from "@/lib/admin-ui"
 export const metadata: Metadata = {
   title: "Admin login",
   description:
-    "Secure sign-in for the CodeTelemetryLabs admin dashboard, CMS controls, blog editing, and project management.",
+    "Secure sign-in for the CodeTelemetryLab admin dashboard, CMS controls, blog editing, and project management.",
+  robots: {
+    index: false,
+    follow: false,
+    nocache: true,
+  },
 }
 
 export default async function AdminLoginPage({

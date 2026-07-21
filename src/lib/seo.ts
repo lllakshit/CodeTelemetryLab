@@ -18,18 +18,25 @@ export const SITE_URL =
   normalizeSiteUrl(process.env.VERCEL_PROJECT_PRODUCTION_URL) ||
   "https://www.codetelemetrylab.me"
 
+/** Canonical public brand — matches domain and brand search queries. */
+export const BRAND_NAME = "CodeTelemetryLab"
+export const BRAND_ALTERNATE_NAMES = ["CodeTelemetry Lab", "CodeTelemetryLabs", "CodeTelemetry"]
+export const BRAND_TAGLINE = "Code. Automate. Elevate."
+export const BRAND_EMAIL = "contact@codetelemetrylab.me"
+
 export const organizationJsonLd = {
   "@context": "https://schema.org",
   "@type": ["Organization", "ProfessionalService"],
-  name: "CodeTelemetryLabs",
-  legalName: "CodeTelemetryLabs",
+  name: BRAND_NAME,
+  legalName: BRAND_NAME,
+  alternateName: BRAND_ALTERNATE_NAMES,
   url: SITE_URL,
   logo: `${SITE_URL}/brand/ct-labs-mark.png`,
   image: `${SITE_URL}/brand/ct-labs-logo.png`,
-  email: "contact@codetelemetrylab.me",
+  email: BRAND_EMAIL,
   description:
-    "International software agency specializing in AI development, automation, SaaS, MVP, and custom software for startups and product teams.",
-  slogan: "Code. Automate. Elevate.",
+    "CodeTelemetryLab is an international software agency specializing in AI development, automation, SaaS, MVP, and custom software for startups and product teams.",
+  slogan: BRAND_TAGLINE,
   foundingLocation: {
     "@type": "Place",
     name: "Jaipur, India",
@@ -73,15 +80,40 @@ export const organizationJsonLd = {
     "SaaS architecture",
     "Technical SEO",
   ],
-  sameAs: [],
+  // Add real profile URLs when available (LinkedIn, GitHub, X) to strengthen brand entity.
+  sameAs: [] as string[],
   contactPoint: [
     {
       "@type": "ContactPoint",
       contactType: "sales",
-      email: "contact@codetelemetrylab.me",
+      email: BRAND_EMAIL,
       availableLanguage: ["English", "Hindi"],
     },
   ],
+}
+
+export const websiteJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: BRAND_NAME,
+  alternateName: BRAND_ALTERNATE_NAMES,
+  url: SITE_URL,
+  description:
+    "CodeTelemetryLab — AI development, automation, SaaS, MVP, and custom software for international product teams.",
+  publisher: {
+    "@type": "Organization",
+    name: BRAND_NAME,
+    url: SITE_URL,
+    logo: `${SITE_URL}/brand/ct-labs-mark.png`,
+  },
+  potentialAction: {
+    "@type": "SearchAction",
+    target: {
+      "@type": "EntryPoint",
+      urlTemplate: `${SITE_URL}/blog?q={search_term_string}`,
+    },
+    "query-input": "required name=search_term_string",
+  },
 }
 
 export function absoluteUrl(path: string) {
@@ -101,7 +133,7 @@ export function serviceJsonLd(input: {
     description: input.description,
     provider: {
       "@type": "ProfessionalService",
-      name: "CodeTelemetryLabs",
+      name: BRAND_NAME,
       url: SITE_URL,
     },
     areaServed: input.areaServed
@@ -128,7 +160,7 @@ export function buildPageMetadata(input: {
       title: input.title,
       description: input.description,
       url: absoluteUrl(input.path),
-      siteName: "CodeTelemetryLabs",
+      siteName: BRAND_NAME,
       images: ["/brand/ct-labs-logo.png"],
       type: "website" as const,
     },
@@ -138,5 +170,18 @@ export function buildPageMetadata(input: {
       description: input.description,
       images: ["/brand/ct-labs-logo.png"],
     },
+  }
+}
+
+export function breadcrumbJsonLd(items: { name: string; path: string }[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: items.map((item, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: item.name,
+      item: item.path.startsWith("http") ? item.path : absoluteUrl(item.path),
+    })),
   }
 }

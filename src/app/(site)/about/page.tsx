@@ -3,12 +3,19 @@ import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import { BrandIllustration } from "@/components/brand-illustration"
 import { SectionHeading } from "@/components/section-heading"
+import { BRAND_NAME } from "@/lib/seo"
 
 export const metadata: Metadata = {
-  title: "About | Engineering Partner for AI & Software Delivery",
+  title: `About ${BRAND_NAME} | Engineering Partner for AI & Software Delivery`,
   description:
-    "CodeTelemetryLabs is a remote-first software agency focused on AI, automation, SaaS, and custom product delivery with release discipline and clear handoff.",
+    "CodeTelemetryLab is a remote-first software agency focused on AI, automation, SaaS, and custom product delivery with release discipline and clear handoff.",
   alternates: { canonical: "/about" },
+  openGraph: {
+    title: `About ${BRAND_NAME} | Engineering Partner for AI & Software Delivery`,
+    description:
+      "CodeTelemetryLab builds scalable digital products, automates operations, and ships with confidence for startups and product teams.",
+    images: ["/brand/about-us.png"],
+  },
 }
 
 const values = [
@@ -51,7 +58,7 @@ export default function AboutPage() {
         <SectionHeading
           eyebrow="About"
           title="An engineering partner built around release discipline, not presentation theater."
-          description="CodeTelemetryLabs is designed for teams that want the first public release to feel credible to customers, operators, and future developers at the same time."
+          description={`${BRAND_NAME} is designed for teams that want the first public release to feel credible to customers, operators, and future developers at the same time.`}
           level={1}
         />
         <BrandIllustration variant="about" />
@@ -105,7 +112,7 @@ export default function AboutPage() {
             href="/contact"
             className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-slate-200"
           >
-            Start a conversation
+            Let&apos;s Discuss Your Project
             <ArrowRight className="h-4 w-4" />
           </Link>
         </div>

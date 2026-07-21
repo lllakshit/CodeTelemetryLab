@@ -1,6 +1,6 @@
 import { SiteFooter } from "@/components/site-footer"
 import { SiteHeader } from "@/components/site-header"
-import { organizationJsonLd } from "@/lib/seo"
+import { organizationJsonLd, websiteJsonLd } from "@/lib/seo"
 
 export default function SiteLayout({
   children,
@@ -15,6 +15,11 @@ export default function SiteLayout({
         type="application/ld+json"
         suppressHydrationWarning
         dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        suppressHydrationWarning
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
       />
       <SiteHeader />
       <main>{children}</main>

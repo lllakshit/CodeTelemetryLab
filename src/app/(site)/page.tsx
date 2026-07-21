@@ -7,11 +7,27 @@ import { SectionHeading } from "@/components/section-heading"
 import { getHomeContent, listBlogPosts, listProjects } from "@/lib/cms"
 import { cn } from "@/lib/utils"
 
+const homepageServiceLinks: Record<string, string> = {
+  "AI Automation": "/services/ai-automation",
+  "Web Development": "/services/website-development",
+  "SaaS Platforms": "/services/saas-development",
+  "API Engineering": "/services/api-development",
+  "Technical Documentation": "/services",
+  "Cloud Infrastructure": "/services",
+}
+
 export const metadata: Metadata = {
-  title: "AI Development, Automation & Custom Software Agency",
+  title: {
+    absolute: "CodeTelemetryLab | AI Development, Automation & Custom Software Agency",
+  },
   description:
-    "Hire CodeTelemetryLabs for AI development, AI automation, SaaS, MVP, React/Next.js, and custom software. International delivery for US, Canada, UK, UAE, Australia, and India.",
+    "Hire CodeTelemetryLab for AI development, AI automation, SaaS, MVP, React/Next.js, and custom software. International delivery for US, Canada, UK, UAE, Australia, and India.",
   alternates: { canonical: "/" },
+  openGraph: {
+    title: "CodeTelemetryLab | AI Development, Automation & Custom Software Agency",
+    description:
+      "CodeTelemetryLab builds AI, automation, SaaS, and custom software for product teams across the US, Canada, UK, UAE, Australia, and India.",
+  },
 }
 
 const trustPoints = [
@@ -105,7 +121,7 @@ export default async function HomePage() {
                 <div className="relative overflow-hidden rounded-[1.45rem] border border-white/70 bg-white shadow-[0_18px_40px_rgba(59,130,246,0.12)]">
                   <Image
                     src="/uploads/dashboard-image.png"
-                    alt="CodeTelemetryLabs dashboard interface preview"
+                    alt="CodeTelemetryLab dashboard interface preview"
                     width={1372}
                     height={830}
                     priority
@@ -153,7 +169,10 @@ export default async function HomePage() {
             description="Each service is positioned to support product teams that need software built with structure, not just visual polish."
           />
           <div className="divide-y divide-slate-200">
-            {home.services.map((service, index) => (
+            {home.services.map((service, index) => {
+              const href = homepageServiceLinks[service.title] ?? "/services"
+
+              return (
               <article
                 key={service.title}
                 className={cn("grid gap-4 py-6 md:grid-cols-[0.34fr_1fr]", index === 0 && "pt-0")}
@@ -162,11 +181,23 @@ export default async function HomePage() {
                   {service.notes}
                 </p>
                 <div>
-                  <h3 className="text-2xl font-medium tracking-tight text-slate-950">{service.title}</h3>
+                  <h3 className="text-2xl font-medium tracking-tight text-slate-950">
+                    <Link href={href} className="transition hover:text-blue-700">
+                      {service.title}
+                    </Link>
+                  </h3>
                   <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600">{service.description}</p>
+                  <Link
+                    href={href}
+                    className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-slate-950 transition hover:text-blue-700"
+                  >
+                    Explore service
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
                 </div>
               </article>
-            ))}
+              )
+            })}
           </div>
         </div>
       </section>
@@ -253,7 +284,11 @@ export default async function HomePage() {
                     <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-blue-700">
                       {project.category}
                     </p>
-                    <h3 className="mt-4 text-2xl font-medium tracking-tight text-slate-950">{project.title}</h3>
+                    <h3 className="mt-4 text-2xl font-medium tracking-tight text-slate-950">
+                      <Link href={`/projects/${project.slug}`} className="transition hover:text-blue-700">
+                        {project.title}
+                      </Link>
+                    </h3>
                     <p className="mt-4 text-sm leading-7 text-slate-600">{project.problem}</p>
                     <div className="mt-5 flex flex-wrap gap-2">
                       {project.stack.map((item) => (
@@ -265,6 +300,13 @@ export default async function HomePage() {
                     <p className="mt-5 border-t border-slate-200 pt-5 text-sm leading-7 text-slate-700">
                       {project.results}
                     </p>
+                    <Link
+                      href={`/projects/${project.slug}`}
+                      className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-slate-950"
+                    >
+                      Open case study
+                      <ArrowRight className="h-4 w-4" />
+                    </Link>
                   </article>
                 ))}
               </div>

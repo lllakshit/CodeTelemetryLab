@@ -8,19 +8,21 @@ type BrandIllustrationProps = {
 const variantLabels = {
   about: {
     eyebrow: "Operating model",
-    caption: "Discovery, build, handoff, and future expansion framed as one system.",
+    caption: "Discover, build, handoff, and grow — one partner from idea to impact.",
+    image: "/brand/about-us.png",
+    alt: "CodeTelemetryLab operating model: Discover, Build, Handoff, and Grow",
   },
   contact: {
     eyebrow: "Inquiry flow",
     caption: "Clear intake, realistic timelines, and a response path that feels human.",
     image: "/brand/inquiry-flow-contact.png",
-    alt: "CodeTelemetryLabs inquiry flow from project brief to kickoff and continuous support",
+    alt: "CodeTelemetryLab inquiry flow from project brief to kickoff and continuous support",
   },
   blog: {
     eyebrow: "Editorial system",
     caption: "Content architecture designed for SEO, publishing workflows, and product credibility.",
     image: "/brand/editorial-system.png",
-    alt: "CodeTelemetryLabs editorial system dashboard for SEO-ready content publishing",
+    alt: "CodeTelemetryLab editorial system dashboard for SEO-ready content publishing",
   },
   portal: {
     eyebrow: "Portal surface",
@@ -64,7 +66,7 @@ export function BrandIllustration({ variant, className }: BrandIllustrationProps
               height={1024}
               className="h-auto w-full object-cover object-top"
               sizes="(max-width: 1024px) 100vw, 560px"
-              priority={variant === "contact" || variant === "blog"}
+              priority={variant === "about" || variant === "contact" || variant === "blog"}
             />
           </div>
           <figcaption className="text-sm leading-6 text-slate-600">{label.caption}</figcaption>
