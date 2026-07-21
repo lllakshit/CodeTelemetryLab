@@ -29,8 +29,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const service = getServiceBySlug(serviceSlug)
   if (!city || !service) return {}
 
-  const title = `${service.name} Company in ${city.name} | CodeTelemetryLabs`
-  const description = `Looking for a ${service.name.toLowerCase()} company in ${city.name}? CodeTelemetryLabs delivers ${service.primaryKeyword} for startups and product teams in ${city.name}, ${city.country}.`
+  const title = `${service.name} Company in ${city.name}`
+  const description = `Looking for a ${service.name.toLowerCase()} company in ${city.name}? CodeTelemetryLab delivers ${service.primaryKeyword} for startups and product teams in ${city.name}, ${city.country}.`
 
   return {
     title,
@@ -80,7 +80,7 @@ export default async function CityServicePage({ params }: PageProps) {
         name: `Do you provide ${service.name.toLowerCase()} for companies in ${city.name}?`,
         acceptedAnswer: {
           "@type": "Answer",
-          text: `Yes. CodeTelemetryLabs works with founders, SaaS teams, and operators in ${city.name} on ${service.name.toLowerCase()} engagements with remote-first delivery and clear scoping.`,
+          text: `Yes. CodeTelemetryLab works with founders, SaaS teams, and operators in ${city.name} on ${service.name.toLowerCase()} engagements with remote-first delivery and clear scoping.`,
         },
       },
       ...service.faqs.map((faq) => ({
@@ -126,7 +126,7 @@ export default async function CityServicePage({ params }: PageProps) {
       <SectionHeading
         eyebrow={`${service.primaryKeyword} · ${city.name}`}
         title={`${service.name} company in ${city.name} for teams that need a real engineering partner.`}
-        description={`Hire CodeTelemetryLabs for ${service.name.toLowerCase()} in ${city.name}. ${city.localAngle} ${service.description}`}
+        description={`Hire CodeTelemetryLab for ${service.name.toLowerCase()} in ${city.name}. ${city.localAngle} ${service.description}`}
         level={1}
       />
 

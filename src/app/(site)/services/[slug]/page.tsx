@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!service) return {}
 
   const title = `${service.name} Company | ${service.primaryKeyword}`
-  const description = `${service.description} CodeTelemetryLabs delivers ${service.name.toLowerCase()} for startups, SaaS teams, and operators across the US, Canada, UK, UAE, Australia, and India.`
+  const description = `${service.description} CodeTelemetryLab delivers ${service.name.toLowerCase()} for startups, SaaS teams, and operators across the US, Canada, UK, UAE, Australia, and India.`
 
   return {
     title,

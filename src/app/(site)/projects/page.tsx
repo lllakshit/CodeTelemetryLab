@@ -7,9 +7,10 @@ import { listProjects } from "@/lib/cms"
 import { getProjectVisual } from "@/lib/project-media"
 
 export const metadata: Metadata = {
-  title: "Projects",
+  title: "Projects | Engineering Case Studies",
   description:
-    "Browse CodeTelemetryLabs case studies with real problem statements, solution summaries, tech stacks, and delivery outcomes.",
+    "Browse CodeTelemetryLab case studies with real problem statements, solution summaries, tech stacks, and delivery outcomes.",
+  alternates: { canonical: "/projects" },
 }
 
 export default async function ProjectsPage() {

@@ -6,7 +6,7 @@ import { seoCities } from "@/lib/seo-markets"
 export const metadata: Metadata = {
   title: "Locations | AI & Software Development Markets",
   description:
-    "CodeTelemetryLabs serves buyers across Jaipur, Delhi, Mumbai, Bangalore, Pune, Hyderabad, Ahmedabad, and high-opportunity US and Canadian metros—plus London, Dubai, and Sydney.",
+    "CodeTelemetryLab serves buyers across Jaipur, Delhi, Mumbai, Bangalore, Pune, Hyderabad, Ahmedabad, and high-opportunity US and Canadian metros—plus London, Dubai, and Sydney.",
   alternates: { canonical: "/locations" },
 }
 

@@ -6,9 +6,9 @@ import { CONTACT_DISPLAY_EMAIL } from "@/lib/contact"
 import { attributionFromSearchParams } from "@/lib/lead-capture"
 
 export const metadata: Metadata = {
-  title: "Contact | Start an AI or Software Project",
+  title: "Contact | Book a Free Consultation",
   description:
-    "Send a project brief for AI development, automation, SaaS, MVP, or custom software. Structured intake with a real response within one business day.",
+    "Contact CodeTelemetryLab with your name, email, and project message. Get a real engineering response within one business day for AI, SaaS, MVP, or custom software work.",
   alternates: { canonical: "/contact" },
 }
 
@@ -60,8 +60,8 @@ export default async function ContactPage({
       <div className="grid gap-10 lg:grid-cols-[0.88fr_1.12fr] lg:items-center">
         <SectionHeading
           eyebrow="Contact"
-          title="Start with a project brief, not a vague request."
-          description="The inquiry flow is intentionally structured so you can share the problem, constraints, and timeline before anyone wastes time in a generic sales call."
+          title="Tell us what you need to ship. We will reply with a clear next step."
+          description="Start with name, email, and a short message. Extra project details are optional — they help us scope faster, but they never block a conversation."
           level={1}
         />
         <BrandIllustration variant="contact" />
@@ -87,10 +87,9 @@ export default async function ContactPage({
           <div className="rounded-[2rem] border border-slate-200 bg-white p-6">
             <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-blue-700">What to include</p>
             <ul className="mt-5 space-y-3 text-sm leading-7 text-slate-600">
-              <li>Current problem or project goal</li>
-              <li>Deadline or launch window</li>
-              <li>Stack preference or existing systems</li>
-              <li>Budget range and decision-maker context</li>
+              <li>The problem or outcome you need</li>
+              <li>Any deadline or launch window (optional)</li>
+              <li>Stack preference or existing systems (optional)</li>
             </ul>
 
             <div className="mt-8 space-y-4 border-t border-slate-200 pt-6 text-sm text-slate-700">
@@ -140,149 +139,161 @@ export default async function ContactPage({
             Leave this field blank
             <input name="fax" tabIndex={-1} autoComplete="off" />
           </label>
-          <div className="grid gap-5 sm:grid-cols-2">
+
+          <div className="grid gap-5">
             <label className="grid gap-2 text-sm">
-              <span className="text-slate-700">Name</span>
+              <span className="text-slate-700">
+                Name <span className="text-slate-400">(required)</span>
+              </span>
               <input
                 name="name"
                 required
+                autoComplete="name"
                 className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-blue-400/40 focus:bg-white"
                 placeholder="Your name"
               />
             </label>
             <label className="grid gap-2 text-sm">
-              <span className="text-slate-700">Email</span>
+              <span className="text-slate-700">
+                Email <span className="text-slate-400">(required)</span>
+              </span>
               <input
                 type="email"
                 name="email"
                 required
+                autoComplete="email"
                 className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-blue-400/40 focus:bg-white"
                 placeholder="you@company.com"
               />
             </label>
             <label className="grid gap-2 text-sm">
-              <span className="text-slate-700">Company</span>
-              <input
-                name="company"
-                className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-blue-400/40 focus:bg-white"
-                placeholder="Company or startup name"
-              />
-            </label>
-            <label className="grid gap-2 text-sm">
-              <span className="text-slate-700">Phone</span>
-              <input
-                name="phone"
-                className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-blue-400/40 focus:bg-white"
-                placeholder="Best number for follow-up"
-              />
-            </label>
-            <label className="grid gap-2 text-sm">
-              <span className="text-slate-700">Country</span>
-              <input
-                name="country"
-                className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-blue-400/40 focus:bg-white"
-                placeholder="United States, Canada, or your region"
-              />
-            </label>
-            <label className="grid gap-2 text-sm">
-              <span className="text-slate-700">Service interested in</span>
-              <select
-                name="projectType"
-                required
-                className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-950 outline-none transition focus:border-blue-400/40 focus:bg-white"
-                defaultValue={
-                  projectTypeOptions.includes(defaultProjectType) ? defaultProjectType : ""
-                }
-              >
-                <option value="" disabled>
-                  Select a project type
-                </option>
-                {projectTypeOptions.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="grid gap-2 text-sm">
-              <span className="text-slate-700">Budget</span>
-              <select
-                name="budget"
-                required
-                className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-950 outline-none transition focus:border-blue-400/40 focus:bg-white"
-                defaultValue=""
-              >
-                <option value="" disabled>
-                  Select a budget range
-                </option>
-                <option>$5k - $10k</option>
-                <option>$10k - $25k</option>
-                <option>$25k - $50k</option>
-                <option>$50k+</option>
-              </select>
-            </label>
-            <label className="grid gap-2 text-sm">
-              <span className="text-slate-700">Timeline</span>
-              <select
-                name="timeline"
-                className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-950 outline-none transition focus:border-blue-400/40 focus:bg-white"
-                defaultValue=""
-              >
-                <option value="" disabled>
-                  Select a launch window
-                </option>
-                <option>As soon as possible</option>
-                <option>2-4 weeks</option>
-                <option>1-2 months</option>
-                <option>3+ months</option>
-                <option>Exploring options</option>
-              </select>
-            </label>
-            <label className="grid gap-2 text-sm">
-              <span className="text-slate-700">Preferred contact</span>
-              <select
-                name="preferredContactMethod"
-                className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-950 outline-none transition focus:border-blue-400/40 focus:bg-white"
-                defaultValue="Email"
-              >
-                <option>Email</option>
-                <option>Phone</option>
-                <option>Video call</option>
-              </select>
-            </label>
-            <label className="grid gap-2 text-sm">
-              <span className="text-slate-700">Website URL</span>
-              <input
-                name="websiteUrl"
-                className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-blue-400/40 focus:bg-white"
-                placeholder="https://company.com"
-              />
-            </label>
-            <label className="grid gap-2 text-sm sm:col-span-2">
-              <span className="text-slate-700">Subject</span>
-              <input
-                name="subject"
-                className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-blue-400/40 focus:bg-white"
-                placeholder="Example: SaaS MVP rebuild with lead workflow"
-              />
-            </label>
-            <label className="grid gap-2 text-sm sm:col-span-2">
-              <span className="text-slate-700">Message</span>
+              <span className="text-slate-700">
+                Message <span className="text-slate-400">(required)</span>
+              </span>
               <textarea
                 name="message"
                 required
-                rows={7}
+                rows={6}
                 className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-blue-400/40 focus:bg-white"
-                placeholder="Describe the problem, timeline, existing tools, and what needs to feel credible in the first release."
+                placeholder="Describe the problem, timeline, and what a successful first release looks like."
               />
             </label>
           </div>
+
+          <details className="mt-6 rounded-2xl border border-slate-200 bg-slate-50/80 p-4">
+            <summary className="cursor-pointer text-sm font-semibold text-slate-900">
+              Optional project details
+            </summary>
+            <p className="mt-2 text-xs leading-5 text-slate-500">
+              These fields stay optional. If you leave them blank, we still create the lead and follow up.
+            </p>
+            <div className="mt-4 grid gap-5 sm:grid-cols-2">
+              <label className="grid gap-2 text-sm">
+                <span className="text-slate-700">Company</span>
+                <input
+                  name="company"
+                  className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-blue-400/40"
+                  placeholder="Company or startup name"
+                />
+              </label>
+              <label className="grid gap-2 text-sm">
+                <span className="text-slate-700">Phone</span>
+                <input
+                  name="phone"
+                  className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-blue-400/40"
+                  placeholder="Best number for follow-up"
+                />
+              </label>
+              <label className="grid gap-2 text-sm">
+                <span className="text-slate-700">Country</span>
+                <input
+                  name="country"
+                  className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-blue-400/40"
+                  placeholder="United States, Canada, or your region"
+                />
+              </label>
+              <label className="grid gap-2 text-sm">
+                <span className="text-slate-700">Service interested in</span>
+                <select
+                  name="projectType"
+                  className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-950 outline-none transition focus:border-blue-400/40"
+                  defaultValue={
+                    projectTypeOptions.includes(defaultProjectType) ? defaultProjectType : ""
+                  }
+                >
+                  <option value="">General project inquiry</option>
+                  {projectTypeOptions.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="grid gap-2 text-sm">
+                <span className="text-slate-700">Budget</span>
+                <select
+                  name="budget"
+                  className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-950 outline-none transition focus:border-blue-400/40"
+                  defaultValue=""
+                >
+                  <option value="">Prefer not to say yet</option>
+                  <option>$5k - $10k</option>
+                  <option>$10k - $25k</option>
+                  <option>$25k - $50k</option>
+                  <option>$50k+</option>
+                </select>
+              </label>
+              <label className="grid gap-2 text-sm">
+                <span className="text-slate-700">Timeline</span>
+                <select
+                  name="timeline"
+                  className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-950 outline-none transition focus:border-blue-400/40"
+                  defaultValue=""
+                >
+                  <option value="">Select a launch window</option>
+                  <option>As soon as possible</option>
+                  <option>2-4 weeks</option>
+                  <option>1-2 months</option>
+                  <option>3+ months</option>
+                  <option>Exploring options</option>
+                </select>
+              </label>
+              <label className="grid gap-2 text-sm">
+                <span className="text-slate-700">Preferred contact</span>
+                <select
+                  name="preferredContactMethod"
+                  className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-950 outline-none transition focus:border-blue-400/40"
+                  defaultValue="Email"
+                >
+                  <option>Email</option>
+                  <option>Phone</option>
+                  <option>Video call</option>
+                </select>
+              </label>
+              <label className="grid gap-2 text-sm">
+                <span className="text-slate-700">Website URL</span>
+                <input
+                  name="websiteUrl"
+                  className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-blue-400/40"
+                  placeholder="https://company.com"
+                />
+              </label>
+              <label className="grid gap-2 text-sm sm:col-span-2">
+                <span className="text-slate-700">Subject</span>
+                <input
+                  name="subject"
+                  className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-blue-400/40"
+                  placeholder="Example: SaaS MVP rebuild with lead workflow"
+                />
+              </label>
+            </div>
+          </details>
 
           <button
             type="submit"
             className="mt-6 inline-flex items-center justify-center rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-700"
           >
-            Submit inquiry
+            Book Free Consultation
           </button>
         </form>
       </div>

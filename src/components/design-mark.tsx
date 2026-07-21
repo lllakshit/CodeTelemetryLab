@@ -37,7 +37,7 @@ export function DesignMark({
       >
         <Image
           src="/brand/ct-labs-mark-light.png"
-          alt="CodeTelemetryLabs"
+          alt="CodeTelemetryLab"
           width={dimensions.px}
           height={dimensions.px}
           className="h-full w-full object-contain"
@@ -47,7 +47,7 @@ export function DesignMark({
       {showLabel ? (
         <span className={labelClassName ?? "inline-flex flex-col leading-none"}>
           <span className="text-[0.72rem] font-semibold uppercase tracking-[0.28em] text-slate-900">
-            CodeTelemetryLabs
+            CodeTelemetryLab
           </span>
           <span className="text-[0.68rem] text-slate-500">Code. Automate. Elevate.</span>
         </span>

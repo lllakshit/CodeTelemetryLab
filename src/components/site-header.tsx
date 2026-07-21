@@ -42,7 +42,7 @@ export function SiteHeader() {
             href="/contact"
             className="inline-flex items-center justify-center rounded-full border border-slate-900 bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-700"
           >
-            Start a project
+            Book Free Consultation
           </Link>
         </div>
 
@@ -74,7 +74,7 @@ export function SiteHeader() {
               className="rounded-2xl bg-slate-950 px-4 py-3 text-center text-sm font-semibold text-white"
               onClick={() => setOpen(false)}
             >
-              Start a project
+              Book Free Consultation
             </Link>
           </div>
         </div>

@@ -25,7 +25,7 @@ export function SiteFooter() {
               A dependable engineering partner for AI, SaaS, automation, and product launches.
             </h2>
             <p className="mt-4 max-w-lg text-sm leading-6 text-slate-600">
-              CodeTelemetryLabs focuses on clarity, delivery discipline, and systems that stay maintainable
+              CodeTelemetryLab focuses on clarity, delivery discipline, and systems that stay maintainable
               as the product grows—across India, North America, and international metros.
             </p>
           </div>
@@ -89,13 +89,19 @@ export function SiteFooter() {
         </div>
 
         <div className="mt-12 flex flex-col gap-4 border-t border-slate-200 pt-6 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between">
-          <p>© {new Date().getFullYear()} CodeTelemetryLabs. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} CodeTelemetryLab. All rights reserved.</p>
           <div className="flex gap-4">
+            <Link href="/privacy" className="transition hover:text-slate-950">
+              Privacy
+            </Link>
+            <Link href="/terms" className="transition hover:text-slate-950">
+              Terms
+            </Link>
             <Link href="/locations" className="transition hover:text-slate-950">
               Locations
             </Link>
             <Link href="/contact" className="transition hover:text-slate-950">
-              Request proposal
+              Book Free Consultation
             </Link>
           </div>
         </div>

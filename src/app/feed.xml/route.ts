@@ -8,7 +8,7 @@ export async function GET() {
   const xml = `<?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>CodeTelemetryLabs Blog</title>
+    <title>CodeTelemetryLab Blog</title>
     <link>${SITE_URL}</link>
     <description>Engineering notes on software systems, SaaS delivery, automation, and technical SEO.</description>
     <language>en-us</language>
