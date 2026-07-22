@@ -69,6 +69,15 @@ export function SiteFooter() {
                 <span>Based in Jaipur · remote delivery for US, Canada, UK, UAE & Australia</span>
               </p>
             </div>
+            <p className="mt-6 text-sm font-semibold text-slate-900">Also</p>
+            <div className="mt-3 flex flex-col gap-3">
+              <Link href="/process" className="text-sm text-slate-600 transition hover:text-slate-950">
+                Process
+              </Link>
+              <Link href="/locations" className="text-sm text-slate-600 transition hover:text-slate-950">
+                Locations
+              </Link>
+            </div>
             <p className="mt-6 text-sm font-semibold text-slate-900">Markets we serve</p>
             <div className="mt-3 flex flex-wrap gap-2">
               {featuredCities.map((city) => (
