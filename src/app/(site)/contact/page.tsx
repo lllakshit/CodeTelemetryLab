@@ -6,9 +6,9 @@ import { CONTACT_DISPLAY_EMAIL } from "@/lib/contact"
 import { attributionFromSearchParams } from "@/lib/lead-capture"
 
 export const metadata: Metadata = {
-  title: "Contact | Book a Free Consultation",
+  title: "Contact | Send a Project Brief",
   description:
-    "Contact CodeTelemetryLab with your name, email, and project message. Get a real engineering response within one business day for AI, SaaS, MVP, or custom software work.",
+    "Contact CodeTelemetryLab with your name, email, and project message. Expect a real engineering response within one business day.",
   alternates: { canonical: "/contact" },
 }
 
@@ -293,7 +293,7 @@ export default async function ContactPage({
             type="submit"
             className="mt-6 inline-flex items-center justify-center rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-700"
           >
-            Book Free Consultation
+            Send project brief
           </button>
         </form>
       </div>

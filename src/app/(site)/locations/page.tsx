@@ -4,9 +4,9 @@ import { SectionHeading } from "@/components/section-heading"
 import { seoCities } from "@/lib/seo-markets"
 
 export const metadata: Metadata = {
-  title: "Locations | AI & Software Development Markets",
+  title: "Locations | Markets We Serve",
   description:
-    "CodeTelemetryLab serves buyers across Jaipur, Delhi, Mumbai, Bangalore, Pune, Hyderabad, Ahmedabad, and high-opportunity US and Canadian metros—plus London, Dubai, and Sydney.",
+    "CodeTelemetryLab works with teams in India, the United States, Canada, the UK, UAE, and Australia—remote-first with clear delivery ownership.",
   alternates: { canonical: "/locations" },
 }
 
@@ -19,8 +19,8 @@ export default function LocationsIndexPage() {
     <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
       <SectionHeading
         eyebrow="Locations"
-        title="City-focused software and AI delivery for markets where buyers actually search."
-        description="These pages target commercial local intent—AI development, automation, SaaS, MVP, and custom software—without diluting the brand into thin country-level fluff."
+        title="Markets where we deliver software and AI systems."
+        description="Remote-first engagements for product and operations teams. Each city page lists the services we commonly run for that market."
         level={1}
       />
 
@@ -48,11 +48,9 @@ function MarketGroup({
             href={`/locations/${city.slug}`}
             className="rounded-2xl border border-slate-200 bg-white p-5 transition hover:border-slate-400"
           >
-            <p className="text-sm font-semibold text-slate-950">
-              {city.name}
-              <span className="ml-2 text-xs font-medium uppercase tracking-[0.18em] text-blue-700">
-                {city.priority}
-              </span>
+            <p className="text-sm font-semibold text-slate-950">{city.name}</p>
+            <p className="mt-1 text-xs text-slate-500">
+              {city.region} · {city.country}
             </p>
             <p className="mt-2 text-sm leading-6 text-slate-600">{city.localAngle}</p>
           </Link>

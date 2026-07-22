@@ -104,17 +104,9 @@ export default async function ProjectDetailPage({
               sizes="(max-width: 1024px) 100vw, 55vw"
             />
           </div>
-          {leadVisual.isIllustrative && leadVisual.sourceUrl ? (
+          {leadVisual.isIllustrative ? (
             <figcaption className="bg-white px-5 py-3 text-xs text-slate-500">
-              Illustrative project visual ·{" "}
-              <a
-                href={leadVisual.sourceUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="font-medium text-slate-700 underline decoration-slate-300 underline-offset-2"
-              >
-                Unsplash
-              </a>
+              Brand overview visual — product screenshots available on request for qualified conversations.
             </figcaption>
           ) : null}
         </figure>
@@ -181,9 +173,10 @@ export default async function ProjectDetailPage({
           </div>
 
           <div className="rounded-[1.75rem] border border-slate-200 bg-white p-5">
-            <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">Notes</p>
+            <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">Next step</p>
             <p className="mt-3 text-sm leading-7 text-slate-600">
-              This case study structure is designed to scale into richer screenshots, walkthrough clips, and deeper delivery notes once the media library is populated.
+              If this problem shape matches yours, send a brief with constraints and timeline. We will reply with a
+              scoped next step.
             </p>
             <Link href="/contact" className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-slate-950">
               Discuss a similar build

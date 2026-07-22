@@ -21,7 +21,7 @@ export const SITE_URL =
 /** Canonical public brand — matches domain and brand search queries. */
 export const BRAND_NAME = "CodeTelemetryLab"
 export const BRAND_ALTERNATE_NAMES = ["CodeTelemetry Lab", "CodeTelemetryLabs", "CodeTelemetry"]
-export const BRAND_TAGLINE = "Code. Automate. Elevate."
+export const BRAND_TAGLINE = "Build. Ship. Maintain."
 export const BRAND_EMAIL = "contact@codetelemetrylab.me"
 
 export const organizationJsonLd = {

@@ -6,14 +6,14 @@ import { SectionHeading } from "@/components/section-heading"
 import { BRAND_NAME } from "@/lib/seo"
 
 export const metadata: Metadata = {
-  title: `About ${BRAND_NAME} | Engineering Partner for AI & Software Delivery`,
+  title: `About ${BRAND_NAME} | Engineering Partner for Product Teams`,
   description:
-    "CodeTelemetryLab is a remote-first software agency focused on AI, automation, SaaS, and custom product delivery with release discipline and clear handoff.",
+    "CodeTelemetryLab is a remote-first software practice focused on AI features, automation, SaaS products, and custom systems with clear scope and durable handoff.",
   alternates: { canonical: "/about" },
   openGraph: {
-    title: `About ${BRAND_NAME} | Engineering Partner for AI & Software Delivery`,
+    title: `About ${BRAND_NAME}`,
     description:
-      "CodeTelemetryLab builds scalable digital products, automates operations, and ships with confidence for startups and product teams.",
+      "How CodeTelemetryLab approaches discovery, build, and handoff for product and operations teams.",
     images: ["/brand/about-us.png"],
   },
 }
@@ -21,33 +21,33 @@ export const metadata: Metadata = {
 const values = [
   {
     title: "Mission",
-    text: "Build software that is reliable enough for production and readable enough for handoff.",
+    text: "Help teams ship software that works in production and remains understandable when the next engineer opens the repo.",
   },
   {
-    title: "Engineering philosophy",
-    text: "Reduce the problem to a stable release path, then expand the system only after the foundation is trustworthy.",
+    title: "Working stance",
+    text: "Prefer the smallest release that proves the workflow. Expand only after the foundation is trusted by operators.",
   },
   {
-    title: "Quality standard",
-    text: "Clear typography, disciplined spacing, predictable data flow, and operational tools that match the public site quality.",
+    title: "Quality bar",
+    text: "Readable interfaces, predictable data flow, explicit ownership, and documentation that matches what is actually live.",
   },
 ]
 
 const workflow = [
   {
     label: "01",
-    title: "Clarify the release target",
-    text: "We start with the actual launch surface, the content owner, and the environment assumptions instead of pretending those decisions can wait.",
+    title: "Name the release target",
+    text: "We start with users, constraints, environments, and what “done” means for the first public or internal cut.",
   },
   {
     label: "02",
     title: "Build the smallest credible system",
-    text: "The first pass favors clarity, delivery speed, and maintainability over feature sprawl or decorative complexity.",
+    text: "Implementation stays narrow: the workflow that matters, the integrations that must work, and the controls operators need.",
   },
   {
     label: "03",
     title: "Handoff with structure",
-    text: "We leave behind documentation, environment notes, and a clear operating path that future collaborators can actually use.",
+    text: "You leave with environment notes, runbooks, and a clear path for the next release—not a black box.",
   },
 ]
 
@@ -57,8 +57,8 @@ export default function AboutPage() {
       <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
         <SectionHeading
           eyebrow="About"
-          title="An engineering partner built around release discipline, not presentation theater."
-          description={`${BRAND_NAME} is designed for teams that want the first public release to feel credible to customers, operators, and future developers at the same time.`}
+          title="An engineering partner for teams that need the first release to hold up under real use."
+          description={`${BRAND_NAME} works with founders and operators who need AI features, automation, SaaS products, or custom systems delivered with discipline—not theatre.`}
           level={1}
         />
         <BrandIllustration variant="about" />
@@ -77,10 +77,10 @@ export default function AboutPage() {
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-blue-700">Workflow</p>
           <h2 className="mt-4 text-3xl font-medium tracking-[-0.03em] text-slate-950 sm:text-4xl">
-            The working style is simple on purpose.
+            How engagements usually run
           </h2>
           <p className="mt-4 max-w-xl text-sm leading-7 text-slate-600">
-            The goal is to make good decisions early, keep the implementation narrow, and leave the site in a state that a real team can extend later.
+            Discover, build, handoff, then grow. The sequence stays simple so decisions stay visible.
           </p>
         </div>
 
@@ -102,17 +102,18 @@ export default function AboutPage() {
           <div className="max-w-2xl">
             <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-blue-300">Working style</p>
             <h2 className="mt-4 text-3xl font-medium tracking-[-0.03em] text-white sm:text-4xl">
-              Calm process, serious delivery, and no template-shop posturing.
+              Calm process. Serious delivery.
             </h2>
             <p className="mt-4 text-sm leading-7 text-slate-300">
-              That means realistic timelines, practical architecture choices, and surfaces that can evolve into portals, operations tools, or internal systems without being rebuilt from zero.
+              Realistic timelines, practical architecture, and surfaces that can grow into portals or internal
+              tools without starting over.
             </p>
           </div>
           <Link
             href="/contact"
             className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-slate-200"
           >
-            Let&apos;s Discuss Your Project
+            Let&apos;s discuss your project
             <ArrowRight className="h-4 w-4" />
           </Link>
         </div>

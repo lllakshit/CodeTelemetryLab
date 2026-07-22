@@ -20,8 +20,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const service = getServiceBySlug(slug)
   if (!service) return {}
 
-  const title = `${service.name} Company | ${service.primaryKeyword}`
-  const description = `${service.description} CodeTelemetryLab delivers ${service.name.toLowerCase()} for startups, SaaS teams, and operators across the US, Canada, UK, UAE, Australia, and India.`
+  const title = service.name
+  const description = `${service.description} Delivered by CodeTelemetryLab for startups, SaaS teams, and operators across the US, Canada, UK, UAE, Australia, and India.`
 
   return {
     title,
@@ -97,8 +97,8 @@ export default async function ServiceDetailPage({ params }: PageProps) {
       </nav>
 
       <SectionHeading
-        eyebrow={service.primaryKeyword}
-        title={`${service.name} built for buyers who need production systems, not demos.`}
+        eyebrow="Service"
+        title={service.name}
         description={service.description}
         level={1}
       />
@@ -108,7 +108,7 @@ export default async function ServiceDetailPage({ params }: PageProps) {
           href={`/contact?service=${encodeURIComponent(service.name)}`}
           className="inline-flex items-center justify-center gap-2 rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-700"
         >
-          Start a {service.shortName.toLowerCase()} project
+          Discuss {service.shortName.toLowerCase()}
           <ArrowRight className="h-4 w-4" />
         </Link>
         <Link
@@ -121,7 +121,7 @@ export default async function ServiceDetailPage({ params }: PageProps) {
 
       <div className="mt-14 grid gap-8 lg:grid-cols-2">
         <section className="rounded-[2rem] border border-slate-200 bg-white p-6 lg:p-8">
-          <h2 className="text-2xl font-medium tracking-tight text-slate-950">Outcomes buyers care about</h2>
+          <h2 className="text-2xl font-medium tracking-tight text-slate-950">Outcomes</h2>
           <ul className="mt-6 space-y-4">
             {service.outcomes.map((item) => (
               <li key={item} className="flex items-start gap-3 text-sm leading-7 text-slate-700">
@@ -183,7 +183,7 @@ export default async function ServiceDetailPage({ params }: PageProps) {
             {service.name} by city
           </h2>
           <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
-            Local landing pages for teams searching for a {service.name.toLowerCase()} partner in their metro market.
+            Teams in these markets often ask for {service.name.toLowerCase()} with remote delivery and clear ownership.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             {localCities.map((city) => (
@@ -204,7 +204,7 @@ export default async function ServiceDetailPage({ params }: PageProps) {
           Ready to scope a {service.shortName.toLowerCase()} engagement?
         </h2>
         <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-700">
-          Send a brief with the problem, constraints, and timeline. You get a scoped response—not a generic sales script.
+          Send a brief with the problem, constraints, and timeline. You get a scoped engineering response.
         </p>
         <Link
           href={`/contact?service=${encodeURIComponent(service.name)}`}

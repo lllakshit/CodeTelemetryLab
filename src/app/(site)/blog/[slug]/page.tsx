@@ -147,9 +147,9 @@ export default async function BlogDetailPage({
 
       <div className="mt-12 grid gap-10 lg:grid-cols-[0.72fr_0.28fr]">
         <article className="rounded-[2rem] border border-slate-200 bg-white p-6 lg:p-8">
-          {post.featuredImage ? (
+          {post.featuredImage && !post.featuredImage.includes("og-image.svg") ? (
             <figure className="mb-8 overflow-hidden rounded-[1.75rem] border border-slate-200 bg-slate-50">
-              <Image src={post.featuredImage} alt={post.title} width={1400} height={840} className="h-full w-full object-cover" />
+              <Image src={post.featuredImage} alt="" width={1400} height={840} className="h-full w-full object-cover" />
               {post.featuredImageAttribution ? (
                 <figcaption className="border-t border-slate-200 bg-white px-4 py-3 text-xs leading-5 text-slate-500">
                   Image:{" "}
@@ -182,18 +182,23 @@ export default async function BlogDetailPage({
 
         <aside className="space-y-5">
           <div className="rounded-[1.75rem] border border-slate-200 bg-white p-5">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-blue-700">Article focus</p>
-            <p className="mt-3 text-sm leading-7 text-slate-700">
-              Each article is written to support trust, clarify delivery thinking, and make the engineering brand feel grounded.
-            </p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-blue-700">Related services</p>
+            <div className="mt-4 flex flex-col gap-3 text-sm">
+              <Link href="/services" className="font-medium text-slate-700 transition hover:text-slate-950">
+                Browse services
+              </Link>
+              <Link href="/projects" className="font-medium text-slate-700 transition hover:text-slate-950">
+                View projects
+              </Link>
+            </div>
           </div>
           <div className="rounded-[1.75rem] bg-[linear-gradient(180deg,#f4f8ff,#edf5ff)] p-5">
             <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-blue-700">Need this built?</p>
             <p className="mt-3 text-sm leading-7 text-slate-700">
-              The same structure behind the article is what drives the product work: clear scope, disciplined implementation, and a handoff path.
+              Send a short brief with the workflow, timeline, and systems that need to connect.
             </p>
             <Link href="/contact" className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-slate-950">
-              Discuss a similar build
+              Send a project brief
               <ArrowRight className="h-4 w-4" />
             </Link>
           </div>

@@ -97,7 +97,7 @@ export default async function CityPage({ params }: PageProps) {
       <SectionHeading
         eyebrow={`${city.name} · ${city.country}`}
         title={`AI and software development partner for teams in ${city.name}.`}
-        description={`${city.localAngle} CodeTelemetryLab helps startups, SaaS companies, and operators in ${city.name} ship AI, automation, and custom software with clear scope and delivery discipline.`}
+        description={`${city.localAngle} CodeTelemetryLab helps startups, SaaS companies, and operators in ${city.name} ship AI, automation, and custom software with clear scope and durable handoff.`}
         level={1}
       />
 

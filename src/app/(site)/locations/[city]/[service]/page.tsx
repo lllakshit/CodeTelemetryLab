@@ -29,8 +29,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const service = getServiceBySlug(serviceSlug)
   if (!city || !service) return {}
 
-  const title = `${service.name} Company in ${city.name}`
-  const description = `Looking for a ${service.name.toLowerCase()} company in ${city.name}? CodeTelemetryLab delivers ${service.primaryKeyword} for startups and product teams in ${city.name}, ${city.country}.`
+  const title = `${service.name} in ${city.name}`
+  const description = `CodeTelemetryLab provides ${service.name.toLowerCase()} for startups and product teams in ${city.name}, ${city.country}. ${service.description}`
 
   return {
     title,
@@ -124,9 +124,9 @@ export default async function CityServicePage({ params }: PageProps) {
       </nav>
 
       <SectionHeading
-        eyebrow={`${service.primaryKeyword} · ${city.name}`}
-        title={`${service.name} company in ${city.name} for teams that need a real engineering partner.`}
-        description={`Hire CodeTelemetryLab for ${service.name.toLowerCase()} in ${city.name}. ${city.localAngle} ${service.description}`}
+        eyebrow={`${city.name} · ${service.name}`}
+        title={`${service.name} for teams in ${city.name}`}
+        description={`${city.localAngle} ${service.description}`}
         level={1}
       />
 
@@ -135,7 +135,7 @@ export default async function CityServicePage({ params }: PageProps) {
           href={`/contact?service=${encodeURIComponent(service.name)}&city=${encodeURIComponent(city.name)}`}
           className="inline-flex items-center justify-center gap-2 rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-700"
         >
-          Get a {city.name} project proposal
+          Discuss a {city.name} engagement
           <ArrowRight className="h-4 w-4" />
         </Link>
         <Link

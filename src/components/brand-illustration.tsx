@@ -8,21 +8,21 @@ type BrandIllustrationProps = {
 const variantLabels = {
   about: {
     eyebrow: "Operating model",
-    caption: "Discover, build, handoff, and grow — one partner from idea to impact.",
+    caption: "Discover, build, handoff, and grow — one partner from idea to production.",
     image: "/brand/about-us.png",
     alt: "CodeTelemetryLab operating model: Discover, Build, Handoff, and Grow",
   },
   contact: {
     eyebrow: "Inquiry flow",
-    caption: "Clear intake, realistic timelines, and a response path that feels human.",
+    caption: "Clear intake, realistic timelines, and a human response path.",
     image: "/brand/inquiry-flow-contact.png",
     alt: "CodeTelemetryLab inquiry flow from project brief to kickoff and continuous support",
   },
   blog: {
     eyebrow: "Editorial system",
-    caption: "Content architecture designed for SEO, publishing workflows, and product credibility.",
+    caption: "Writing that documents how we build and operate software systems.",
     image: "/brand/editorial-system.png",
-    alt: "CodeTelemetryLab editorial system dashboard for SEO-ready content publishing",
+    alt: "CodeTelemetryLab editorial workspace for engineering articles",
   },
   portal: {
     eyebrow: "Portal surface",

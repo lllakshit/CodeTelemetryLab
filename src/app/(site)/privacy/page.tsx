@@ -21,6 +21,10 @@ export default function PrivacyPage() {
 
       <div className="mt-12 space-y-8 text-sm leading-7 text-slate-700">
         <section>
+          <h2 className="text-xl font-semibold text-slate-950">Last updated</h2>
+          <p className="mt-3">22 July 2026</p>
+        </section>
+        <section>
           <h2 className="text-xl font-semibold text-slate-950">Information we collect</h2>
           <p className="mt-3">
             When you submit the contact form, we may collect your name, email address, message, and any optional

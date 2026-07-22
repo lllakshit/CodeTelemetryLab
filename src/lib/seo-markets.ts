@@ -279,11 +279,11 @@ export const seoServices: SeoService[] = [
     name: "Next.js Development",
     shortName: "Next.js",
     primaryKeyword: "Next.js development company",
-    secondaryKeywords: ["hire Next.js developers", "Next.js agency", "Next.js SEO website"],
+    secondaryKeywords: ["hire Next.js developers", "Next.js agency", "Next.js product websites"],
     description:
-      "SEO-ready Next.js applications with App Router patterns, metadata, and performance discipline.",
+      "Next.js applications with App Router patterns, solid metadata, and performance discipline for product and marketing surfaces.",
     outcomes: [
-      "Strong SEO and Core Web Vitals foundations",
+      "Fast public pages with maintainable structure",
       "Server and client rendering used intentionally",
       "Content and product surfaces in one codebase",
     ],
@@ -292,7 +292,7 @@ export const seoServices: SeoService[] = [
       {
         question: "Is Next.js a good fit for lead-generation websites?",
         answer:
-          "Yes. Next.js is especially strong when you need SEO, fast pages, structured content, and room to grow into portals or product features.",
+          "Yes. Next.js is especially strong when you need fast pages, structured content, and room to grow into portals or product features.",
       },
     ],
     relatedSlugs: ["react-development", "website-development", "saas-development"],
@@ -426,14 +426,14 @@ export const seoServices: SeoService[] = [
     shortName: "Websites",
     primaryKeyword: "website development company",
     secondaryKeywords: ["B2B website development", "agency website development", "lead generation website"],
-    description: "High-trust marketing and lead-generation websites with SEO structure and conversion-focused UX.",
-    outcomes: ["Better qualified inquiries", "Clear positioning", "SEO-ready information architecture"],
-    deliverables: ["IA and copy structure", "Design system implementation", "SEO metadata", "Forms and analytics"],
+    description: "High-trust marketing and lead-generation websites with clear information architecture and conversion-focused UX.",
+    outcomes: ["Better qualified inquiries", "Clear positioning", "Maintainable content structure"],
+    deliverables: ["IA and copy structure", "Design system implementation", "Page metadata", "Forms and analytics"],
     faqs: [
       {
         question: "Do you build brochure sites or conversion systems?",
         answer:
-          "Conversion systems. Every site is structured for positioning, trust, SEO, and a clear path to an inquiry.",
+          "Conversion systems. Every site is structured for positioning, trust, and a clear path to an inquiry.",
       },
     ],
     relatedSlugs: ["nextjs-development", "react-development", "mvp-development"],
@@ -569,7 +569,7 @@ export const seoCities: SeoCity[] = [
     region: "Florida",
     timezone: "America/New_York",
     priority: "secondary",
-    localAngle: "Expanding tech and services market with lower SEO difficulty than coastal hubs.",
+    localAngle: "Expanding tech and services market with strong demand for custom product work.",
   },
   {
     slug: "phoenix",
@@ -641,7 +641,7 @@ export const seoCities: SeoCity[] = [
     region: "England",
     timezone: "Europe/London",
     priority: "secondary",
-    localAngle: "High commercial intent for AI, SaaS, and custom software with selective long-tail opportunity.",
+    localAngle: "High commercial demand for AI, SaaS, and custom software from established operators.",
   },
   {
     slug: "dubai",
@@ -661,7 +661,7 @@ export const seoCities: SeoCity[] = [
     region: "New South Wales",
     timezone: "Australia/Sydney",
     priority: "secondary",
-    localAngle: "SaaS and services buyers with strong English-language SEO opportunity on long-tail terms.",
+    localAngle: "SaaS and services buyers who need clear English-language delivery and durable systems.",
   },
 ]
 
