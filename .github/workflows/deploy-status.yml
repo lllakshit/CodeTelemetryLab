@@ -1,0 +1,57 @@
+name: Deploy status
+
+# Deployments are handled by the Vercel GitHub integration:
+# - push/merge to Staging  -> staging.codetelemetrylab.me (Preview alias on Staging branch)
+# - push/merge to main     -> www.codetelemetrylab.me (Production)
+# - pull requests          -> unique Preview URLs from Vercel
+#
+# This workflow only posts a reminder comment on PRs targeting Staging or main.
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - Staging
+      - main
+
+jobs:
+  note:
+    name: Deployment target
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Comment deploy target
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const base = context.payload.pull_request.base.ref;
+            const head = context.payload.pull_request.head.ref;
+            const body =
+              base === "Staging"
+                ? `### Deploy target: Staging\n\nAfter merge, Vercel will deploy \`${head}\` → **Staging** at https://staging.codetelemetrylab.me\n\nPRs also get a unique Preview URL from the Vercel check on this PR.`
+                : `### Deploy target: Production\n\nAfter merge to \`main\`, Vercel will deploy to **Production** at https://www.codetelemetrylab.me\n\nPromote only after verifying Staging.`;
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            const existing = comments.find((c) =>
+              c.user?.type === "Bot" && c.body?.includes("### Deploy target:")
+            );
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+            }

@@ -1,92 +1,76 @@
 {
   "homepage": {
     "key": "homepage",
-    "heroEyebrow": "Engineering partner for modern product teams",
-    "heroTitle": "Enterprise-grade software systems for teams that need clarity, speed, and trust.",
-    "heroDescription": "CodeTelemetryLab builds product platforms, internal tools, and automation systems for USA and Canada clients who want disciplined execution, believable design, and a handoff path that stays readable after launch.",
-    "primaryCtaLabel": "Start a project",
+    "heroEyebrow": "Software engineering for product teams",
+    "heroTitle": "Build the system your operators can run—not a slide deck that looks finished.",
+    "heroDescription": "CodeTelemetryLab designs and ships AI features, automation workflows, SaaS products, and custom software for startups and operating teams across North America, Europe, the UAE, Australia, and India.",
+    "primaryCtaLabel": "Send a project brief",
     "primaryCtaHref": "/contact",
-    "secondaryCtaLabel": "See case studies",
+    "secondaryCtaLabel": "See selected work",
     "secondaryCtaHref": "/projects",
     "services": [
       {
         "title": "AI Automation",
-        "description": "Workflow automation, agent-assisted operations, and practical AI features that reduce manual effort without turning the core product into a gimmick.",
-        "notes": "Operations, support, internal tooling"
+        "description": "Workflow automation and practical AI features that remove repetitive work while keeping human review where it matters.",
+        "notes": "Operations & support"
       },
       {
         "title": "Web Development",
-        "description": "Fast, accessible, and maintainable frontends built with modern React and Next.js architecture for public sites, dashboards, and internal tools.",
-        "notes": "Marketing sites, portals, dashboards"
+        "description": "Public sites, portals, and dashboards in React and Next.js—fast enough for customers, clear enough for your team to maintain.",
+        "notes": "Sites & portals"
       },
       {
         "title": "SaaS Platforms",
-        "description": "Multi-tenant product systems with authentication, roles, billing-ready structure, and operational foundations that can support the second phase without a rewrite.",
-        "notes": "MVPs, internal SaaS, client portals"
+        "description": "Multi-tenant products with authentication, roles, and operational foundations that can grow without a rewrite.",
+        "notes": "MVP to platform"
       },
       {
         "title": "API Engineering",
-        "description": "Clean backend layers, route handlers, integrations, and system boundaries that scale with product demand and team size.",
-        "notes": "CRUD, integrations, sync jobs"
+        "description": "Backend services, integrations, and sync jobs with explicit boundaries so data stays consistent as volume grows.",
+        "notes": "Integrations & APIs"
       },
       {
         "title": "Technical Documentation",
-        "description": "Documentation systems that help teams ship, hand off, and support software without losing context between releases.",
-        "notes": "Runbooks, product docs, onboarding"
+        "description": "Runbooks, product docs, and onboarding material so the system survives the first staffing change.",
+        "notes": "Handoff & ops"
       },
       {
         "title": "Cloud Infrastructure",
-        "description": "Practical deployment architecture for Vercel and adjacent cloud services with an eye on reliability, observability, and environment hygiene.",
-        "notes": "Deployment, environment setup, delivery"
+        "description": "Deployment architecture, environments, and observability tuned for reliability—not for demo day.",
+        "notes": "Delivery & hosting"
       }
     ],
-    "testimonials": [
-      {
-        "name": "SaaS founder, Toronto",
-        "role": "Product lead",
-        "quote": "The work felt like it came from an internal engineering team: structured, specific, and easy to hand off."
-      },
-      {
-        "name": "Agency operator, Austin",
-        "role": "Delivery partner",
-        "quote": "They reduced ambiguity early and kept the build focused on what would actually ship."
-      },
-      {
-        "name": "Operations lead, Vancouver",
-        "role": "Internal systems owner",
-        "quote": "The biggest difference was clarity. We knew what was live, what was editable, and what needed to happen next."
-      }
-    ],
+    "testimonials": [],
     "stats": [
       {
-        "label": "Discovery to delivery",
-        "value": "2-8 weeks"
+        "label": "Typical first release",
+        "value": "2–8 weeks"
       },
       {
-        "label": "Primary time zone",
-        "value": "UTC-5 to UTC-8 overlap"
+        "label": "Time-zone overlap",
+        "value": "Americas & Asia"
       },
       {
         "label": "Engagement model",
-        "value": "Project and retainer"
+        "value": "Project or retainer"
       }
     ],
     "process": [
       {
         "title": "Discover",
-        "description": "We scope the problem, constraints, users, and technical direction before touching production code."
+        "description": "Map the operating problem, users, constraints, and success criteria before writing production code."
       },
       {
         "title": "Build",
-        "description": "We ship the smallest useful version quickly, then refine the structure and workflow with real feedback."
+        "description": "Ship the smallest useful release, validate with real workflows, then harden the edges that fail first."
       },
       {
         "title": "Stabilize",
-        "description": "We harden the system, document the handoff, and create a path for future features."
+        "description": "Document environments, ownership, and the next release path so your team can run the system without us."
       }
     ],
-    "ctaTitle": "Build the next version with an engineering partner, not a template shop.",
-    "ctaDescription": "If the first release needs to feel credible to customers, investors, or operators, the foundation has to be disciplined from day one."
+    "ctaTitle": "Ready to scope a release that has to work in production?",
+    "ctaDescription": "Send a short brief: the problem, who uses the system, the deadline, and any tools that must connect. We reply with a clear next step within one business day."
   },
   "blogs": [
     {
@@ -104,7 +88,7 @@
       ],
       "seoTitle": "Next.js SaaS architecture for B2B products that need to scale | CodeTelemetryLab",
       "seoDescription": "Learn how to plan next.js saas architecture with production architecture, operations workflows, performance, and SEO in mind.",
-      "isPublished": true,
+      "isPublished": false,
       "publishedAt": "2026-01-05T00:00:00.000Z",
       "createdAt": "2026-01-05T00:00:00.000Z",
       "updatedAt": "2026-06-20T00:00:00.000Z"
@@ -124,7 +108,7 @@
       ],
       "seoTitle": "React performance optimization for content-heavy business websites | CodeTelemetryLab",
       "seoDescription": "Learn how to plan react performance with production architecture, operations workflows, performance, and SEO in mind.",
-      "isPublished": true,
+      "isPublished": false,
       "publishedAt": "2026-01-06T00:00:00.000Z",
       "createdAt": "2026-01-06T00:00:00.000Z",
       "updatedAt": "2026-06-20T00:00:00.000Z"
@@ -144,7 +128,7 @@
       ],
       "seoTitle": "TypeScript patterns for safer API contracts in full-stack apps | CodeTelemetryLab",
       "seoDescription": "Learn how to plan typescript apis with production architecture, operations workflows, performance, and SEO in mind.",
-      "isPublished": true,
+      "isPublished": false,
       "publishedAt": "2026-01-07T00:00:00.000Z",
       "createdAt": "2026-01-07T00:00:00.000Z",
       "updatedAt": "2026-06-20T00:00:00.000Z"
@@ -164,7 +148,7 @@
       ],
       "seoTitle": "Node.js backend architecture for reliable agency and startup platforms | CodeTelemetryLab",
       "seoDescription": "Learn how to plan node.js backends with production architecture, operations workflows, performance, and SEO in mind.",
-      "isPublished": true,
+      "isPublished": false,
       "publishedAt": "2026-01-08T00:00:00.000Z",
       "createdAt": "2026-01-08T00:00:00.000Z",
       "updatedAt": "2026-06-20T00:00:00.000Z"
@@ -184,7 +168,7 @@
       ],
       "seoTitle": "When NestJS is the right choice for enterprise Node.js platforms | CodeTelemetryLab",
       "seoDescription": "Learn how to plan nestjs systems with production architecture, operations workflows, performance, and SEO in mind.",
-      "isPublished": true,
+      "isPublished": false,
       "publishedAt": "2026-01-09T00:00:00.000Z",
       "createdAt": "2026-01-09T00:00:00.000Z",
       "updatedAt": "2026-06-20T00:00:00.000Z"
@@ -204,7 +188,7 @@
       ],
       "seoTitle": "Modernizing legacy Express applications without stopping delivery | CodeTelemetryLab",
       "seoDescription": "Learn how to plan express modernization with production architecture, operations workflows, performance, and SEO in mind.",
-      "isPublished": true,
+      "isPublished": false,
       "publishedAt": "2026-01-10T00:00:00.000Z",
       "createdAt": "2026-01-10T00:00:00.000Z",
       "updatedAt": "2026-06-20T00:00:00.000Z"
@@ -224,7 +208,7 @@
       ],
       "seoTitle": "PostgreSQL schema design for SaaS products and internal tools | CodeTelemetryLab",
       "seoDescription": "Learn how to plan postgresql design with production architecture, operations workflows, performance, and SEO in mind.",
-      "isPublished": true,
+      "isPublished": false,
       "publishedAt": "2026-01-11T00:00:00.000Z",
       "createdAt": "2026-01-11T00:00:00.000Z",
       "updatedAt": "2026-06-20T00:00:00.000Z"
@@ -244,7 +228,7 @@
       ],
       "seoTitle": "MongoDB data modeling for product teams that need flexibility | CodeTelemetryLab",
       "seoDescription": "Learn how to plan mongodb modeling with production architecture, operations workflows, performance, and SEO in mind.",
-      "isPublished": true,
+      "isPublished": false,
       "publishedAt": "2026-01-12T00:00:00.000Z",
       "createdAt": "2026-01-12T00:00:00.000Z",
       "updatedAt": "2026-06-20T00:00:00.000Z"
@@ -264,7 +248,7 @@
       ],
       "seoTitle": "Redis caching strategies that improve speed without hiding bugs | CodeTelemetryLab",
       "seoDescription": "Learn how to plan redis caching with production architecture, operations workflows, performance, and SEO in mind.",
-      "isPublished": true,
+      "isPublished": false,
       "publishedAt": "2026-01-13T00:00:00.000Z",
       "createdAt": "2026-01-13T00:00:00.000Z",
       "updatedAt": "2026-06-20T00:00:00.000Z"
@@ -284,7 +268,7 @@
       ],
       "seoTitle": "Docker for predictable software delivery across teams and environments | CodeTelemetryLab",
       "seoDescription": "Learn how to plan docker delivery with production architecture, operations workflows, performance, and SEO in mind.",
-      "isPublished": true,
+      "isPublished": false,
       "publishedAt": "2026-01-14T00:00:00.000Z",
       "createdAt": "2026-01-14T00:00:00.000Z",
       "updatedAt": "2026-06-20T00:00:00.000Z"
@@ -304,7 +288,7 @@
       ],
       "seoTitle": "How to decide whether a product really needs Kubernetes | CodeTelemetryLab",
       "seoDescription": "Learn how to plan kubernetes readiness with production architecture, operations workflows, performance, and SEO in mind.",
-      "isPublished": true,
+      "isPublished": false,
       "publishedAt": "2026-01-15T00:00:00.000Z",
       "createdAt": "2026-01-15T00:00:00.000Z",
       "updatedAt": "2026-06-20T00:00:00.000Z"
@@ -324,7 +308,7 @@
       ],
       "seoTitle": "AWS launch architecture for startups that expect real traffic | CodeTelemetryLab",
       "seoDescription": "Learn how to plan aws launches with production architecture, operations workflows, performance, and SEO in mind.",
-      "isPublished": true,
+      "isPublished": false,
       "publishedAt": "2026-01-16T00:00:00.000Z",
       "createdAt": "2026-01-16T00:00:00.000Z",
       "updatedAt": "2026-06-20T00:00:00.000Z"
@@ -344,7 +328,7 @@
       ],
       "seoTitle": "Azure migration planning for companies replacing legacy workflows | CodeTelemetryLab",
       "seoDescription": "Learn how to plan azure modernization with production architecture, operations workflows, performance, and SEO in mind.",
-      "isPublished": true,
+      "isPublished": false,
       "publishedAt": "2026-01-17T00:00:00.000Z",
       "createdAt": "2026-01-17T00:00:00.000Z",
       "updatedAt": "2026-06-20T00:00:00.000Z"
@@ -364,7 +348,7 @@
       ],
       "seoTitle": "Google Cloud architecture for data-heavy business applications | CodeTelemetryLab",
       "seoDescription": "Learn how to plan google cloud with production architecture, operations workflows, performance, and SEO in mind.",
-      "isPublished": true,
+      "isPublished": false,
       "publishedAt": "2026-01-18T00:00:00.000Z",
       "createdAt": "2026-01-18T00:00:00.000Z",
       "updatedAt": "2026-06-20T00:00:00.000Z"
@@ -384,7 +368,7 @@
       ],
       "seoTitle": "CI/CD pipelines that make releases calmer instead of just faster | CodeTelemetryLab",
       "seoDescription": "Learn how to plan ci/cd with production architecture, operations workflows, performance, and SEO in mind.",
-      "isPublished": true,
+      "isPublished": false,
       "publishedAt": "2026-01-19T00:00:00.000Z",
       "createdAt": "2026-01-19T00:00:00.000Z",
       "updatedAt": "2026-06-20T00:00:00.000Z"
@@ -404,7 +388,7 @@
       ],
       "seoTitle": "Web security basics every SaaS MVP should handle before launch | CodeTelemetryLab",
       "seoDescription": "Learn how to plan web security with production architecture, operations workflows, performance, and SEO in mind.",
-      "isPublished": true,
+      "isPublished": false,
       "publishedAt": "2026-01-20T00:00:00.000Z",
       "createdAt": "2026-01-20T00:00:00.000Z",
       "updatedAt": "2026-06-20T00:00:00.000Z"
@@ -424,7 +408,7 @@
       ],
       "seoTitle": "Authentication and authorization design for operations-heavy products | CodeTelemetryLab",
       "seoDescription": "Learn how to plan authentication with production architecture, operations workflows, performance, and SEO in mind.",
-      "isPublished": true,
+      "isPublished": false,
       "publishedAt": "2026-01-21T00:00:00.000Z",
       "createdAt": "2026-01-21T00:00:00.000Z",
       "updatedAt": "2026-06-20T00:00:00.000Z"
@@ -444,7 +428,7 @@
       ],
       "seoTitle": "OAuth and JWT decisions that affect product security and UX | CodeTelemetryLab",
       "seoDescription": "Learn how to plan oauth and jwt with production architecture, operations workflows, performance, and SEO in mind.",
-      "isPublished": true,
+      "isPublished": false,
       "publishedAt": "2026-01-22T00:00:00.000Z",
       "createdAt": "2026-01-22T00:00:00.000Z",
       "updatedAt": "2026-06-20T00:00:00.000Z"
@@ -464,7 +448,7 @@
       ],
       "seoTitle": "Practical AI integration for business software without gimmicks | CodeTelemetryLab",
       "seoDescription": "Learn how to plan ai integration with production architecture, operations workflows, performance, and SEO in mind.",
-      "isPublished": true,
+      "isPublished": false,
       "publishedAt": "2026-01-23T00:00:00.000Z",
       "createdAt": "2026-01-23T00:00:00.000Z",
       "updatedAt": "2026-06-20T00:00:00.000Z"
@@ -484,7 +468,7 @@
       ],
       "seoTitle": "How to build a chatbot that helps support teams instead of distracting users | CodeTelemetryLab",
       "seoDescription": "Learn how to plan chatbots with production architecture, operations workflows, performance, and SEO in mind.",
-      "isPublished": true,
+      "isPublished": false,
       "publishedAt": "2026-01-24T00:00:00.000Z",
       "createdAt": "2026-01-24T00:00:00.000Z",
       "updatedAt": "2026-06-20T00:00:00.000Z"
@@ -504,7 +488,7 @@
       ],
       "seoTitle": "Business automation workflows that remove busywork safely | CodeTelemetryLab",
       "seoDescription": "Learn how to plan automation with production architecture, operations workflows, performance, and SEO in mind.",
-      "isPublished": true,
+      "isPublished": false,
       "publishedAt": "2026-01-25T00:00:00.000Z",
       "createdAt": "2026-01-25T00:00:00.000Z",
       "updatedAt": "2026-06-20T00:00:00.000Z"
@@ -524,7 +508,7 @@
       ],
       "seoTitle": "Custom CRM development for sales teams that need better follow-up | CodeTelemetryLab",
       "seoDescription": "Learn how to plan crm development with production architecture, operations workflows, performance, and SEO in mind.",
-      "isPublished": true,
+      "isPublished": false,
       "publishedAt": "2026-01-26T00:00:00.000Z",
       "createdAt": "2026-01-26T00:00:00.000Z",
       "updatedAt": "2026-06-20T00:00:00.000Z"
@@ -544,7 +528,7 @@
       ],
       "seoTitle": "ERP software planning for operations teams with messy processes | CodeTelemetryLab",
       "seoDescription": "Learn how to plan erp development with production architecture, operations workflows, performance, and SEO in mind.",
-      "isPublished": true,
+      "isPublished": false,
       "publishedAt": "2026-01-27T00:00:00.000Z",
       "createdAt": "2026-01-27T00:00:00.000Z",
       "updatedAt": "2026-06-20T00:00:00.000Z"
@@ -564,7 +548,7 @@
       ],
       "seoTitle": "Healthcare software development with privacy and workflow clarity | CodeTelemetryLab",
       "seoDescription": "Learn how to plan healthcare software with production architecture, operations workflows, performance, and SEO in mind.",
-      "isPublished": true,
+      "isPublished": false,
       "publishedAt": "2026-01-28T00:00:00.000Z",
       "createdAt": "2026-01-28T00:00:00.000Z",
       "updatedAt": "2026-06-20T00:00:00.000Z"
@@ -584,7 +568,7 @@
       ],
       "seoTitle": "FinTech software architecture for trust, audit trails, and payments | CodeTelemetryLab",
       "seoDescription": "Learn how to plan fintech software with production architecture, operations workflows, performance, and SEO in mind.",
-      "isPublished": true,
+      "isPublished": false,
       "publishedAt": "2026-01-29T00:00:00.000Z",
       "createdAt": "2026-01-29T00:00:00.000Z",
       "updatedAt": "2026-06-20T00:00:00.000Z"
@@ -604,7 +588,7 @@
       ],
       "seoTitle": "EdTech platform development for learning teams and training businesses | CodeTelemetryLab",
       "seoDescription": "Learn how to plan edtech platforms with production architecture, operations workflows, performance, and SEO in mind.",
-      "isPublished": true,
+      "isPublished": false,
       "publishedAt": "2026-01-30T00:00:00.000Z",
       "createdAt": "2026-01-30T00:00:00.000Z",
       "updatedAt": "2026-06-20T00:00:00.000Z"
@@ -624,7 +608,7 @@
       ],
       "seoTitle": "Travel software features that improve booking confidence | CodeTelemetryLab",
       "seoDescription": "Learn how to plan travel software with production architecture, operations workflows, performance, and SEO in mind.",
-      "isPublished": true,
+      "isPublished": false,
       "publishedAt": "2026-01-31T00:00:00.000Z",
       "createdAt": "2026-01-31T00:00:00.000Z",
       "updatedAt": "2026-06-20T00:00:00.000Z"
@@ -644,7 +628,7 @@
       ],
       "seoTitle": "Restaurant software systems for ordering, loyalty, and operations | CodeTelemetryLab",
       "seoDescription": "Learn how to plan restaurant software with production architecture, operations workflows, performance, and SEO in mind.",
-      "isPublished": true,
+      "isPublished": false,
       "publishedAt": "2026-02-01T00:00:00.000Z",
       "createdAt": "2026-02-01T00:00:00.000Z",
       "updatedAt": "2026-06-20T00:00:00.000Z"
@@ -664,7 +648,7 @@
       ],
       "seoTitle": "Construction software for field operations and project visibility | CodeTelemetryLab",
       "seoDescription": "Learn how to plan construction software with production architecture, operations workflows, performance, and SEO in mind.",
-      "isPublished": true,
+      "isPublished": false,
       "publishedAt": "2026-02-02T00:00:00.000Z",
       "createdAt": "2026-02-02T00:00:00.000Z",
       "updatedAt": "2026-06-20T00:00:00.000Z"
@@ -684,7 +668,7 @@
       ],
       "seoTitle": "Manufacturing software dashboards that reduce operational blind spots | CodeTelemetryLab",
       "seoDescription": "Learn how to plan manufacturing software with production architecture, operations workflows, performance, and SEO in mind.",
-      "isPublished": true,
+      "isPublished": false,
       "publishedAt": "2026-02-03T00:00:00.000Z",
       "createdAt": "2026-02-03T00:00:00.000Z",
       "updatedAt": "2026-06-20T00:00:00.000Z"
@@ -704,7 +688,7 @@
       ],
       "seoTitle": "E-commerce development choices that protect conversion and operations | CodeTelemetryLab",
       "seoDescription": "Learn how to plan e-commerce development with production architecture, operations workflows, performance, and SEO in mind.",
-      "isPublished": true,
+      "isPublished": false,
       "publishedAt": "2026-02-04T00:00:00.000Z",
       "createdAt": "2026-02-04T00:00:00.000Z",
       "updatedAt": "2026-06-20T00:00:00.000Z"
@@ -724,7 +708,7 @@
       ],
       "seoTitle": "Stripe and Razorpay integration planning for SaaS and marketplaces | CodeTelemetryLab",
       "seoDescription": "Learn how to plan payment gateways with production architecture, operations workflows, performance, and SEO in mind.",
-      "isPublished": true,
+      "isPublished": false,
       "publishedAt": "2026-02-05T00:00:00.000Z",
       "createdAt": "2026-02-05T00:00:00.000Z",
       "updatedAt": "2026-06-20T00:00:00.000Z"
@@ -744,7 +728,7 @@
       ],
       "seoTitle": "Technical SEO foundations for Next.js websites and SaaS landing pages | CodeTelemetryLab",
       "seoDescription": "Learn how to plan technical seo with production architecture, operations workflows, performance, and SEO in mind.",
-      "isPublished": true,
+      "isPublished": false,
       "publishedAt": "2026-02-06T00:00:00.000Z",
       "createdAt": "2026-02-06T00:00:00.000Z",
       "updatedAt": "2026-06-20T00:00:00.000Z"
@@ -764,7 +748,7 @@
       ],
       "seoTitle": "Core Web Vitals optimization for websites that need leads | CodeTelemetryLab",
       "seoDescription": "Learn how to plan core web vitals with production architecture, operations workflows, performance, and SEO in mind.",
-      "isPublished": true,
+      "isPublished": false,
       "publishedAt": "2026-02-07T00:00:00.000Z",
       "createdAt": "2026-02-07T00:00:00.000Z",
       "updatedAt": "2026-06-20T00:00:00.000Z"
@@ -784,7 +768,7 @@
       ],
       "seoTitle": "Accessibility improvements that make business websites more trustworthy | CodeTelemetryLab",
       "seoDescription": "Learn how to plan accessibility with production architecture, operations workflows, performance, and SEO in mind.",
-      "isPublished": true,
+      "isPublished": false,
       "publishedAt": "2026-02-08T00:00:00.000Z",
       "createdAt": "2026-02-08T00:00:00.000Z",
       "updatedAt": "2026-06-20T00:00:00.000Z"
@@ -804,7 +788,7 @@
       ],
       "seoTitle": "Progressive web app planning for field teams and customer portals | CodeTelemetryLab",
       "seoDescription": "Learn how to plan pwas with production architecture, operations workflows, performance, and SEO in mind.",
-      "isPublished": true,
+      "isPublished": false,
       "publishedAt": "2026-02-09T00:00:00.000Z",
       "createdAt": "2026-02-09T00:00:00.000Z",
       "updatedAt": "2026-06-20T00:00:00.000Z"
@@ -824,7 +808,7 @@
       ],
       "seoTitle": "Flutter app development for cross-platform business workflows | CodeTelemetryLab",
       "seoDescription": "Learn how to plan flutter apps with production architecture, operations workflows, performance, and SEO in mind.",
-      "isPublished": true,
+      "isPublished": false,
       "publishedAt": "2026-02-10T00:00:00.000Z",
       "createdAt": "2026-02-10T00:00:00.000Z",
       "updatedAt": "2026-06-20T00:00:00.000Z"
@@ -844,7 +828,7 @@
       ],
       "seoTitle": "React Native app development for product teams with web experience | CodeTelemetryLab",
       "seoDescription": "Learn how to plan react native with production architecture, operations workflows, performance, and SEO in mind.",
-      "isPublished": true,
+      "isPublished": false,
       "publishedAt": "2026-02-11T00:00:00.000Z",
       "createdAt": "2026-02-11T00:00:00.000Z",
       "updatedAt": "2026-06-20T00:00:00.000Z"
@@ -864,7 +848,7 @@
       ],
       "seoTitle": "Microservices architecture decisions for growing software products | CodeTelemetryLab",
       "seoDescription": "Learn how to plan microservices with production architecture, operations workflows, performance, and SEO in mind.",
-      "isPublished": true,
+      "isPublished": false,
       "publishedAt": "2026-02-12T00:00:00.000Z",
       "createdAt": "2026-02-12T00:00:00.000Z",
       "updatedAt": "2026-06-20T00:00:00.000Z"
@@ -884,7 +868,7 @@
       ],
       "seoTitle": "Cloud migration planning that avoids expensive rewrites | CodeTelemetryLab",
       "seoDescription": "Learn how to plan cloud migration with production architecture, operations workflows, performance, and SEO in mind.",
-      "isPublished": true,
+      "isPublished": false,
       "publishedAt": "2026-02-13T00:00:00.000Z",
       "createdAt": "2026-02-13T00:00:00.000Z",
       "updatedAt": "2026-06-20T00:00:00.000Z"
@@ -904,7 +888,7 @@
       ],
       "seoTitle": "Database optimization work that actually improves product speed | CodeTelemetryLab",
       "seoDescription": "Learn how to plan database optimization with production architecture, operations workflows, performance, and SEO in mind.",
-      "isPublished": true,
+      "isPublished": false,
       "publishedAt": "2026-02-14T00:00:00.000Z",
       "createdAt": "2026-02-14T00:00:00.000Z",
       "updatedAt": "2026-06-20T00:00:00.000Z"
@@ -924,7 +908,7 @@
       ],
       "seoTitle": "Startup MVP development that proves the business without creating debt | CodeTelemetryLab",
       "seoDescription": "Learn how to plan startup mvp with production architecture, operations workflows, performance, and SEO in mind.",
-      "isPublished": true,
+      "isPublished": false,
       "publishedAt": "2026-02-15T00:00:00.000Z",
       "createdAt": "2026-02-15T00:00:00.000Z",
       "updatedAt": "2026-06-20T00:00:00.000Z"
@@ -944,7 +928,7 @@
       ],
       "seoTitle": "Custom software development for companies outgrowing spreadsheets | CodeTelemetryLab",
       "seoDescription": "Learn how to plan custom software with production architecture, operations workflows, performance, and SEO in mind.",
-      "isPublished": true,
+      "isPublished": false,
       "publishedAt": "2026-02-16T00:00:00.000Z",
       "createdAt": "2026-02-16T00:00:00.000Z",
       "updatedAt": "2026-06-20T00:00:00.000Z"
@@ -964,7 +948,7 @@
       ],
       "seoTitle": "Digital transformation projects that start with workflow clarity | CodeTelemetryLab",
       "seoDescription": "Learn how to plan digital transformation with production architecture, operations workflows, performance, and SEO in mind.",
-      "isPublished": true,
+      "isPublished": false,
       "publishedAt": "2026-02-17T00:00:00.000Z",
       "createdAt": "2026-02-17T00:00:00.000Z",
       "updatedAt": "2026-06-20T00:00:00.000Z"
@@ -984,7 +968,7 @@
       ],
       "seoTitle": "API development practices for integrations that keep working | CodeTelemetryLab",
       "seoDescription": "Learn how to plan api development with production architecture, operations workflows, performance, and SEO in mind.",
-      "isPublished": true,
+      "isPublished": false,
       "publishedAt": "2026-02-18T00:00:00.000Z",
       "createdAt": "2026-02-18T00:00:00.000Z",
       "updatedAt": "2026-06-20T00:00:00.000Z"
@@ -1004,7 +988,7 @@
       ],
       "seoTitle": "Website speed optimization for service businesses competing on trust | CodeTelemetryLab",
       "seoDescription": "Learn how to plan website speed with production architecture, operations workflows, performance, and SEO in mind.",
-      "isPublished": true,
+      "isPublished": false,
       "publishedAt": "2026-02-19T00:00:00.000Z",
       "createdAt": "2026-02-19T00:00:00.000Z",
       "updatedAt": "2026-06-20T00:00:00.000Z"
@@ -1024,7 +1008,7 @@
       ],
       "seoTitle": "Technical content systems that support SEO and sales conversations | CodeTelemetryLab",
       "seoDescription": "Learn how to plan technical content with production architecture, operations workflows, performance, and SEO in mind.",
-      "isPublished": true,
+      "isPublished": false,
       "publishedAt": "2026-02-20T00:00:00.000Z",
       "createdAt": "2026-02-20T00:00:00.000Z",
       "updatedAt": "2026-06-20T00:00:00.000Z"
@@ -1044,7 +1028,7 @@
       ],
       "seoTitle": "Lead management workflows for agency websites and B2B services | CodeTelemetryLab",
       "seoDescription": "Learn how to plan lead management with production architecture, operations workflows, performance, and SEO in mind.",
-      "isPublished": true,
+      "isPublished": false,
       "publishedAt": "2026-02-21T00:00:00.000Z",
       "createdAt": "2026-02-21T00:00:00.000Z",
       "updatedAt": "2026-06-20T00:00:00.000Z"
@@ -1064,7 +1048,7 @@
       ],
       "seoTitle": "Operations panel design for content, leads, and operational control | CodeTelemetryLab",
       "seoDescription": "Learn how to plan operations panels with production architecture, operations workflows, performance, and SEO in mind.",
-      "isPublished": true,
+      "isPublished": false,
       "publishedAt": "2026-02-22T00:00:00.000Z",
       "createdAt": "2026-02-22T00:00:00.000Z",
       "updatedAt": "2026-06-20T00:00:00.000Z"
@@ -1084,7 +1068,7 @@
       ],
       "seoTitle": "Observability planning for software teams before production incidents | CodeTelemetryLab",
       "seoDescription": "Learn how to plan observability with production architecture, operations workflows, performance, and SEO in mind.",
-      "isPublished": true,
+      "isPublished": false,
       "publishedAt": "2026-02-23T00:00:00.000Z",
       "createdAt": "2026-02-23T00:00:00.000Z",
       "updatedAt": "2026-06-20T00:00:00.000Z"
@@ -1104,7 +1088,7 @@
       ],
       "seoTitle": "Why agency projects fail in the first 30 days",
       "seoDescription": "A practical breakdown of the early decisions that make software delivery succeed or stall.",
-      "isPublished": true,
+      "isPublished": false,
       "publishedAt": "2026-05-20T00:00:00.000Z",
       "createdAt": "2026-05-20T00:00:00.000Z",
       "updatedAt": "2026-05-20T00:00:00.000Z"
@@ -1124,7 +1108,7 @@
       ],
       "seoTitle": "What a real operations panel needs at phase one",
       "seoDescription": "A straightforward checklist for the first version of an internal content system.",
-      "isPublished": true,
+      "isPublished": false,
       "publishedAt": "2026-05-21T00:00:00.000Z",
       "createdAt": "2026-05-21T00:00:00.000Z",
       "updatedAt": "2026-05-21T00:00:00.000Z"
@@ -1144,7 +1128,7 @@
       ],
       "seoTitle": "Shipping trust before shipping more features",
       "seoDescription": "Why credible releases are usually built on clarity and operational confidence, not maximum feature count.",
-      "isPublished": true,
+      "isPublished": false,
       "publishedAt": "2026-05-23T00:00:00.000Z",
       "createdAt": "2026-05-23T00:00:00.000Z",
       "updatedAt": "2026-05-23T00:00:00.000Z"
@@ -1164,7 +1148,7 @@
       ],
       "seoTitle": "Content operations are part of the product",
       "seoDescription": "Why editable content, metadata, and operational clarity should be part of the product architecture from the beginning.",
-      "isPublished": true,
+      "isPublished": false,
       "publishedAt": "2026-05-25T00:00:00.000Z",
       "createdAt": "2026-05-25T00:00:00.000Z",
       "updatedAt": "2026-05-25T00:00:00.000Z"
@@ -1189,8 +1173,8 @@
         "/og-image.svg"
       ],
       "results": "The engagement improved operational visibility, reduced repetitive follow-up, and gave the team a production-ready workflow for intake, review, reporting, and customer communication.",
-      "featured": true,
-      "isPublished": true,
+      "featured": false,
+      "isPublished": false,
       "createdAt": "2026-02-01T00:00:00.000Z",
       "updatedAt": "2026-06-18T00:00:00.000Z"
     },
@@ -1212,8 +1196,8 @@
         "/og-image.svg"
       ],
       "results": "The engagement improved operational visibility, reduced repetitive follow-up, and gave the team a production-ready workflow for intake, review, reporting, and customer communication.",
-      "featured": true,
-      "isPublished": true,
+      "featured": false,
+      "isPublished": false,
       "createdAt": "2026-02-02T00:00:00.000Z",
       "updatedAt": "2026-06-18T00:00:00.000Z"
     },
@@ -1235,8 +1219,8 @@
         "/og-image.svg"
       ],
       "results": "The engagement improved operational visibility, reduced repetitive follow-up, and gave the team a production-ready workflow for intake, review, reporting, and customer communication.",
-      "featured": true,
-      "isPublished": true,
+      "featured": false,
+      "isPublished": false,
       "createdAt": "2026-02-03T00:00:00.000Z",
       "updatedAt": "2026-06-18T00:00:00.000Z"
     },
@@ -1258,8 +1242,8 @@
         "/og-image.svg"
       ],
       "results": "The engagement improved operational visibility, reduced repetitive follow-up, and gave the team a production-ready workflow for intake, review, reporting, and customer communication.",
-      "featured": true,
-      "isPublished": true,
+      "featured": false,
+      "isPublished": false,
       "createdAt": "2026-02-04T00:00:00.000Z",
       "updatedAt": "2026-06-18T00:00:00.000Z"
     },
@@ -1281,8 +1265,8 @@
         "/og-image.svg"
       ],
       "results": "The engagement improved operational visibility, reduced repetitive follow-up, and gave the team a production-ready workflow for intake, review, reporting, and customer communication.",
-      "featured": true,
-      "isPublished": true,
+      "featured": false,
+      "isPublished": false,
       "createdAt": "2026-02-05T00:00:00.000Z",
       "updatedAt": "2026-06-18T00:00:00.000Z"
     },
@@ -1304,8 +1288,8 @@
         "/og-image.svg"
       ],
       "results": "The engagement improved operational visibility, reduced repetitive follow-up, and gave the team a production-ready workflow for intake, review, reporting, and customer communication.",
-      "featured": true,
-      "isPublished": true,
+      "featured": false,
+      "isPublished": false,
       "createdAt": "2026-02-06T00:00:00.000Z",
       "updatedAt": "2026-06-18T00:00:00.000Z"
     },
@@ -1328,7 +1312,7 @@
       ],
       "results": "The engagement improved operational visibility, reduced repetitive follow-up, and gave the team a production-ready workflow for intake, review, reporting, and customer communication.",
       "featured": false,
-      "isPublished": true,
+      "isPublished": false,
       "createdAt": "2026-02-07T00:00:00.000Z",
       "updatedAt": "2026-06-18T00:00:00.000Z"
     },
@@ -1351,7 +1335,7 @@
       ],
       "results": "The engagement improved operational visibility, reduced repetitive follow-up, and gave the team a production-ready workflow for intake, review, reporting, and customer communication.",
       "featured": false,
-      "isPublished": true,
+      "isPublished": false,
       "createdAt": "2026-02-08T00:00:00.000Z",
       "updatedAt": "2026-06-18T00:00:00.000Z"
     },
@@ -1374,7 +1358,7 @@
       ],
       "results": "The engagement improved operational visibility, reduced repetitive follow-up, and gave the team a production-ready workflow for intake, review, reporting, and customer communication.",
       "featured": false,
-      "isPublished": true,
+      "isPublished": false,
       "createdAt": "2026-02-09T00:00:00.000Z",
       "updatedAt": "2026-06-18T00:00:00.000Z"
     },
@@ -1397,7 +1381,7 @@
       ],
       "results": "The engagement improved operational visibility, reduced repetitive follow-up, and gave the team a production-ready workflow for intake, review, reporting, and customer communication.",
       "featured": false,
-      "isPublished": true,
+      "isPublished": false,
       "createdAt": "2026-02-10T00:00:00.000Z",
       "updatedAt": "2026-06-18T00:00:00.000Z"
     },
@@ -1420,7 +1404,7 @@
       ],
       "results": "The engagement improved operational visibility, reduced repetitive follow-up, and gave the team a production-ready workflow for intake, review, reporting, and customer communication.",
       "featured": false,
-      "isPublished": true,
+      "isPublished": false,
       "createdAt": "2026-02-11T00:00:00.000Z",
       "updatedAt": "2026-06-18T00:00:00.000Z"
     },
@@ -1443,7 +1427,7 @@
       ],
       "results": "The engagement improved operational visibility, reduced repetitive follow-up, and gave the team a production-ready workflow for intake, review, reporting, and customer communication.",
       "featured": false,
-      "isPublished": true,
+      "isPublished": false,
       "createdAt": "2026-02-12T00:00:00.000Z",
       "updatedAt": "2026-06-18T00:00:00.000Z"
     },
@@ -1466,7 +1450,7 @@
       ],
       "results": "The engagement improved operational visibility, reduced repetitive follow-up, and gave the team a production-ready workflow for intake, review, reporting, and customer communication.",
       "featured": false,
-      "isPublished": true,
+      "isPublished": false,
       "createdAt": "2026-02-13T00:00:00.000Z",
       "updatedAt": "2026-06-18T00:00:00.000Z"
     },
@@ -1489,7 +1473,7 @@
       ],
       "results": "The engagement improved operational visibility, reduced repetitive follow-up, and gave the team a production-ready workflow for intake, review, reporting, and customer communication.",
       "featured": false,
-      "isPublished": true,
+      "isPublished": false,
       "createdAt": "2026-02-14T00:00:00.000Z",
       "updatedAt": "2026-06-18T00:00:00.000Z"
     },
@@ -1512,7 +1496,7 @@
       ],
       "results": "The engagement improved operational visibility, reduced repetitive follow-up, and gave the team a production-ready workflow for intake, review, reporting, and customer communication.",
       "featured": false,
-      "isPublished": true,
+      "isPublished": false,
       "createdAt": "2026-02-15T00:00:00.000Z",
       "updatedAt": "2026-06-18T00:00:00.000Z"
     },
@@ -1535,7 +1519,7 @@
       ],
       "results": "The engagement improved operational visibility, reduced repetitive follow-up, and gave the team a production-ready workflow for intake, review, reporting, and customer communication.",
       "featured": false,
-      "isPublished": true,
+      "isPublished": false,
       "createdAt": "2026-02-16T00:00:00.000Z",
       "updatedAt": "2026-06-18T00:00:00.000Z"
     },
@@ -1558,7 +1542,7 @@
       ],
       "results": "The engagement improved operational visibility, reduced repetitive follow-up, and gave the team a production-ready workflow for intake, review, reporting, and customer communication.",
       "featured": false,
-      "isPublished": true,
+      "isPublished": false,
       "createdAt": "2026-02-17T00:00:00.000Z",
       "updatedAt": "2026-06-18T00:00:00.000Z"
     },
@@ -1581,7 +1565,7 @@
       ],
       "results": "The engagement improved operational visibility, reduced repetitive follow-up, and gave the team a production-ready workflow for intake, review, reporting, and customer communication.",
       "featured": false,
-      "isPublished": true,
+      "isPublished": false,
       "createdAt": "2026-02-18T00:00:00.000Z",
       "updatedAt": "2026-06-18T00:00:00.000Z"
     },
@@ -1604,7 +1588,7 @@
       ],
       "results": "The engagement improved operational visibility, reduced repetitive follow-up, and gave the team a production-ready workflow for intake, review, reporting, and customer communication.",
       "featured": false,
-      "isPublished": true,
+      "isPublished": false,
       "createdAt": "2026-02-19T00:00:00.000Z",
       "updatedAt": "2026-06-18T00:00:00.000Z"
     },
@@ -1627,7 +1611,7 @@
       ],
       "results": "The engagement improved operational visibility, reduced repetitive follow-up, and gave the team a production-ready workflow for intake, review, reporting, and customer communication.",
       "featured": false,
-      "isPublished": true,
+      "isPublished": false,
       "createdAt": "2026-02-20T00:00:00.000Z",
       "updatedAt": "2026-06-18T00:00:00.000Z"
     },
@@ -1650,7 +1634,7 @@
       ],
       "results": "The engagement improved operational visibility, reduced repetitive follow-up, and gave the team a production-ready workflow for intake, review, reporting, and customer communication.",
       "featured": false,
-      "isPublished": true,
+      "isPublished": false,
       "createdAt": "2026-02-21T00:00:00.000Z",
       "updatedAt": "2026-06-18T00:00:00.000Z"
     },
@@ -1673,7 +1657,7 @@
       ],
       "results": "The engagement improved operational visibility, reduced repetitive follow-up, and gave the team a production-ready workflow for intake, review, reporting, and customer communication.",
       "featured": false,
-      "isPublished": true,
+      "isPublished": false,
       "createdAt": "2026-02-22T00:00:00.000Z",
       "updatedAt": "2026-06-18T00:00:00.000Z"
     },
@@ -1696,7 +1680,7 @@
       ],
       "results": "The engagement improved operational visibility, reduced repetitive follow-up, and gave the team a production-ready workflow for intake, review, reporting, and customer communication.",
       "featured": false,
-      "isPublished": true,
+      "isPublished": false,
       "createdAt": "2026-02-23T00:00:00.000Z",
       "updatedAt": "2026-06-18T00:00:00.000Z"
     },
@@ -1719,7 +1703,7 @@
       ],
       "results": "The engagement improved operational visibility, reduced repetitive follow-up, and gave the team a production-ready workflow for intake, review, reporting, and customer communication.",
       "featured": false,
-      "isPublished": true,
+      "isPublished": false,
       "createdAt": "2026-02-24T00:00:00.000Z",
       "updatedAt": "2026-06-18T00:00:00.000Z"
     },
@@ -1742,7 +1726,7 @@
       ],
       "results": "The engagement improved operational visibility, reduced repetitive follow-up, and gave the team a production-ready workflow for intake, review, reporting, and customer communication.",
       "featured": false,
-      "isPublished": true,
+      "isPublished": false,
       "createdAt": "2026-02-25T00:00:00.000Z",
       "updatedAt": "2026-06-18T00:00:00.000Z"
     },
@@ -1765,7 +1749,7 @@
       ],
       "results": "The engagement improved operational visibility, reduced repetitive follow-up, and gave the team a production-ready workflow for intake, review, reporting, and customer communication.",
       "featured": false,
-      "isPublished": true,
+      "isPublished": false,
       "createdAt": "2026-02-26T00:00:00.000Z",
       "updatedAt": "2026-06-18T00:00:00.000Z"
     },
@@ -1788,7 +1772,7 @@
       ],
       "results": "The engagement improved operational visibility, reduced repetitive follow-up, and gave the team a production-ready workflow for intake, review, reporting, and customer communication.",
       "featured": false,
-      "isPublished": true,
+      "isPublished": false,
       "createdAt": "2026-02-27T00:00:00.000Z",
       "updatedAt": "2026-06-18T00:00:00.000Z"
     },
@@ -1811,7 +1795,7 @@
       ],
       "results": "The engagement improved operational visibility, reduced repetitive follow-up, and gave the team a production-ready workflow for intake, review, reporting, and customer communication.",
       "featured": false,
-      "isPublished": true,
+      "isPublished": false,
       "createdAt": "2026-02-28T00:00:00.000Z",
       "updatedAt": "2026-06-18T00:00:00.000Z"
     },
@@ -1834,7 +1818,7 @@
       ],
       "results": "The engagement improved operational visibility, reduced repetitive follow-up, and gave the team a production-ready workflow for intake, review, reporting, and customer communication.",
       "featured": false,
-      "isPublished": true,
+      "isPublished": false,
       "createdAt": "2026-03-01T00:00:00.000Z",
       "updatedAt": "2026-06-18T00:00:00.000Z"
     },
@@ -1857,7 +1841,7 @@
       ],
       "results": "The engagement improved operational visibility, reduced repetitive follow-up, and gave the team a production-ready workflow for intake, review, reporting, and customer communication.",
       "featured": false,
-      "isPublished": true,
+      "isPublished": false,
       "createdAt": "2026-03-02T00:00:00.000Z",
       "updatedAt": "2026-06-18T00:00:00.000Z"
     },
@@ -1880,7 +1864,7 @@
       ],
       "results": "The engagement improved operational visibility, reduced repetitive follow-up, and gave the team a production-ready workflow for intake, review, reporting, and customer communication.",
       "featured": false,
-      "isPublished": true,
+      "isPublished": false,
       "createdAt": "2026-03-03T00:00:00.000Z",
       "updatedAt": "2026-06-18T00:00:00.000Z"
     },
@@ -1903,7 +1887,7 @@
       ],
       "results": "The engagement improved operational visibility, reduced repetitive follow-up, and gave the team a production-ready workflow for intake, review, reporting, and customer communication.",
       "featured": false,
-      "isPublished": true,
+      "isPublished": false,
       "createdAt": "2026-03-04T00:00:00.000Z",
       "updatedAt": "2026-06-18T00:00:00.000Z"
     },
@@ -1926,7 +1910,7 @@
       ],
       "results": "The engagement improved operational visibility, reduced repetitive follow-up, and gave the team a production-ready workflow for intake, review, reporting, and customer communication.",
       "featured": false,
-      "isPublished": true,
+      "isPublished": false,
       "createdAt": "2026-03-05T00:00:00.000Z",
       "updatedAt": "2026-06-18T00:00:00.000Z"
     },
@@ -1949,7 +1933,7 @@
       ],
       "results": "The engagement improved operational visibility, reduced repetitive follow-up, and gave the team a production-ready workflow for intake, review, reporting, and customer communication.",
       "featured": false,
-      "isPublished": true,
+      "isPublished": false,
       "createdAt": "2026-03-06T00:00:00.000Z",
       "updatedAt": "2026-06-18T00:00:00.000Z"
     },
@@ -1972,7 +1956,7 @@
       ],
       "results": "The engagement improved operational visibility, reduced repetitive follow-up, and gave the team a production-ready workflow for intake, review, reporting, and customer communication.",
       "featured": false,
-      "isPublished": true,
+      "isPublished": false,
       "createdAt": "2026-03-07T00:00:00.000Z",
       "updatedAt": "2026-06-18T00:00:00.000Z"
     },
@@ -1995,7 +1979,7 @@
       ],
       "results": "The engagement improved operational visibility, reduced repetitive follow-up, and gave the team a production-ready workflow for intake, review, reporting, and customer communication.",
       "featured": false,
-      "isPublished": true,
+      "isPublished": false,
       "createdAt": "2026-03-08T00:00:00.000Z",
       "updatedAt": "2026-06-18T00:00:00.000Z"
     },
@@ -2018,7 +2002,7 @@
       ],
       "results": "The engagement improved operational visibility, reduced repetitive follow-up, and gave the team a production-ready workflow for intake, review, reporting, and customer communication.",
       "featured": false,
-      "isPublished": true,
+      "isPublished": false,
       "createdAt": "2026-03-09T00:00:00.000Z",
       "updatedAt": "2026-06-18T00:00:00.000Z"
     },
@@ -2041,7 +2025,7 @@
       ],
       "results": "The engagement improved operational visibility, reduced repetitive follow-up, and gave the team a production-ready workflow for intake, review, reporting, and customer communication.",
       "featured": false,
-      "isPublished": true,
+      "isPublished": false,
       "createdAt": "2026-03-10T00:00:00.000Z",
       "updatedAt": "2026-06-18T00:00:00.000Z"
     },
@@ -2064,7 +2048,7 @@
       ],
       "results": "The engagement improved operational visibility, reduced repetitive follow-up, and gave the team a production-ready workflow for intake, review, reporting, and customer communication.",
       "featured": false,
-      "isPublished": true,
+      "isPublished": false,
       "createdAt": "2026-03-11T00:00:00.000Z",
       "updatedAt": "2026-06-18T00:00:00.000Z"
     },
@@ -2087,7 +2071,7 @@
       ],
       "results": "The engagement improved operational visibility, reduced repetitive follow-up, and gave the team a production-ready workflow for intake, review, reporting, and customer communication.",
       "featured": false,
-      "isPublished": true,
+      "isPublished": false,
       "createdAt": "2026-03-12T00:00:00.000Z",
       "updatedAt": "2026-06-18T00:00:00.000Z"
     },
@@ -2110,7 +2094,7 @@
       ],
       "results": "The engagement improved operational visibility, reduced repetitive follow-up, and gave the team a production-ready workflow for intake, review, reporting, and customer communication.",
       "featured": false,
-      "isPublished": true,
+      "isPublished": false,
       "createdAt": "2026-03-13T00:00:00.000Z",
       "updatedAt": "2026-06-18T00:00:00.000Z"
     },
@@ -2133,7 +2117,7 @@
       ],
       "results": "The engagement improved operational visibility, reduced repetitive follow-up, and gave the team a production-ready workflow for intake, review, reporting, and customer communication.",
       "featured": false,
-      "isPublished": true,
+      "isPublished": false,
       "createdAt": "2026-03-14T00:00:00.000Z",
       "updatedAt": "2026-06-18T00:00:00.000Z"
     },
@@ -2156,7 +2140,7 @@
       ],
       "results": "The engagement improved operational visibility, reduced repetitive follow-up, and gave the team a production-ready workflow for intake, review, reporting, and customer communication.",
       "featured": false,
-      "isPublished": true,
+      "isPublished": false,
       "createdAt": "2026-03-15T00:00:00.000Z",
       "updatedAt": "2026-06-18T00:00:00.000Z"
     },
@@ -2179,7 +2163,7 @@
       ],
       "results": "The engagement improved operational visibility, reduced repetitive follow-up, and gave the team a production-ready workflow for intake, review, reporting, and customer communication.",
       "featured": false,
-      "isPublished": true,
+      "isPublished": false,
       "createdAt": "2026-03-16T00:00:00.000Z",
       "updatedAt": "2026-06-18T00:00:00.000Z"
     },
@@ -2202,7 +2186,7 @@
       ],
       "results": "The engagement improved operational visibility, reduced repetitive follow-up, and gave the team a production-ready workflow for intake, review, reporting, and customer communication.",
       "featured": false,
-      "isPublished": true,
+      "isPublished": false,
       "createdAt": "2026-03-17T00:00:00.000Z",
       "updatedAt": "2026-06-18T00:00:00.000Z"
     },

@@ -12,9 +12,29 @@ import { BrandIllustration } from "@/components/brand-illustration"
 import { SectionHeading } from "@/components/section-heading"
 import { getBlogPostBySlug, listBlogPosts } from "@/lib/cms"
 import { mdxComponents } from "@/components/mdx-components"
-import { absoluteUrl, organizationJsonLd } from "@/lib/seo"
+import { absoluteUrl, breadcrumbJsonLd, buildPageMetadata, organizationJsonLd } from "@/lib/seo"
 
 export const dynamic = "force-dynamic"
+
+function findRelatedPosts(
+  posts: Awaited<ReturnType<typeof listBlogPosts>>,
+  current: Awaited<ReturnType<typeof listBlogPosts>>[number],
+) {
+  const currentTags = new Set(current.tags.map((tag) => tag.toLowerCase()))
+
+  return posts
+    .filter((candidate) => candidate.slug !== current.slug)
+    .map((candidate) => {
+      const sharesCategory = candidate.category === current.category
+      const sharedTags = candidate.tags.filter((tag) => currentTags.has(tag.toLowerCase())).length
+      const score = (sharesCategory ? 2 : 0) + sharedTags
+      return { candidate, score }
+    })
+    .filter((entry) => entry.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 3)
+    .map((entry) => entry.candidate)
+}
 
 function stripLeadingHeading(content: string, title: string) {
   const normalized = content.trimStart()
@@ -41,28 +61,31 @@ export async function generateMetadata({
   const { slug } = await params
   const post = await getBlogPostBySlug(slug)
 
-  if (!post) return {}
+  if (!post || !post.isPublished) return {}
+
+  const title = post.seoTitle || post.title
+  const description = post.seoDescription || post.excerpt
+  const image = post.featuredImage || "/og-image.svg"
+  const base = buildPageMetadata({
+    title,
+    description,
+    path: `/blog/${post.slug}`,
+    keywords: post.tags,
+  })
 
   return {
-    title: post.seoTitle || post.title,
-    description: post.seoDescription || post.excerpt,
-    alternates: {
-      canonical: `/blog/${post.slug}`,
-    },
+    ...base,
     openGraph: {
-      title: post.seoTitle || post.title,
-      description: post.seoDescription || post.excerpt,
-      url: absoluteUrl(`/blog/${post.slug}`),
+      ...base.openGraph,
       type: "article",
       publishedTime: post.publishedAt ?? undefined,
       modifiedTime: post.updatedAt,
-      images: post.featuredImage ? [post.featuredImage] : ["/og-image.svg"],
+      images: [image],
+      tags: post.tags,
     },
     twitter: {
-      card: "summary_large_image",
-      title: post.seoTitle || post.title,
-      description: post.seoDescription || post.excerpt,
-      images: post.featuredImage ? [post.featuredImage] : ["/og-image.svg"],
+      ...base.twitter,
+      images: [image],
     },
   }
 }
@@ -80,17 +103,19 @@ export default async function BlogDetailPage({
   const { slug } = await params
   const post = await getBlogPostBySlug(slug)
 
-  if (!post) notFound()
+  if (!post || !post.isPublished) notFound()
 
   const readTime = estimateReadTime(post.content)
   const articleJsonLd = {
     "@context": "https://schema.org",
-    "@type": "Article",
+    "@type": "BlogPosting",
     headline: post.title,
     description: post.seoDescription || post.excerpt,
     image: post.featuredImage ? absoluteUrl(post.featuredImage) : absoluteUrl("/og-image.svg"),
     datePublished: post.publishedAt,
     dateModified: post.updatedAt,
+    articleSection: post.category,
+    keywords: post.tags.join(", "),
     author: {
       "@type": "Organization",
       name: organizationJsonLd.name,
@@ -99,6 +124,15 @@ export default async function BlogDetailPage({
     publisher: organizationJsonLd,
     mainEntityOfPage: absoluteUrl(`/blog/${post.slug}`),
   }
+
+  const breadcrumbs = breadcrumbJsonLd([
+    { name: "Home", path: "/" },
+    { name: "Blog", path: "/blog" },
+    { name: post.title, path: `/blog/${post.slug}` },
+  ])
+
+  const allPosts = await listBlogPosts({ publishedOnly: true })
+  const relatedPosts = findRelatedPosts(allPosts, post)
 
   const { content } = await compileMDX({
     source: stripLeadingHeading(post.content, post.title),
@@ -118,8 +152,35 @@ export default async function BlogDetailPage({
         suppressHydrationWarning
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
       />
-      <Link href="/blog" className="inline-flex items-center gap-2 text-sm font-medium text-slate-700 transition hover:text-slate-950">
-        <ArrowLeft className="h-4 w-4" />
+      <script
+        type="application/ld+json"
+        suppressHydrationWarning
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbs) }}
+      />
+
+      <nav aria-label="Breadcrumb" className="text-sm text-slate-500">
+        <ol className="flex flex-wrap items-center gap-2">
+          <li>
+            <Link href="/" className="hover:text-slate-900">
+              Home
+            </Link>
+          </li>
+          <li aria-hidden="true">/</li>
+          <li>
+            <Link href="/blog" className="hover:text-slate-900">
+              Blog
+            </Link>
+          </li>
+          <li aria-hidden="true">/</li>
+          <li className="text-slate-900">{post.title}</li>
+        </ol>
+      </nav>
+
+      <Link
+        href="/blog"
+        className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-slate-700 transition hover:text-slate-950"
+      >
+        <ArrowLeft className="h-4 w-4" aria-hidden="true" />
         Back to writing
       </Link>
 
@@ -147,9 +208,9 @@ export default async function BlogDetailPage({
 
       <div className="mt-12 grid gap-10 lg:grid-cols-[0.72fr_0.28fr]">
         <article className="rounded-[2rem] border border-slate-200 bg-white p-6 lg:p-8">
-          {post.featuredImage ? (
+          {post.featuredImage && !post.featuredImage.includes("og-image.svg") ? (
             <figure className="mb-8 overflow-hidden rounded-[1.75rem] border border-slate-200 bg-slate-50">
-              <Image src={post.featuredImage} alt={post.title} width={1400} height={840} className="h-full w-full object-cover" />
+              <Image src={post.featuredImage} alt="" width={1400} height={840} className="h-full w-full object-cover" />
               {post.featuredImageAttribution ? (
                 <figcaption className="border-t border-slate-200 bg-white px-4 py-3 text-xs leading-5 text-slate-500">
                   Image:{" "}
@@ -181,20 +242,42 @@ export default async function BlogDetailPage({
         </article>
 
         <aside className="space-y-5">
+          {relatedPosts.length ? (
+            <div className="rounded-[1.75rem] border border-slate-200 bg-white p-5">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-blue-700">Related reading</p>
+              <div className="mt-4 flex flex-col gap-4 text-sm">
+                {relatedPosts.map((related) => (
+                  <Link
+                    key={related.slug}
+                    href={`/blog/${related.slug}`}
+                    className="group block"
+                  >
+                    <p className="font-medium text-slate-950 transition group-hover:text-blue-700">{related.title}</p>
+                    <p className="mt-1 text-xs text-slate-500">{related.category}</p>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          ) : null}
           <div className="rounded-[1.75rem] border border-slate-200 bg-white p-5">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-blue-700">Article focus</p>
-            <p className="mt-3 text-sm leading-7 text-slate-700">
-              Each article is written to support trust, clarify delivery thinking, and make the engineering brand feel grounded.
-            </p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-blue-700">Related services</p>
+            <div className="mt-4 flex flex-col gap-3 text-sm">
+              <Link href="/services" className="font-medium text-slate-700 transition hover:text-slate-950">
+                Browse services
+              </Link>
+              <Link href="/projects" className="font-medium text-slate-700 transition hover:text-slate-950">
+                View projects
+              </Link>
+            </div>
           </div>
           <div className="rounded-[1.75rem] bg-[linear-gradient(180deg,#f4f8ff,#edf5ff)] p-5">
             <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-blue-700">Need this built?</p>
             <p className="mt-3 text-sm leading-7 text-slate-700">
-              The same structure behind the article is what drives the product work: clear scope, disciplined implementation, and a handoff path.
+              Send a short brief with the workflow, timeline, and systems that need to connect.
             </p>
             <Link href="/contact" className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-slate-950">
-              Discuss a similar build
-              <ArrowRight className="h-4 w-4" />
+              Send a project brief
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
           </div>
         </aside>

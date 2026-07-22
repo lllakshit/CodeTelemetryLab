@@ -15,13 +15,13 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/88 backdrop-blur-xl">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-        <Link href="/" className="flex items-center gap-3">
+        <Link href="/" className="flex items-center gap-3" aria-label="CodeTelemetryLab home">
           <DesignMark priority labelClassName="hidden sm:inline-flex flex-col leading-none" />
         </Link>
 
-        <nav className="hidden items-center gap-8 md:flex">
+        <nav className="hidden items-center gap-8 md:flex" aria-label="Primary">
           {siteNav.map((item) => {
-            const active = pathname === item.href
+            const active = pathname === item.href || pathname.startsWith(`${item.href}/`)
             return (
               <Link
                 key={item.href}
@@ -30,6 +30,7 @@ export function SiteHeader() {
                   "text-sm font-medium transition-colors",
                   active ? "text-slate-950" : "text-slate-600 hover:text-slate-950",
                 )}
+                aria-current={active ? "page" : undefined}
               >
                 {item.label}
               </Link>
@@ -42,14 +43,15 @@ export function SiteHeader() {
             href="/contact"
             className="inline-flex items-center justify-center rounded-full border border-slate-900 bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-700"
           >
-            Book Free Consultation
+            Send a brief
           </Link>
         </div>
 
         <button
           type="button"
           className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-900 md:hidden"
-          aria-label="Toggle navigation"
+          aria-label={open ? "Close navigation" : "Open navigation"}
+          aria-expanded={open}
           onClick={() => setOpen((value) => !value)}
         >
           {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -74,7 +76,7 @@ export function SiteHeader() {
               className="rounded-2xl bg-slate-950 px-4 py-3 text-center text-sm font-semibold text-white"
               onClick={() => setOpen(false)}
             >
-              Book Free Consultation
+              Send a brief
             </Link>
           </div>
         </div>

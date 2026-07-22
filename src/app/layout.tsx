@@ -59,7 +59,7 @@ export const metadata: Metadata = {
         url: "/brand/ct-labs-logo.png",
         width: 1536,
         height: 1024,
-        alt: `${BRAND_NAME} — Code. Automate. Elevate.`,
+        alt: `${BRAND_NAME} — Build. Ship. Maintain.`,
       },
     ],
     type: "website",
