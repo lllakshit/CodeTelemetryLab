@@ -71,6 +71,11 @@ function asStringArray(value: string | string[] | undefined) {
     : []
 }
 
+function isDraft(value: string | string[] | undefined) {
+  const normalized = asString(value).trim().toLowerCase()
+  return normalized === "true" || normalized === "yes"
+}
+
 export async function listContentBlogPosts(): Promise<BlogPost[]> {
   let entries: string[]
 
@@ -91,6 +96,7 @@ export async function listContentBlogPosts(): Promise<BlogPost[]> {
         const date = asString(frontmatter.date) || new Date().toISOString()
         const title = asString(frontmatter.title)
         const description = asString(frontmatter.description)
+        const draft = isDraft(frontmatter.draft)
 
         return {
           id: `content:${slug}`,
@@ -98,12 +104,12 @@ export async function listContentBlogPosts(): Promise<BlogPost[]> {
           title,
           excerpt: description,
           content: body,
-          featuredImage: asString(frontmatter.featuredImage) || "/og-image.svg",
+          featuredImage: asString(frontmatter.featuredImage) || "/brand/ct-labs-logo.png",
           category: asString(frontmatter.category) || "Business",
           tags: asStringArray(frontmatter.tags),
           seoTitle: asString(frontmatter.seoTitle) || title,
           seoDescription: asString(frontmatter.seoDescription) || description,
-          isPublished: true,
+          isPublished: !draft,
           publishedAt: date,
           createdAt: date,
           updatedAt: date,
@@ -116,7 +122,7 @@ export async function listContentBlogPosts(): Promise<BlogPost[]> {
       }),
   )
 
-  return posts.filter((post) => post.title && post.slug && post.excerpt)
+  return posts.filter((post) => post.title && post.slug && post.excerpt && post.isPublished)
 }
 
 export async function getContentBlogPostBySlug(slug: string) {

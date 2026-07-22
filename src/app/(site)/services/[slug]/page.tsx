@@ -2,10 +2,18 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import { ArrowRight, CheckCircle2 } from "lucide-react"
+import { SystemLayersDiagram } from "@/components/diagrams/engineering-diagrams"
 import { SectionHeading } from "@/components/section-heading"
 import { absoluteUrl, serviceJsonLd } from "@/lib/seo"
-import { getServiceBySlug, seoServices } from "@/lib/seo-markets"
-import { seoCities, localServicePrioritySlugs } from "@/lib/seo-markets"
+import { getServiceNarrative } from "@/lib/service-narratives"
+import {
+  getServiceBySlug,
+  localServicePrioritySlugs,
+  seoCities,
+  seoServices,
+} from "@/lib/seo-markets"
+import { listProjects } from "@/lib/cms"
+import { getRelatedArticlesForService } from "@/lib/service-related-articles"
 
 type PageProps = {
   params: Promise<{ slug: string }>
@@ -18,13 +26,14 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params
   const service = getServiceBySlug(slug)
+  const narrative = getServiceNarrative(slug)
   if (!service) return {}
 
-  const title = `${service.name} Company | ${service.primaryKeyword}`
-  const description = `${service.description} CodeTelemetryLab delivers ${service.name.toLowerCase()} for startups, SaaS teams, and operators across the US, Canada, UK, UAE, Australia, and India.`
+  const title = `${service.name} | CodeTelemetryLab`
+  const description = narrative?.overview ?? service.description
 
   return {
-    title,
+    title: { absolute: title },
     description,
     alternates: { canonical: `/services/${service.slug}` },
     openGraph: {
@@ -47,29 +56,32 @@ export default async function ServiceDetailPage({ params }: PageProps) {
   const service = getServiceBySlug(slug)
   if (!service) notFound()
 
+  const narrative = getServiceNarrative(slug)
   const related = service.relatedSlugs
     .map((relatedSlug) => getServiceBySlug(relatedSlug))
     .filter(Boolean)
-  const localCities = seoCities.filter((city) => city.priority === "primary").slice(0, 8)
-  const showLocal =
-    (localServicePrioritySlugs as readonly string[]).includes(service.slug)
+  const projects = (await listProjects({ publishedOnly: true })).slice(0, 3)
+  const relatedArticles = getRelatedArticlesForService(service.slug)
+  const localCities = seoCities.filter((city) => city.priority === "primary").slice(0, 6)
+  const showLocal = (localServicePrioritySlugs as readonly string[]).includes(service.slug)
+
+  const faqs = narrative?.faqs?.length
+    ? narrative.faqs
+    : service.faqs
 
   const jsonLd = serviceJsonLd({
     name: service.name,
-    description: service.description,
+    description: narrative?.overview ?? service.description,
     path: `/services/${service.slug}`,
   })
 
   const faqLd = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
-    mainEntity: service.faqs.map((faq) => ({
+    mainEntity: faqs.map((faq) => ({
       "@type": "Question",
       name: faq.question,
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: faq.answer,
-      },
+      acceptedAnswer: { "@type": "Answer", text: faq.answer },
     })),
   }
 
@@ -97,9 +109,9 @@ export default async function ServiceDetailPage({ params }: PageProps) {
       </nav>
 
       <SectionHeading
-        eyebrow={service.primaryKeyword}
-        title={`${service.name} built for buyers who need production systems, not demos.`}
-        description={service.description}
+        eyebrow="Service"
+        title={service.name}
+        description={narrative?.overview ?? service.description}
         level={1}
       />
 
@@ -108,47 +120,125 @@ export default async function ServiceDetailPage({ params }: PageProps) {
           href={`/contact?service=${encodeURIComponent(service.name)}`}
           className="inline-flex items-center justify-center gap-2 rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-700"
         >
-          Start a {service.shortName.toLowerCase()} project
+          {narrative?.cta.label ?? `Discuss ${service.shortName.toLowerCase()}`}
           <ArrowRight className="h-4 w-4" />
         </Link>
         <Link
-          href="/projects"
+          href="/process"
           className="inline-flex items-center justify-center rounded-full border-2 border-slate-950 px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-slate-950 hover:text-white"
         >
-          View related work
+          How delivery works
         </Link>
       </div>
 
-      <div className="mt-14 grid gap-8 lg:grid-cols-2">
-        <section className="rounded-[2rem] border border-slate-200 bg-white p-6 lg:p-8">
-          <h2 className="text-2xl font-medium tracking-tight text-slate-950">Outcomes buyers care about</h2>
-          <ul className="mt-6 space-y-4">
-            {service.outcomes.map((item) => (
-              <li key={item} className="flex items-start gap-3 text-sm leading-7 text-slate-700">
-                <CheckCircle2 className="mt-1 h-4 w-4 shrink-0 text-blue-600" />
-                <span>{item}</span>
-              </li>
-            ))}
-          </ul>
-        </section>
+      {narrative ? (
+        <>
+          <section className="mt-14 grid gap-8 lg:grid-cols-2">
+            <div className="rounded-[2rem] border border-slate-200 bg-white p-6 lg:p-8">
+              <h2 className="text-2xl font-medium tracking-tight text-slate-950">Problems this work usually addresses</h2>
+              <ul className="mt-6 space-y-4">
+                {narrative.problems.map((item) => (
+                  <li key={item} className="flex items-start gap-3 text-sm leading-7 text-slate-700">
+                    <CheckCircle2 className="mt-1 h-4 w-4 shrink-0 text-blue-600" aria-hidden="true" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="rounded-[2rem] border border-slate-200 bg-white p-6 lg:p-8">
+              <h2 className="text-2xl font-medium tracking-tight text-slate-950">Who benefits most</h2>
+              <p className="mt-6 text-sm leading-7 text-slate-700">{narrative.whoBenefits}</p>
+              <h3 className="mt-8 text-lg font-semibold text-slate-950">Typical outcomes</h3>
+              <ul className="mt-4 space-y-3">
+                {service.outcomes.map((item) => (
+                  <li key={item} className="flex items-start gap-3 text-sm leading-7 text-slate-700">
+                    <CheckCircle2 className="mt-1 h-4 w-4 shrink-0 text-blue-600" aria-hidden="true" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </section>
 
-        <section className="rounded-[2rem] border border-slate-200 bg-white p-6 lg:p-8">
-          <h2 className="text-2xl font-medium tracking-tight text-slate-950">What the engagement includes</h2>
-          <ul className="mt-6 space-y-4">
-            {service.deliverables.map((item) => (
-              <li key={item} className="flex items-start gap-3 text-sm leading-7 text-slate-700">
-                <CheckCircle2 className="mt-1 h-4 w-4 shrink-0 text-blue-600" />
-                <span>{item}</span>
-              </li>
-            ))}
-          </ul>
-        </section>
-      </div>
+          <section className="mt-14">
+            <h2 className="text-3xl font-medium tracking-tight text-slate-950">Technical approach</h2>
+            <div className="mt-8 divide-y divide-slate-200 border-t border-slate-200">
+              {narrative.approach.map((step, index) => (
+                <article key={step.title} className="grid gap-4 py-8 lg:grid-cols-[0.22fr_0.78fr]">
+                  <p className="text-sm font-semibold text-blue-700">{String(index + 1).padStart(2, "0")}</p>
+                  <div>
+                    <h3 className="text-xl font-semibold text-slate-950">{step.title}</h3>
+                    <p className="mt-3 text-sm leading-7 text-slate-600">{step.text}</p>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
+
+          <section className="mt-8 grid gap-10 lg:grid-cols-[0.48fr_0.52fr] lg:items-center">
+            <div>
+              <h2 className="text-3xl font-medium tracking-tight text-slate-950">Architecture considerations</h2>
+              <p className="mt-4 text-sm leading-7 text-slate-600">{narrative.architecture}</p>
+              <h3 className="mt-8 text-lg font-semibold text-slate-950">Security</h3>
+              <p className="mt-3 text-sm leading-7 text-slate-600">{narrative.security}</p>
+              <h3 className="mt-8 text-lg font-semibold text-slate-950">Scaling</h3>
+              <p className="mt-3 text-sm leading-7 text-slate-600">{narrative.scaling}</p>
+            </div>
+            <div className="overflow-hidden rounded-[2rem] border border-slate-200 bg-white p-4">
+              <SystemLayersDiagram className="h-auto w-full" />
+            </div>
+          </section>
+
+          <section className="mt-14 rounded-[2rem] border border-slate-200 bg-white p-6 lg:p-8">
+            <h2 className="text-2xl font-medium text-slate-950">Technology stack</h2>
+            <div className="mt-6 flex flex-wrap gap-3">
+              {narrative.stack.map((item) => (
+                <span key={item} className="rounded-full bg-slate-100 px-4 py-2 text-sm text-slate-700">
+                  {item}
+                </span>
+              ))}
+            </div>
+            <h3 className="mt-10 text-lg font-semibold text-slate-950">Common challenges</h3>
+            <ul className="mt-4 space-y-3">
+              {narrative.challenges.map((item) => (
+                <li key={item} className="text-sm leading-7 text-slate-600">
+                  • {item}
+                </li>
+              ))}
+            </ul>
+          </section>
+        </>
+      ) : (
+        <div className="mt-14 grid gap-8 lg:grid-cols-2">
+          <section className="rounded-[2rem] border border-slate-200 bg-white p-6 lg:p-8">
+            <h2 className="text-2xl font-medium text-slate-950">Outcomes</h2>
+            <ul className="mt-6 space-y-4">
+              {service.outcomes.map((item) => (
+                <li key={item} className="flex items-start gap-3 text-sm leading-7 text-slate-700">
+                  <CheckCircle2 className="mt-1 h-4 w-4 shrink-0 text-blue-600" />
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+          <section className="rounded-[2rem] border border-slate-200 bg-white p-6 lg:p-8">
+            <h2 className="text-2xl font-medium text-slate-950">What the engagement includes</h2>
+            <ul className="mt-6 space-y-4">
+              {service.deliverables.map((item) => (
+                <li key={item} className="flex items-start gap-3 text-sm leading-7 text-slate-700">
+                  <CheckCircle2 className="mt-1 h-4 w-4 shrink-0 text-blue-600" />
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        </div>
+      )}
 
       <section className="mt-14 rounded-[2rem] border border-slate-200 bg-slate-50 p-6 lg:p-8">
-        <h2 className="text-2xl font-medium tracking-tight text-slate-950">FAQ</h2>
+        <h2 className="text-2xl font-medium tracking-tight text-slate-950">Frequently asked questions</h2>
         <div className="mt-6 space-y-6">
-          {service.faqs.map((faq) => (
+          {faqs.map((faq) => (
             <div key={faq.question}>
               <h3 className="text-lg font-medium text-slate-950">{faq.question}</h3>
               <p className="mt-2 text-sm leading-7 text-slate-600">{faq.answer}</p>
@@ -156,6 +246,24 @@ export default async function ServiceDetailPage({ params }: PageProps) {
           ))}
         </div>
       </section>
+
+      {relatedArticles.length ? (
+        <section className="mt-14">
+          <h2 className="text-2xl font-medium tracking-tight text-slate-950">Related reading</h2>
+          <ul className="mt-6 space-y-3">
+            {relatedArticles.map((article) => (
+              <li key={article.slug}>
+                <Link
+                  href={`/blog/${article.slug}`}
+                  className="text-sm font-medium text-blue-700 hover:text-blue-900"
+                >
+                  {article.title}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
       {related.length ? (
         <section className="mt-14">
@@ -177,22 +285,35 @@ export default async function ServiceDetailPage({ params }: PageProps) {
         </section>
       ) : null}
 
+      {projects.length ? (
+        <section className="mt-14">
+          <h2 className="text-2xl font-medium tracking-tight text-slate-950">Relevant projects</h2>
+          <div className="mt-6 grid gap-4 lg:grid-cols-3">
+            {projects.map((project) => (
+              <Link
+                key={project.id}
+                href={`/projects/${project.slug}`}
+                className="rounded-2xl border border-slate-200 bg-white p-5 transition hover:border-slate-400"
+              >
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-700">{project.category}</p>
+                <p className="mt-3 text-sm font-semibold text-slate-950">{project.title}</p>
+              </Link>
+            ))}
+          </div>
+        </section>
+      ) : null}
+
       {showLocal ? (
         <section className="mt-14">
-          <h2 className="text-2xl font-medium tracking-tight text-slate-950">
-            {service.name} by city
-          </h2>
-          <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
-            Local landing pages for teams searching for a {service.name.toLowerCase()} partner in their metro market.
-          </p>
+          <h2 className="text-2xl font-medium tracking-tight text-slate-950">{service.name} by market</h2>
           <div className="mt-6 flex flex-wrap gap-3">
             {localCities.map((city) => (
               <Link
                 key={city.slug}
                 href={`/locations/${city.slug}/${service.slug}`}
-                className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700 transition hover:border-slate-400 hover:text-slate-950"
+                className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700 transition hover:border-slate-400"
               >
-                {service.shortName} in {city.name}
+                {city.name}
               </Link>
             ))}
           </div>
@@ -201,16 +322,17 @@ export default async function ServiceDetailPage({ params }: PageProps) {
 
       <div className="mt-16 rounded-[2rem] border border-slate-200 bg-[linear-gradient(180deg,#f4f8ff,#edf5ff)] p-8">
         <h2 className="text-3xl font-medium tracking-tight text-slate-950">
-          Ready to scope a {service.shortName.toLowerCase()} engagement?
+          {narrative?.cta.title ?? `Ready to scope ${service.shortName.toLowerCase()}?`}
         </h2>
         <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-700">
-          Send a brief with the problem, constraints, and timeline. You get a scoped response—not a generic sales script.
+          {narrative?.cta.text ??
+            "Send a brief with the problem, constraints, and timeline. You get a scoped engineering response."}
         </p>
         <Link
           href={`/contact?service=${encodeURIComponent(service.name)}`}
           className="mt-6 inline-flex items-center gap-2 rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-700"
         >
-          Request a proposal
+          {narrative?.cta.label ?? "Send a brief"}
           <ArrowRight className="h-4 w-4" />
         </Link>
       </div>

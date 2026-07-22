@@ -4,18 +4,41 @@ import { BrandIllustration } from "@/components/brand-illustration"
 import { SectionHeading } from "@/components/section-heading"
 import { CONTACT_DISPLAY_EMAIL } from "@/lib/contact"
 import { attributionFromSearchParams } from "@/lib/lead-capture"
+import { buildPageMetadata } from "@/lib/seo"
 
-export const metadata: Metadata = {
-  title: "Contact | Book a Free Consultation",
+export const metadata: Metadata = buildPageMetadata({
+  title: "Contact | Send a Project Brief",
   description:
-    "Contact CodeTelemetryLab with your name, email, and project message. Get a real engineering response within one business day for AI, SaaS, MVP, or custom software work.",
-  alternates: { canonical: "/contact" },
-}
+    "Contact CodeTelemetryLab with your name, email, and project message. Expect a real engineering response within one business day.",
+  path: "/contact",
+})
 
 const responseNotes = [
-  "A real response within one business day",
-  "No generic intake script or outsourced sales flow",
-  "A scoped follow-up based on the actual brief you send",
+  "Reply within one business day from someone who can discuss the work",
+  "Clarifying questions or a proposed first slice—not a scripted pitch",
+  "Optional details help scope; name, email, and message are enough to start",
+]
+
+const includeHints = [
+  "The problem operators feel today",
+  "Who uses the system and who owns decisions",
+  "Deadline or launch window, even if approximate",
+  "Tools that must connect (CRM, auth, payments, docs)",
+]
+
+const contactFaqs = [
+  {
+    q: "What happens after I submit?",
+    a: "We read the brief, check fit, and reply by email. If the work is a match, we propose a discovery call or a written first-slice plan. If it is not a match, we say so.",
+  },
+  {
+    q: "What should I expect on a discovery call?",
+    a: "Thirty to forty-five minutes on users, constraints, and success criteria. We will not pressure you into a package. Notes and next steps follow in writing.",
+  },
+  {
+    q: "Do you sign NDAs?",
+    a: "Yes for serious evaluations. Send the document with your brief or after the first reply.",
+  },
 ]
 
 export default async function ContactPage({
@@ -50,9 +73,6 @@ export default async function ContactPage({
     "Startup Product Development",
     "Website Development",
     "Enterprise Software",
-    "Web development",
-    "SaaS platform",
-    "Cloud infrastructure",
   ]
 
   return (
@@ -60,8 +80,8 @@ export default async function ContactPage({
       <div className="grid gap-10 lg:grid-cols-[0.88fr_1.12fr] lg:items-center">
         <SectionHeading
           eyebrow="Contact"
-          title="Tell us what you need to ship. We will reply with a clear next step."
-          description="Start with name, email, and a short message. Extra project details are optional — they help us scope faster, but they never block a conversation."
+          title="Send a brief. Get a grounded reply."
+          description="Name, email, and a short description of the problem are enough. We respond within one business day with questions or a proposed next step."
           level={1}
         />
         <BrandIllustration variant="contact" />
@@ -87,9 +107,9 @@ export default async function ContactPage({
           <div className="rounded-[2rem] border border-slate-200 bg-white p-6">
             <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-blue-700">What to include</p>
             <ul className="mt-5 space-y-3 text-sm leading-7 text-slate-600">
-              <li>The problem or outcome you need</li>
-              <li>Any deadline or launch window (optional)</li>
-              <li>Stack preference or existing systems (optional)</li>
+              {includeHints.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
             </ul>
 
             <div className="mt-8 space-y-4 border-t border-slate-200 pt-6 text-sm text-slate-700">
@@ -101,18 +121,30 @@ export default async function ContactPage({
               </p>
               <p className="flex items-center gap-2">
                 <MapPin className="h-4 w-4 text-blue-600" />
-                Remote-first, working across North American time zones
+                Jaipur-based · remote delivery across NA, Europe, UAE & Australia
               </p>
             </div>
           </div>
 
           <div className="rounded-[2rem] bg-slate-950 p-6 text-white">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-blue-300">What happens next</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-blue-300">Engagement expectations</p>
             <div className="mt-5 space-y-4">
               {responseNotes.map((item) => (
                 <div key={item} className="flex items-start gap-3 text-sm text-slate-200">
                   <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-blue-300" />
                   <span>{item}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="rounded-[2rem] border border-slate-200 bg-white p-6">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-blue-700">Contact FAQs</p>
+            <div className="mt-5 space-y-5">
+              {contactFaqs.map((item) => (
+                <div key={item.q}>
+                  <p className="text-sm font-semibold text-slate-950">{item.q}</p>
+                  <p className="mt-2 text-sm leading-6 text-slate-600">{item.a}</p>
                 </div>
               ))}
             </div>
@@ -293,7 +325,7 @@ export default async function ContactPage({
             type="submit"
             className="mt-6 inline-flex items-center justify-center rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-700"
           >
-            Book Free Consultation
+            Send project brief
           </button>
         </form>
       </div>

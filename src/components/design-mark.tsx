@@ -49,7 +49,7 @@ export function DesignMark({
           <span className="text-[0.72rem] font-semibold uppercase tracking-[0.28em] text-slate-900">
             CodeTelemetryLab
           </span>
-          <span className="text-[0.68rem] text-slate-500">Code. Automate. Elevate.</span>
+          <span className="text-[0.68rem] text-slate-500">Build. Ship. Maintain.</span>
         </span>
       ) : null}
     </span>

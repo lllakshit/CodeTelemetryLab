@@ -6,15 +6,16 @@ import { ArrowLeft, ArrowRight, Search } from "lucide-react"
 import { BrandIllustration } from "@/components/brand-illustration"
 import { SectionHeading } from "@/components/section-heading"
 import { listBlogPosts } from "@/lib/cms"
+import { buildPageMetadata } from "@/lib/seo"
 
 const POSTS_PER_PAGE = 12
 
-export const metadata: Metadata = {
-  title: "Blog | AI, Software, SaaS & Automation Insights",
+export const metadata: Metadata = buildPageMetadata({
+  title: "Blog | Engineering Notes on Software, AI & Delivery",
   description:
-    "Buyer-intent articles on AI automation, SaaS, MVP development, React/Next.js, SEO, and hiring engineering partners—written to support qualified inquiries.",
-  alternates: { canonical: "/blog" },
-}
+    "Articles from CodeTelemetryLab on AI automation, SaaS architecture, MVP delivery, and building systems operators can run.",
+  path: "/blog",
+})
 
 function postMatchesSearch(
   post: Awaited<ReturnType<typeof listBlogPosts>>[number],
@@ -23,15 +24,7 @@ function postMatchesSearch(
 ) {
   const normalizedQuery = query.trim().toLowerCase()
   const normalizedCategory = category.trim().toLowerCase()
-  const haystack = [
-    post.title,
-    post.excerpt,
-    post.category,
-    post.tags.join(" "),
-    post.primaryKeyword,
-    post.searchIntent,
-    post.targetAudience,
-  ]
+  const haystack = [post.title, post.excerpt, post.category, post.tags.join(" ")]
     .filter(Boolean)
     .join(" ")
     .toLowerCase()
@@ -82,26 +75,47 @@ export default async function BlogPage({
       <div className="grid gap-10 lg:grid-cols-[0.88fr_1.12fr] lg:items-center">
         <SectionHeading
           eyebrow="Blog"
-          title="Writing that supports the engineering brand with real operating substance."
-          description="The editorial system is designed for SEO, publishing operations, and product credibility, not filler content."
+          title="Notes on building software that has to survive contact with operators."
+          description="Architecture trade-offs, delivery patterns, and product decisions we see across AI, automation, and SaaS work."
           level={1}
         />
         <BrandIllustration variant="blog" />
       </div>
 
-      <form action="/blog" className="mt-12 grid gap-3 rounded-[1.5rem] border border-slate-200 bg-white p-4 sm:grid-cols-[1fr_14rem_auto]">
+      <p className="mt-6 max-w-3xl text-sm leading-7 text-slate-600">
+        Most of these posts come out of client work: a data model that needed rethinking, an automation that broke
+        quietly, a launch checklist we wished existed sooner. If a post overlaps with something you are scoping, our{" "}
+        <Link href="/services" className="font-medium text-blue-700 underline decoration-slate-300 underline-offset-2 hover:text-blue-900">
+          services
+        </Link>{" "}
+        pages go deeper on approach, and the{" "}
+        <Link href="/process" className="font-medium text-blue-700 underline decoration-slate-300 underline-offset-2 hover:text-blue-900">
+          process
+        </Link>{" "}
+        page explains how an engagement actually runs.
+      </p>
+
+      <form
+        action="/blog"
+        className="mt-12 grid gap-3 rounded-[1.5rem] border border-slate-200 bg-white p-4 sm:grid-cols-[1fr_14rem_auto]"
+      >
         <label className="relative block">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+          <span className="sr-only">Search articles</span>
+          <Search
+            className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+            aria-hidden="true"
+          />
           <input
             name="q"
             defaultValue={query}
             className="h-12 w-full rounded-xl border border-slate-200 bg-white pl-10 pr-4 text-sm text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-600/10"
-            placeholder="Search services, keywords, or topics"
+            placeholder="Search articles by topic"
           />
         </label>
         <select
           name="category"
           defaultValue={selectedCategory}
+          aria-label="Filter by category"
           className="h-12 rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-700 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-600/10"
         >
           <option value="">All categories</option>
@@ -134,18 +148,18 @@ export default async function BlogPage({
           Showing {showingStart}-{showingEnd} of {visiblePosts.length} article
           {visiblePosts.length === 1 ? "" : "s"}
           {selectedCategory ? ` in ${selectedCategory}` : ""}
-          {query ? ` matching "${query}"` : ""}.
+          {query ? ` matching “${query}”` : ""}.
         </p>
       ) : null}
 
       {leadPost ? (
         <article className="mt-16 grid gap-8 rounded-[2rem] border border-slate-200 bg-white p-6 lg:grid-cols-[0.92fr_1.08fr] lg:p-8">
           <div className="grid gap-6">
-            {leadPost.featuredImage ? (
+            {leadPost.featuredImage && !leadPost.featuredImage.includes("og-image.svg") ? (
               <div className="overflow-hidden rounded-[1.75rem] border border-slate-200 bg-slate-50">
                 <Image
                   src={leadPost.featuredImage}
-                  alt={leadPost.title}
+                  alt=""
                   width={1200}
                   height={720}
                   className="h-full w-full object-cover"
@@ -175,8 +189,8 @@ export default async function BlogPage({
                 href={`/blog/${leadPost.slug}`}
                 className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-slate-950"
               >
-                Read feature article
-                <ArrowRight className="h-4 w-4" />
+                Read article
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
             </div>
           </div>
@@ -193,17 +207,6 @@ export default async function BlogPage({
               </p>
             </div>
             <div>
-              {post.featuredImage ? (
-                <div className="mb-5 overflow-hidden rounded-[1.5rem] border border-slate-200 bg-slate-50">
-                  <Image
-                    src={post.featuredImage}
-                    alt={post.title}
-                    width={1200}
-                    height={720}
-                    className="h-full w-full object-cover"
-                  />
-                </div>
-              ) : null}
               <h3 className="text-2xl font-medium tracking-tight text-slate-950">{post.title}</h3>
               <p className="mt-3 text-sm leading-7 text-slate-600">{post.excerpt}</p>
             </div>
@@ -217,7 +220,7 @@ export default async function BlogPage({
               </div>
               <Link href={`/blog/${post.slug}`} className="inline-flex items-center gap-2 text-sm font-semibold text-slate-950">
                 Read article
-                <ArrowRight className="h-4 w-4" />
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
             </div>
           </article>
@@ -242,7 +245,7 @@ export default async function BlogPage({
                   : "border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-50"
               }`}
             >
-              <ArrowLeft className="h-4 w-4" />
+              <ArrowLeft className="h-4 w-4" aria-hidden="true" />
               Previous
             </Link>
             <Link
@@ -255,7 +258,7 @@ export default async function BlogPage({
               }`}
             >
               Next
-              <ArrowRight className="h-4 w-4" />
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
           </div>
         </nav>
@@ -264,9 +267,7 @@ export default async function BlogPage({
       {!visiblePosts.length ? (
         <div className="mt-12 rounded-[1.5rem] border border-slate-200 bg-slate-50 p-8 text-center">
           <p className="text-lg font-semibold text-slate-950">No articles found</p>
-          <p className="mt-2 text-sm leading-6 text-slate-600">
-            Try a broader service, technology, or category search.
-          </p>
+          <p className="mt-2 text-sm leading-6 text-slate-600">Try a different topic or clear the filters.</p>
         </div>
       ) : null}
     </div>
