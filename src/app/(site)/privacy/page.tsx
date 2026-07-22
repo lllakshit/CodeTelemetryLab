@@ -1,13 +1,13 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { SectionHeading } from "@/components/section-heading"
-import { BRAND_EMAIL, BRAND_NAME } from "@/lib/seo"
+import { BRAND_EMAIL, BRAND_NAME, buildPageMetadata } from "@/lib/seo"
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPageMetadata({
   title: "Privacy Policy",
   description: `How ${BRAND_NAME} collects, uses, and protects information submitted through the website and project inquiry forms.`,
-  alternates: { canonical: "/privacy" },
-}
+  path: "/privacy",
+})
 
 export default function PrivacyPage() {
   return (

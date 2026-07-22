@@ -3,13 +3,14 @@ import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import { ProcessFlowDiagram, SystemLayersDiagram } from "@/components/diagrams/engineering-diagrams"
 import { SectionHeading } from "@/components/section-heading"
+import { buildPageMetadata } from "@/lib/seo"
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPageMetadata({
   title: "Process | How CodeTelemetryLab Delivers Software",
   description:
     "Discovery, architecture, build, review, deployment, monitoring, and maintenance—how CodeTelemetryLab runs engineering engagements.",
-  alternates: { canonical: "/process" },
-}
+  path: "/process",
+})
 
 const stages = [
   {

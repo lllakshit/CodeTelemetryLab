@@ -2,14 +2,15 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import { SectionHeading } from "@/components/section-heading"
+import { buildPageMetadata } from "@/lib/seo"
 import { seoServices } from "@/lib/seo-markets"
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPageMetadata({
   title: "Services | AI, Automation, SaaS & Custom Software",
   description:
     "Engineering services from CodeTelemetryLab: AI development, automation, SaaS foundations, APIs, and custom software—each page explains problems, approach, and FAQs.",
-  alternates: { canonical: "/services" },
-}
+  path: "/services",
+})
 
 export default function ServicesPage() {
   return (

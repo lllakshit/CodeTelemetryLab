@@ -4,13 +4,14 @@ import { BrandIllustration } from "@/components/brand-illustration"
 import { SectionHeading } from "@/components/section-heading"
 import { CONTACT_DISPLAY_EMAIL } from "@/lib/contact"
 import { attributionFromSearchParams } from "@/lib/lead-capture"
+import { buildPageMetadata } from "@/lib/seo"
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPageMetadata({
   title: "Contact | Send a Project Brief",
   description:
     "Contact CodeTelemetryLab with your name, email, and project message. Expect a real engineering response within one business day.",
-  alternates: { canonical: "/contact" },
-}
+  path: "/contact",
+})
 
 const responseNotes = [
   "Reply within one business day from someone who can discuss the work",

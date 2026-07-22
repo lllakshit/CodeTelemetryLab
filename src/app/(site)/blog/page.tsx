@@ -6,15 +6,16 @@ import { ArrowLeft, ArrowRight, Search } from "lucide-react"
 import { BrandIllustration } from "@/components/brand-illustration"
 import { SectionHeading } from "@/components/section-heading"
 import { listBlogPosts } from "@/lib/cms"
+import { buildPageMetadata } from "@/lib/seo"
 
 const POSTS_PER_PAGE = 12
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPageMetadata({
   title: "Blog | Engineering Notes on Software, AI & Delivery",
   description:
     "Articles from CodeTelemetryLab on AI automation, SaaS architecture, MVP delivery, and building systems operators can run.",
-  alternates: { canonical: "/blog" },
-}
+  path: "/blog",
+})
 
 function postMatchesSearch(
   post: Awaited<ReturnType<typeof listBlogPosts>>[number],
@@ -81,13 +82,29 @@ export default async function BlogPage({
         <BrandIllustration variant="blog" />
       </div>
 
+      <p className="mt-6 max-w-3xl text-sm leading-7 text-slate-600">
+        Most of these posts come out of client work: a data model that needed rethinking, an automation that broke
+        quietly, a launch checklist we wished existed sooner. If a post overlaps with something you are scoping, our{" "}
+        <Link href="/services" className="font-medium text-blue-700 underline decoration-slate-300 underline-offset-2 hover:text-blue-900">
+          services
+        </Link>{" "}
+        pages go deeper on approach, and the{" "}
+        <Link href="/process" className="font-medium text-blue-700 underline decoration-slate-300 underline-offset-2 hover:text-blue-900">
+          process
+        </Link>{" "}
+        page explains how an engagement actually runs.
+      </p>
+
       <form
         action="/blog"
         className="mt-12 grid gap-3 rounded-[1.5rem] border border-slate-200 bg-white p-4 sm:grid-cols-[1fr_14rem_auto]"
       >
         <label className="relative block">
           <span className="sr-only">Search articles</span>
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+          <Search
+            className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+            aria-hidden="true"
+          />
           <input
             name="q"
             defaultValue={query}
@@ -173,7 +190,7 @@ export default async function BlogPage({
                 className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-slate-950"
               >
                 Read article
-                <ArrowRight className="h-4 w-4" />
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
             </div>
           </div>
@@ -203,7 +220,7 @@ export default async function BlogPage({
               </div>
               <Link href={`/blog/${post.slug}`} className="inline-flex items-center gap-2 text-sm font-semibold text-slate-950">
                 Read article
-                <ArrowRight className="h-4 w-4" />
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
             </div>
           </article>
@@ -228,7 +245,7 @@ export default async function BlogPage({
                   : "border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-50"
               }`}
             >
-              <ArrowLeft className="h-4 w-4" />
+              <ArrowLeft className="h-4 w-4" aria-hidden="true" />
               Previous
             </Link>
             <Link
@@ -241,7 +258,7 @@ export default async function BlogPage({
               }`}
             >
               Next
-              <ArrowRight className="h-4 w-4" />
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
           </div>
         </nav>

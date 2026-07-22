@@ -4,18 +4,14 @@ import { ArrowRight } from "lucide-react"
 import { BrandIllustration } from "@/components/brand-illustration"
 import { SystemLayersDiagram } from "@/components/diagrams/engineering-diagrams"
 import { SectionHeading } from "@/components/section-heading"
-import { BRAND_NAME } from "@/lib/seo"
+import { BRAND_NAME, buildPageMetadata } from "@/lib/seo"
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPageMetadata({
   title: `About ${BRAND_NAME} | Engineering Philosophy & Working Principles`,
   description:
     "Why CodeTelemetryLab exists, how we approach projects, how we communicate, and how we measure success—without invented credentials.",
-  alternates: { canonical: "/about" },
-  openGraph: {
-    title: `About ${BRAND_NAME}`,
-    images: ["/brand/about-us.png"],
-  },
-}
+  path: "/about",
+})
 
 const principles = [
   {

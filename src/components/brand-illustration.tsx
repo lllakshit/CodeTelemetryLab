@@ -1,5 +1,3 @@
-import Image from "next/image"
-
 type BrandIllustrationProps = {
   variant: "about" | "contact" | "blog" | "portal" | "automation" | "platform"
   className?: string
@@ -9,20 +7,14 @@ const variantLabels = {
   about: {
     eyebrow: "Operating model",
     caption: "Discover, build, handoff, and grow — one partner from idea to production.",
-    image: "/brand/about-us.png",
-    alt: "CodeTelemetryLab operating model: Discover, Build, Handoff, and Grow",
   },
   contact: {
     eyebrow: "Inquiry flow",
     caption: "Clear intake, realistic timelines, and a human response path.",
-    image: "/brand/inquiry-flow-contact.png",
-    alt: "CodeTelemetryLab inquiry flow from project brief to kickoff and continuous support",
   },
   blog: {
     eyebrow: "Editorial system",
     caption: "Writing that documents how we build and operate software systems.",
-    image: "/brand/editorial-system.png",
-    alt: "CodeTelemetryLab editorial workspace for engineering articles",
   },
   portal: {
     eyebrow: "Portal surface",
@@ -40,8 +32,6 @@ const variantLabels = {
 
 export function BrandIllustration({ variant, className }: BrandIllustrationProps) {
   const label = variantLabels[variant]
-  const imageSrc = "image" in label ? label.image : null
-  const imageAlt = "alt" in label ? label.alt : label.eyebrow
 
   return (
     <div
@@ -56,24 +46,8 @@ export function BrandIllustration({ variant, className }: BrandIllustrationProps
         </div>
       </div>
 
-      {imageSrc ? (
-        <figure className="space-y-4">
-          <div className="relative overflow-hidden rounded-[1.5rem] border border-slate-200 bg-white">
-            <Image
-              src={imageSrc}
-              alt={imageAlt}
-              width={1536}
-              height={1024}
-              className="h-auto w-full object-cover object-top"
-              sizes="(max-width: 1024px) 100vw, 560px"
-              priority={variant === "about" || variant === "contact" || variant === "blog"}
-            />
-          </div>
-          <figcaption className="text-sm leading-6 text-slate-600">{label.caption}</figcaption>
-        </figure>
-      ) : (
-        <div aria-hidden="true">
-          <svg viewBox="0 0 720 460" className="h-full w-full" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <div aria-hidden="true">
+        <svg viewBox="0 0 720 460" className="h-full w-full" fill="none" xmlns="http://www.w3.org/2000/svg">
             <rect x="18" y="18" width="684" height="360" rx="30" fill="#F8FBFF" stroke="#DEE3E9" />
             <path d="M72 100H648" stroke="#E2E8F0" strokeDasharray="6 8" />
             <path d="M72 182H648" stroke="#E2E8F0" strokeDasharray="6 8" />
@@ -90,6 +64,36 @@ export function BrandIllustration({ variant, className }: BrandIllustrationProps
                 <path d="M168 107H278" stroke="#0064E0" strokeWidth="3" strokeLinecap="round" />
                 <path d="M374 107H484" stroke="#0064E0" strokeWidth="3" strokeLinecap="round" />
                 <path d="M360 121V214" stroke="#0064E0" strokeWidth="3" strokeLinecap="round" />
+              </>
+            ) : null}
+            {variant === "contact" ? (
+              <>
+                <rect x="72" y="70" width="164" height="74" rx="22" fill="#FFFFFF" stroke="#CBD5E1" />
+                <rect x="278" y="70" width="164" height="74" rx="22" fill="#EAF3FF" stroke="#BFDBFE" />
+                <rect x="484" y="70" width="164" height="74" rx="22" fill="#FFFFFF" stroke="#CBD5E1" />
+                <rect x="132" y="214" width="456" height="102" rx="28" fill="#FFFFFF" stroke="#CBD5E1" />
+                <circle cx="154" cy="107" r="14" stroke="#0064E0" strokeWidth="3" />
+                <circle cx="360" cy="107" r="14" stroke="#0064E0" strokeWidth="3" />
+                <circle cx="566" cy="107" r="14" stroke="#0064E0" strokeWidth="3" />
+                <path d="M168 107H278" stroke="#0064E0" strokeWidth="3" strokeLinecap="round" />
+                <path d="M374 107H484" stroke="#0064E0" strokeWidth="3" strokeLinecap="round" />
+                <path d="M360 121V214" stroke="#0064E0" strokeWidth="3" strokeLinecap="round" />
+                <path d="M164 250H420" stroke="#CBD5E1" strokeWidth="3" strokeLinecap="round" />
+                <path d="M164 278H340" stroke="#CBD5E1" strokeWidth="3" strokeLinecap="round" />
+              </>
+            ) : null}
+            {variant === "blog" ? (
+              <>
+                <rect x="92" y="88" width="196" height="216" rx="24" fill="#FFFFFF" stroke="#CBD5E1" />
+                <rect x="318" y="88" width="310" height="98" rx="22" fill="#EAF3FF" stroke="#BFDBFE" />
+                <rect x="318" y="206" width="310" height="98" rx="22" fill="#FFFFFF" stroke="#CBD5E1" />
+                <path d="M122 122H258" stroke="#0064E0" strokeWidth="3" strokeLinecap="round" />
+                <path d="M122 156H234" stroke="#CBD5E1" strokeWidth="3" strokeLinecap="round" />
+                <path d="M122 190H258" stroke="#CBD5E1" strokeWidth="3" strokeLinecap="round" />
+                <path d="M122 224H210" stroke="#CBD5E1" strokeWidth="3" strokeLinecap="round" />
+                <path d="M348 128H560" stroke="#0064E0" strokeWidth="3" strokeLinecap="round" />
+                <path d="M348 246H540" stroke="#CBD5E1" strokeWidth="3" strokeLinecap="round" />
+                <path d="M348 274H480" stroke="#CBD5E1" strokeWidth="3" strokeLinecap="round" />
               </>
             ) : null}
             {variant === "portal" ? (
@@ -141,9 +145,8 @@ export function BrandIllustration({ variant, className }: BrandIllustrationProps
             <text x="42" y="426" fill="#5D6C7B" fontSize="18" fontFamily="Arial, sans-serif">
               {label.caption}
             </text>
-          </svg>
-        </div>
-      )}
+        </svg>
+      </div>
     </div>
   )
 }

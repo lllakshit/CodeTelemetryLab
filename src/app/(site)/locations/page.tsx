@@ -1,13 +1,23 @@
 import type { Metadata } from "next"
 import Link from "next/link"
+import { ArrowRight } from "lucide-react"
 import { SectionHeading } from "@/components/section-heading"
+import { getLocationNarrative } from "@/lib/location-narratives"
+import { buildPageMetadata } from "@/lib/seo"
 import { seoCities } from "@/lib/seo-markets"
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPageMetadata({
   title: "Locations | Markets We Serve",
   description:
     "CodeTelemetryLab works with teams in India, the United States, Canada, the UK, UAE, and Australia—remote-first with clear delivery ownership.",
-  alternates: { canonical: "/locations" },
+  path: "/locations",
+})
+
+function cardBlurb(citySlug: string, fallback: string) {
+  const narrative = getLocationNarrative(citySlug)
+  if (!narrative?.intro) return fallback
+  const [firstSentence] = narrative.intro.split(/(?<=[.!?])\s+/)
+  return firstSentence || fallback
 }
 
 export default function LocationsIndexPage() {
@@ -24,9 +34,37 @@ export default function LocationsIndexPage() {
         level={1}
       />
 
+      <p className="mt-6 max-w-3xl text-sm leading-7 text-slate-600">
+        We are based in Jaipur and work across time zones daily, so these pages describe the market context we plan
+        around—collaboration hours, common stack decisions, and the workflows teams in each city usually bring us.
+        Read the{" "}
+        <Link href="/process" className="font-medium text-blue-700 underline decoration-slate-300 underline-offset-2 hover:text-blue-900">
+          delivery process
+        </Link>{" "}
+        for how an engagement runs, or{" "}
+        <Link href="/contact" className="font-medium text-blue-700 underline decoration-slate-300 underline-offset-2 hover:text-blue-900">
+          send a brief
+        </Link>{" "}
+        if your city isn&rsquo;t listed—remote delivery is not limited to this list.
+      </p>
+
       <MarketGroup title="India" cities={india} />
       <MarketGroup title="United States & Canada" cities={northAmerica} />
       <MarketGroup title="UK, UAE & Australia" cities={international} />
+
+      <div className="mt-16 rounded-[2rem] bg-slate-950 px-6 py-10 sm:px-10">
+        <h2 className="text-3xl font-medium text-white">Don&rsquo;t see your market listed?</h2>
+        <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-300">
+          We take on remote engagements outside these cities regularly. Share the problem, timezone, and timeline.
+        </p>
+        <Link
+          href="/contact"
+          className="mt-6 inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950"
+        >
+          Send a brief
+          <ArrowRight className="h-4 w-4" aria-hidden="true" />
+        </Link>
+      </div>
     </div>
   )
 }
@@ -52,7 +90,7 @@ function MarketGroup({
             <p className="mt-1 text-xs text-slate-500">
               {city.region} · {city.country}
             </p>
-            <p className="mt-2 text-sm leading-6 text-slate-600">{city.localAngle}</p>
+            <p className="mt-2 text-sm leading-6 text-slate-600">{cardBlurb(city.slug, city.localAngle)}</p>
           </Link>
         ))}
       </div>

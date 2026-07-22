@@ -13,6 +13,7 @@ import {
   seoServices,
 } from "@/lib/seo-markets"
 import { listProjects } from "@/lib/cms"
+import { getRelatedArticlesForService } from "@/lib/service-related-articles"
 
 type PageProps = {
   params: Promise<{ slug: string }>
@@ -28,14 +29,23 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const narrative = getServiceNarrative(slug)
   if (!service) return {}
 
+  const title = `${service.name} | CodeTelemetryLab`
+  const description = narrative?.overview ?? service.description
+
   return {
-    title: service.name,
-    description: narrative?.overview ?? service.description,
+    title: { absolute: title },
+    description,
     alternates: { canonical: `/services/${service.slug}` },
     openGraph: {
-      title: `${service.name} | CodeTelemetryLab`,
-      description: narrative?.overview ?? service.description,
+      title,
+      description,
       url: absoluteUrl(`/services/${service.slug}`),
+      images: ["/brand/ct-labs-logo.png"],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
       images: ["/brand/ct-labs-logo.png"],
     },
   }
@@ -51,6 +61,7 @@ export default async function ServiceDetailPage({ params }: PageProps) {
     .map((relatedSlug) => getServiceBySlug(relatedSlug))
     .filter(Boolean)
   const projects = (await listProjects({ publishedOnly: true })).slice(0, 3)
+  const relatedArticles = getRelatedArticlesForService(service.slug)
   const localCities = seoCities.filter((city) => city.priority === "primary").slice(0, 6)
   const showLocal = (localServicePrioritySlugs as readonly string[]).includes(service.slug)
 
@@ -235,6 +246,24 @@ export default async function ServiceDetailPage({ params }: PageProps) {
           ))}
         </div>
       </section>
+
+      {relatedArticles.length ? (
+        <section className="mt-14">
+          <h2 className="text-2xl font-medium tracking-tight text-slate-950">Related reading</h2>
+          <ul className="mt-6 space-y-3">
+            {relatedArticles.map((article) => (
+              <li key={article.slug}>
+                <Link
+                  href={`/blog/${article.slug}`}
+                  className="text-sm font-medium text-blue-700 hover:text-blue-900"
+                >
+                  {article.title}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
       {related.length ? (
         <section className="mt-14">
