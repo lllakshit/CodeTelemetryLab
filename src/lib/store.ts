@@ -157,6 +157,19 @@ export type ActivityLog = {
   createdAt: string
 }
 
+export type EmailLog = {
+  id: string
+  recipient: string
+  cc: string[]
+  bcc: string[]
+  subject: string
+  body: string
+  status: "sent" | "failed"
+  errorMessage?: string | null
+  resendId?: string | null
+  createdAt: string
+}
+
 export type CmsStore = {
   homepage: HomeContent
   blogs: BlogPost[]
@@ -165,12 +178,13 @@ export type CmsStore = {
   leads: Lead[]
   media: MediaAsset[]
   activity: ActivityLog[]
+  emailLogs: EmailLog[]
 }
 
 const storePath = path.join(process.cwd(), "data", "cms-store.json")
 
 function fallbackStore() {
-  return normalizeStore(seed as Partial<CmsStore>)
+  return normalizeStore(seed as unknown as Partial<CmsStore>)
 }
 
 function leadFromMessage(message: Message): Lead {
@@ -209,13 +223,14 @@ export function normalizeStore(store: Partial<CmsStore>): CmsStore {
   const messages = store.messages ?? []
 
   return {
-    homepage: store.homepage ?? (seed as CmsStore).homepage,
+    homepage: store.homepage ?? (seed as unknown as CmsStore).homepage,
     blogs: store.blogs ?? [],
     projects: store.projects ?? [],
     messages,
     leads: store.leads ?? messages.map(leadFromMessage),
     media: store.media ?? [],
     activity: store.activity ?? [],
+    emailLogs: store.emailLogs ?? [],
   }
 }
 
