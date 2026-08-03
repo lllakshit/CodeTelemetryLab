@@ -33,7 +33,8 @@ export default async function AdminDashboardPage() {
           <div className={`${adminSurfaceSoft} p-5`}>
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-blue-700">Quick actions</p>
             <div className="mt-4 flex flex-wrap gap-3">
-              <Link href="/admin/blogs/new" className={adminAccentButton}>New blog</Link>
+              <Link href="/admin/email" className={adminAccentButton}>Compose email</Link>
+              <Link href="/admin/blogs/new" className={adminGhostButton}>New blog</Link>
               <Link href="/admin/projects/new" className={adminGhostButton}>New project</Link>
             </div>
           </div>
