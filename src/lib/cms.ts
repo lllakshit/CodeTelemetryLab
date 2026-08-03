@@ -680,7 +680,7 @@ async function ensureSupabaseSeeded() {
     return
   }
 
-  const store = normalizeStore(seed as Partial<CmsStore>)
+  const store = normalizeStore(seed as unknown as Partial<CmsStore>)
   const homepage = await supabaseClient.from(TABLES.homepage).upsert(toHomeRow(store.homepage), {
     onConflict: "key",
   })
@@ -767,7 +767,7 @@ export async function getHomeContent(): Promise<HomeContent> {
     await ensureSupabaseSeeded()
     const { data, error } = await supabaseClient.from(TABLES.homepage).select("*").eq("key", "home").maybeSingle()
     if (error) throw error
-    if (!data) return (seed as CmsStore).homepage
+    if (!data) return (seed as unknown as CmsStore).homepage
     return fromHomeRow(data as HomepageRow)
   } catch (error) {
     if (isRecoverableSupabaseReadError(error)) {

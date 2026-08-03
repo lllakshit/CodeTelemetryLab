@@ -5,5 +5,8 @@ export function getContactNotificationTo() {
 }
 
 export function getContactNotificationFrom() {
-  return process.env.CONTACT_NOTIFICATION_FROM?.trim()
+  return (
+    process.env.CONTACT_NOTIFICATION_FROM?.trim() ||
+    `CodeTelemetryLab <${CONTACT_DISPLAY_EMAIL}>`
+  )
 }
