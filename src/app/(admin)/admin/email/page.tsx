@@ -13,7 +13,7 @@ export default async function AdminEmailPage() {
         <SectionHeading
           eyebrow="Email"
           title="Send a personal outbound email."
-          description="Private admin tool for founder-led outreach. Messages include the CodeTelemetryLab logo header automatically. Not connected to the public contact form or any marketing campaigns."
+          description="Private admin tool for founder-led outreach. Messages include a light logo and site links in the footer. Not connected to the public contact form or any marketing campaigns."
         />
       </div>
 
