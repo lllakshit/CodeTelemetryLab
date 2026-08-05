@@ -1,4 +1,5 @@
 import { getContactNotificationFrom, getContactNotificationTo } from "@/lib/contact"
+import { escapeEmailHtml, wrapBrandedEmailHtml } from "@/lib/email-branding"
 
 type ContactSubmission = {
   name: string
@@ -23,20 +24,21 @@ export async function sendContactNotification(submission: ContactSubmission) {
 
   const companyLine = submission.company?.trim() ? submission.company.trim() : "Not provided"
 
-  const html = `
-    <div style="font-family: Arial, sans-serif; color: #0a1317; line-height: 1.6;">
-      <h1 style="font-size: 20px; margin-bottom: 16px;">New CodeTelemetryLab inquiry</h1>
-      <p style="margin: 0 0 8px;"><strong>Name:</strong> ${escapeHtml(submission.name)}</p>
-      <p style="margin: 0 0 8px;"><strong>Email:</strong> ${escapeHtml(submission.email)}</p>
-      <p style="margin: 0 0 8px;"><strong>Company:</strong> ${escapeHtml(companyLine)}</p>
-      <p style="margin: 0 0 8px;"><strong>Project type:</strong> ${escapeHtml(submission.projectType)}</p>
-      <p style="margin: 0 0 8px;"><strong>Budget:</strong> ${escapeHtml(submission.budget)}</p>
+  const html = wrapBrandedEmailHtml(
+    `
+      <h1 style="font-size: 20px; margin: 0 0 16px; font-weight: 600;">New CodeTelemetryLab inquiry</h1>
+      <p style="margin: 0 0 8px;"><strong>Name:</strong> ${escapeEmailHtml(submission.name)}</p>
+      <p style="margin: 0 0 8px;"><strong>Email:</strong> ${escapeEmailHtml(submission.email)}</p>
+      <p style="margin: 0 0 8px;"><strong>Company:</strong> ${escapeEmailHtml(companyLine)}</p>
+      <p style="margin: 0 0 8px;"><strong>Project type:</strong> ${escapeEmailHtml(submission.projectType)}</p>
+      <p style="margin: 0 0 8px;"><strong>Budget:</strong> ${escapeEmailHtml(submission.budget)}</p>
       <div style="margin-top: 20px; padding: 16px; border: 1px solid #dee3e9; border-radius: 16px; background: #f8fafc;">
         <p style="margin: 0 0 8px; font-weight: 700;">Message</p>
-        <p style="margin: 0; white-space: pre-wrap;">${escapeHtml(submission.message)}</p>
+        <p style="margin: 0; white-space: pre-wrap;">${escapeEmailHtml(submission.message)}</p>
       </div>
-    </div>
-  `.trim()
+    `.trim(),
+    { preheader: `New inquiry from ${submission.name}` },
+  )
 
   const text = [
     "New CodeTelemetryLab inquiry",
@@ -78,11 +80,3 @@ export async function sendContactNotification(submission: ContactSubmission) {
   }
 }
 
-function escapeHtml(value: string) {
-  return value
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#39;")
-}

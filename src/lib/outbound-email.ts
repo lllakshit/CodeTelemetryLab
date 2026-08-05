@@ -1,5 +1,6 @@
 import { z } from "zod"
 import { CONTACT_DISPLAY_EMAIL, getContactNotificationFrom } from "@/lib/contact"
+import { escapeEmailHtml, wrapBrandedEmailHtml } from "@/lib/email-branding"
 
 const emailAddress = z.string().trim().email("Enter a valid email address")
 
@@ -49,17 +50,9 @@ export function getOutboundEmailFrom() {
   return getContactNotificationFrom() || `CodeTelemetryLab <${CONTACT_DISPLAY_EMAIL}>`
 }
 
-function escapeHtml(value: string) {
-  return value
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#39;")
-}
-
 function toHtmlBody(body: string) {
-  return `<div style="font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif; font-size: 15px; line-height: 1.65; color: #0a1317; white-space: pre-wrap;">${escapeHtml(body)}</div>`
+  const inner = `<div style="white-space: pre-wrap;">${escapeEmailHtml(body)}</div>`
+  return wrapBrandedEmailHtml(inner, { preheader: body.slice(0, 140) })
 }
 
 export type OutboundEmailResult =

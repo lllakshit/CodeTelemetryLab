@@ -10,7 +10,7 @@ export async function GET() {
   <channel>
     <title>CodeTelemetryLab Blog</title>
     <link>${SITE_URL}</link>
-    <description>Engineering notes on software systems, SaaS delivery, automation, and technical SEO.</description>
+    <description>Engineering notes on software systems, SaaS delivery, automation, and product operations.</description>
     <language>en-us</language>
     <lastBuildDate>${new Date(updated).toUTCString()}</lastBuildDate>
     <atom:link href="${absoluteUrl("/feed.xml")}" rel="self" type="application/rss+xml" />

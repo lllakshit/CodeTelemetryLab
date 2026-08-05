@@ -64,7 +64,7 @@ const faqs = [
 
 export default function AboutPage() {
   return (
-    <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+    <div className="site-page">
       <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
         <SectionHeading
           eyebrow="About"
@@ -89,8 +89,8 @@ export default function AboutPage() {
         </p>
       </section>
 
-      <section className="mt-16 border-t border-slate-200">
-        <h2 className="pt-10 text-3xl font-medium tracking-tight text-slate-950">Working principles</h2>
+      <section className="mt-16 border-t border-slate-200 pt-16">
+        <h2 className="text-3xl font-medium tracking-tight text-slate-950">Working principles</h2>
         <div className="mt-8 divide-y divide-slate-200">
           {principles.map((item) => (
             <article key={item.title} className="grid gap-4 py-8 lg:grid-cols-[0.32fr_0.68fr]">
@@ -101,7 +101,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="mt-8 grid gap-10 lg:grid-cols-[0.45fr_0.55fr] lg:items-center">
+      <section className="mt-16 grid gap-10 lg:grid-cols-[0.45fr_0.55fr] lg:items-center">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-blue-700">Problem solving</p>
           <h2 className="mt-4 text-3xl font-medium tracking-tight text-slate-950">

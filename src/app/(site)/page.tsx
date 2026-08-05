@@ -149,7 +149,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl border-t border-slate-200 px-4 py-16 sm:px-6 lg:px-8">
+      <section className="site-section">
         <SectionHeading
           eyebrow="Who we help"
           title="Built for people accountable for shipping and running software."
@@ -165,7 +165,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl border-t border-slate-200 px-4 py-16 sm:px-6 lg:px-8">
+      <section className="site-section">
         <div className="grid gap-12 lg:grid-cols-[0.4fr_0.6fr]">
           <SectionHeading
             eyebrow="Capabilities"
@@ -199,7 +199,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl border-t border-slate-200 px-4 py-16 sm:px-6 lg:px-8">
+      <section className="site-section">
         <div className="grid gap-10 lg:grid-cols-[0.45fr_0.55fr] lg:items-center">
           <SectionHeading
             eyebrow="Engineering process"
@@ -219,7 +219,7 @@ export default async function HomePage() {
         </Link>
       </section>
 
-      <section className="mx-auto max-w-7xl border-t border-slate-200 px-4 py-16 sm:px-6 lg:px-8">
+      <section className="site-section">
         <SectionHeading
           eyebrow="Technologies"
           title="Tools chosen for the problem—not for a buzzword slide."
@@ -241,7 +241,7 @@ export default async function HomePage() {
         </p>
       </section>
 
-      <section className="mx-auto max-w-7xl border-t border-slate-200 px-4 py-16 sm:px-6 lg:px-8">
+      <section className="site-section">
         <SectionHeading
           eyebrow="Selected work"
           title="Case studies written as engineering narratives."
@@ -268,7 +268,7 @@ export default async function HomePage() {
         </Link>
       </section>
 
-      <section className="mx-auto max-w-7xl border-t border-slate-200 px-4 py-16 sm:px-6 lg:px-8">
+      <section className="site-section">
         <SectionHeading
           eyebrow="Why teams work with us"
           title="Competence shown in the work, not claimed in adjectives."
@@ -290,7 +290,7 @@ export default async function HomePage() {
         </Link>
       </section>
 
-      <section className="mx-auto max-w-7xl border-t border-slate-200 px-4 py-16 sm:px-6 lg:px-8">
+      <section className="site-section">
         <h2 className="text-3xl font-medium tracking-tight text-slate-950">Questions before you write</h2>
         <div className="mt-8 space-y-6">
           {homeFaqs.map((item) => (
@@ -302,7 +302,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+      <section className="site-page border-t border-slate-200">
         <div className="rounded-[2rem] bg-slate-950 px-6 py-10 sm:px-10">
           <p className="text-xs font-semibold uppercase tracking-[0.28em] text-blue-300">Next step</p>
           <h2 className="mt-4 max-w-2xl text-3xl font-medium tracking-tight text-white sm:text-4xl">
@@ -327,7 +327,7 @@ export default async function HomePage() {
       </section>
 
       {blogs.length ? (
-        <section className="mx-auto max-w-7xl border-t border-slate-200 px-4 pb-20 pt-8 sm:px-6 lg:px-8">
+        <section className="site-section">
           <SectionHeading
             eyebrow="Notes"
             title="Recent writing from the practice."

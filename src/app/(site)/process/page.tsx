@@ -64,7 +64,7 @@ const faqs = [
 
 export default function ProcessPage() {
   return (
-    <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+    <div className="site-page">
       <SectionHeading
         eyebrow="Process"
         title="How engagements run from first brief to systems your team can operate."
@@ -72,7 +72,7 @@ export default function ProcessPage() {
         level={1}
       />
 
-      <div className="mt-12 overflow-hidden rounded-[2rem] border border-slate-200 bg-white p-4 sm:p-6">
+      <div className="mt-16 overflow-hidden rounded-[2rem] border border-slate-200 bg-white p-4 sm:p-6">
         <ProcessFlowDiagram className="h-auto w-full" />
       </div>
 

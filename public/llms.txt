@@ -1,0 +1,24 @@
+# CodeTelemetryLab
+
+> Software engineering practice for AI development, automation, SaaS, MVP, and custom product systems. Based in Jaipur with remote delivery for US, Canada, UK, UAE, Australia, and India metros.
+
+## Site map
+
+- [Home](https://www.codetelemetrylab.me/): Practice overview and selected work
+- [Services](https://www.codetelemetrylab.me/services): Capability index
+- [MVP Development](https://www.codetelemetrylab.me/services/mvp-development): Idea-to-first-release engagements
+- [Process](https://www.codetelemetrylab.me/process): Discovery through maintenance
+- [Projects](https://www.codetelemetrylab.me/projects): Case studies
+- [Blog](https://www.codetelemetrylab.me/blog): Engineering notes
+- [Locations](https://www.codetelemetrylab.me/locations): Markets we serve
+- [About](https://www.codetelemetrylab.me/about): Working principles
+- [Contact](https://www.codetelemetrylab.me/contact): Send a project brief
+
+## Feeds
+
+- [XML sitemap](https://www.codetelemetrylab.me/sitemap.xml)
+- [RSS feed](https://www.codetelemetrylab.me/feed.xml)
+
+## Contact
+
+- Email: contact@codetelemetrylab.me
