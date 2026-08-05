@@ -78,7 +78,7 @@ export const organizationJsonLd = {
     "Node.js",
     "Python",
     "SaaS architecture",
-    "Technical SEO",
+    "Product operations",
   ],
   // Add real profile URLs when available (LinkedIn, GitHub, X) to strengthen brand entity.
   sameAs: [] as string[],
