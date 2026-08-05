@@ -1,6 +1,6 @@
 # Blog Content Clusters
 
-This maps the published articles in `content/blog/` into topic clusters. All other `.mdx` files in this directory are marked `draft: true` and excluded from the live site. This map should be updated whenever a draft is published or a published article is retired.
+This maps the published articles in `content/blog/` into topic clusters. Factory-template drafts live in `content/blog/_factory-drafts/` and are excluded from the live site. Update this map whenever a draft is published or a published article is retired.
 
 ## AI & Automation
 

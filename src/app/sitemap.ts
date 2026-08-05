@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next"
 import { listBlogPosts, listProjects } from "@/lib/cms"
 import { absoluteUrl } from "@/lib/seo"
-import { getLocalServicePages, seoCities, seoServices } from "@/lib/seo-markets"
+import { seoCities, seoServices } from "@/lib/seo-markets"
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let posts: Awaited<ReturnType<typeof listBlogPosts>> = []
@@ -61,12 +61,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: city.priority === "primary" ? 0.85 : 0.7,
   }))
 
-  const localServiceRoutes = getLocalServicePages().map(({ path, city }) => ({
-    url: absoluteUrl(path),
-    lastModified: now,
-    changeFrequency: "weekly" as const,
-    priority: city.priority === "primary" ? 0.8 : 0.65,
-  }))
+  // City × service combo pages stay reachable for users but are excluded from the sitemap
+  // so Google concentrates on unique service, city, project, and blog URLs.
 
   const blogRoutes = posts.map((post) => ({
     url: absoluteUrl(`/blog/${post.slug}`),
@@ -86,7 +82,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...staticRoutes,
     ...serviceRoutes,
     ...cityRoutes,
-    ...localServiceRoutes,
     ...blogRoutes,
     ...projectRoutes,
   ]

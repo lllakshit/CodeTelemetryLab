@@ -305,7 +305,7 @@ export default async function ServiceDetailPage({ params }: PageProps) {
 
       {showLocal ? (
         <section className="mt-14">
-          <h2 className="text-2xl font-medium tracking-tight text-slate-950">{service.name} by market</h2>
+          <h2 className="text-2xl font-medium tracking-tight text-slate-950">Where we commonly deliver this</h2>
           <div className="mt-6 flex flex-wrap gap-3">
             {localCities.map((city) => (
               <Link

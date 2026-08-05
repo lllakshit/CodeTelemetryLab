@@ -34,7 +34,7 @@ If your marketing team wants to publish blog posts, update landing pages, and ru
 
 ## Where Next.js genuinely wins
 
-**Performance ceiling.** A well-built Next.js site, statically generated or using modern caching strategies, can achieve loading performance that's difficult to match with a traditional WordPress setup, especially once WordPress sites accumulate plugins over time, which is a very common trajectory. Performance affects both user experience and, to a meaningful but often overstated degree, search visibility — see our related note on avoiding SEO-factory thinking below for why we're cautious about overselling this point.
+**Performance ceiling.** A well-built Next.js site, statically generated or using modern caching strategies, can achieve loading performance that's difficult to match with a traditional WordPress setup, especially once WordPress sites accumulate plugins over time. Faster pages help visitors and operators; treating speed as a silver bullet for discovery is usually oversold.
 
 **Design system consistency with your product.** If your marketing site needs to feel like a seamless extension of your actual product — shared components, consistent interactions, a design system used across both — building both in the same modern frontend stack removes a whole category of "these two things look like they were built by different teams" problems.
 
@@ -52,7 +52,7 @@ Ask three questions in order:
 
 1. **Does marketing need to publish content independently, frequently, without engineering involvement?** If no, a simpler Next.js site with content in code is often the leaner choice. If yes, continue.
 2. **Does the marketing site need deep design or data integration with the product?** If yes, lean toward Next.js with a headless CMS rather than WordPress, to keep design and data integration native. If no, continue.
-3. **Is there an existing WordPress site with substantial content and SEO history you'd lose by migrating?** If yes, that's a real cost to weigh against the other factors — migrating a mature site with search history and backlinks carries genuine risk that shouldn't be taken lightly.
+3. **Is there an existing WordPress site with substantial content and URL history you'd lose by migrating?** If yes, that's a real cost to weigh against the other factors — migrating a mature site with established URLs and inbound links carries genuine risk that shouldn't be taken lightly.
 
 ## Cost and maintenance considerations
 
@@ -64,13 +64,13 @@ Neither is inherently cheaper over a multi-year horizon — it depends on how mu
 
 - **Choosing WordPress by default without checking whether the plugin combination needed actually performs well together** — plugin conflicts and bloat are the most common source of slow, fragile WordPress sites.
 - **Choosing Next.js for performance reasons while ignoring that marketing now needs an engineer for every content update**, creating a bottleneck that outweighs the performance gain for a content-heavy site.
-- **Migrating a mature, well-ranking WordPress site to Next.js without careful redirect and technical migration planning**, risking real search visibility loss that takes months to recover from.
+- **Migrating a mature, well-trafficked WordPress site to Next.js without careful redirect and technical migration planning**, risking broken URLs and lost inbound links that take months to recover from.
 - **Treating this as a purely technical decision** without involving whoever actually owns day-to-day content publishing in the conversation.
 
 ## Frequently asked questions
 
 **Can we start with WordPress and migrate to Next.js later?**
-Yes, and many companies do exactly this as their design and performance needs grow past what WordPress comfortably supports. Plan the migration carefully around preserving URLs and search visibility if the site has meaningful existing traffic.
+Yes, and many companies do exactly this as their design and performance needs grow past what WordPress comfortably supports. Plan the migration carefully around preserving URLs and redirects if the site has meaningful existing traffic.
 
 **Does Next.js require more ongoing engineering support than WordPress?**
 For routine content updates, no, if paired with a headless CMS. For anything beyond content — layout changes, new page types — yes, Next.js changes typically go through your engineering team, where a WordPress theme with flexible page-building blocks might not need to.
