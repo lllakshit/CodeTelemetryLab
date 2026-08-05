@@ -11,7 +11,7 @@ export function SiteFooter() {
 
   return (
     <footer className="border-t border-slate-200 bg-white">
-      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+      <div className="site-page !py-16">
         <div className="grid gap-12 lg:grid-cols-[1.2fr_0.7fr_0.7fr_0.8fr]">
           <div className="max-w-xl">
             <div className="mb-5">
@@ -76,6 +76,12 @@ export function SiteFooter() {
               </Link>
               <Link href="/locations" className="text-sm text-slate-600 transition hover:text-slate-950">
                 Locations
+              </Link>
+              <Link href="/sitemap.xml" className="text-sm text-slate-600 transition hover:text-slate-950">
+                Sitemap
+              </Link>
+              <Link href="/feed.xml" className="text-sm text-slate-600 transition hover:text-slate-950">
+                RSS feed
               </Link>
             </div>
             <p className="mt-6 text-sm font-semibold text-slate-900">Markets we serve</p>

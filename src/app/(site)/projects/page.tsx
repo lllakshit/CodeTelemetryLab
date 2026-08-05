@@ -15,7 +15,7 @@ export default async function ProjectsPage() {
   const projects = await listProjects({ publishedOnly: true })
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+    <div className="site-page">
       <SectionHeading
         eyebrow="Projects"
         title="Selected work from recent product and operations engagements."
