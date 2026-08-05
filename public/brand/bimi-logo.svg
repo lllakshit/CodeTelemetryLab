@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.2" baseProfile="tiny-ps" viewBox="0 0 512 512" width="512" height="512">
+  <title>CodeTelemetryLab</title>
+  <rect width="512" height="512" fill="#ffffff"/>
+  <polygon fill="#0a1317" points="256,56 424,152 424,360 256,456 88,360 88,152"/>
+  <polygon fill="#0064e0" points="256,118 372,186 372,326 256,394 140,326 140,186"/>
+  <rect x="188" y="210" width="40" height="120" rx="8" fill="#ffffff"/>
+  <rect x="188" y="210" width="88" height="40" rx="8" fill="#ffffff"/>
+  <rect x="284" y="210" width="40" height="92" rx="8" fill="#00a3ff"/>
+  <rect x="252" y="262" width="72" height="40" rx="8" fill="#00a3ff"/>
+</svg>
