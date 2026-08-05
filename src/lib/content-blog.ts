@@ -3,8 +3,26 @@ import path from "node:path"
 import type { BlogPost } from "@/lib/store"
 
 const blogContentDir = path.join(process.cwd(), "content", "blog")
+const factoryDraftsDir = path.join(blogContentDir, "_factory-drafts")
 
 type Frontmatter = Record<string, string | string[]>
+
+let archivedFactorySlugsCache: Set<string> | null = null
+
+export async function listArchivedFactoryBlogSlugs(): Promise<Set<string>> {
+  if (archivedFactorySlugsCache) return archivedFactorySlugsCache
+
+  try {
+    const entries = await readdir(factoryDraftsDir)
+    archivedFactorySlugsCache = new Set(
+      entries.filter((entry) => entry.endsWith(".mdx")).map((entry) => entry.replace(/\.mdx$/, "")),
+    )
+  } catch {
+    archivedFactorySlugsCache = new Set()
+  }
+
+  return archivedFactorySlugsCache
+}
 
 function stripQuotes(value: string) {
   const trimmed = value.trim()
