@@ -665,18 +665,14 @@ export const seoCities: SeoCity[] = [
   },
 ]
 
-/** Priority local service combinations for programmatic SEO (avoid thin blanket pages). */
+/** Local city × service pages for primary markets only (avoids thin duplicate crawl targets). */
 export const localServicePrioritySlugs = [
   "ai-development",
   "ai-automation",
   "custom-software-development",
   "saas-development",
   "mvp-development",
-  "react-development",
-  "nextjs-development",
   "website-development",
-  "full-stack-development",
-  "business-automation",
 ] as const
 
 export function getServiceBySlug(slug: string) {
@@ -691,13 +687,13 @@ export function getLocalServicePages() {
   const services = seoServices.filter((service) =>
     (localServicePrioritySlugs as readonly string[]).includes(service.slug),
   )
-  return seoCities.flatMap((city) =>
+  const cities = seoCities.filter((city) => city.priority === "primary")
+  return cities.flatMap((city) =>
     services.map((service) => ({
       city,
       service,
       path: `/locations/${city.slug}/${service.slug}`,
-      title: `${service.name} Company in ${city.name}`,
-      keyword: `${service.name} company ${city.name}`.toLowerCase(),
+      title: `${service.name} for teams in ${city.name}`,
     })),
   )
 }

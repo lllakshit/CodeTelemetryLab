@@ -41,11 +41,15 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title: { absolute: `${title} | CodeTelemetryLab` },
     description: cleanDescription,
-    alternates: { canonical: `/locations/${city.slug}/${service.slug}` },
+    alternates: { canonical: `/services/${service.slug}` },
+    robots: {
+      index: false,
+      follow: true,
+    },
     openGraph: {
       title: `${title} | CodeTelemetryLab`,
       description: cleanDescription,
-      url: absoluteUrl(`/locations/${city.slug}/${service.slug}`),
+      url: absoluteUrl(`/services/${service.slug}`),
       images: ["/brand/ct-labs-logo.png"],
     },
     twitter: {
