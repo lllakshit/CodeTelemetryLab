@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto"
 import { isAfter, parseISO } from "date-fns"
 import seed from "../../data/cms-store.json"
-import { getContentBlogPostBySlug, listContentBlogPosts } from "@/lib/content-blog"
+import { getContentBlogPostBySlug, listArchivedFactoryBlogSlugs, listContentBlogPosts } from "@/lib/content-blog"
 import { slugify } from "@/lib/utils"
 import {
   createSupabaseAdminClient,
@@ -207,6 +207,12 @@ function mergeBlogSources(cmsPosts: BlogPost[], contentPosts: BlogPost[]) {
     ...cmsPosts.map((post) => ({ ...post, source: post.source ?? "cms" as const })),
     ...contentPosts.filter((post) => !cmsSlugs.has(post.slug)),
   ]
+}
+
+async function withoutArchivedFactoryPosts(posts: BlogPost[]) {
+  const archived = await listArchivedFactoryBlogSlugs()
+  if (!archived.size) return posts
+  return posts.filter((post) => !archived.has(post.slug))
 }
 
 function isMissingSupabaseTableError(error: unknown) {
@@ -806,10 +812,12 @@ export async function listBlogPosts(options?: { publishedOnly?: boolean }) {
   const contentPosts = await listContentBlogPosts()
 
   if (!isSupabaseReady()) {
-    return fallbackFromStore((store) => {
-      const posts = options?.publishedOnly ? store.blogs.filter((post) => post.isPublished) : store.blogs
-      return sortNewest(mergeBlogSources(posts, contentPosts))
-    })
+    return withoutArchivedFactoryPosts(
+      await fallbackFromStore((store) => {
+        const posts = options?.publishedOnly ? store.blogs.filter((post) => post.isPublished) : store.blogs
+        return sortNewest(mergeBlogSources(posts, contentPosts))
+      }),
+    )
   }
 
   try {
@@ -819,22 +827,27 @@ export async function listBlogPosts(options?: { publishedOnly?: boolean }) {
 
     const posts = (data ?? []).map((row) => fromBlogRow(row as BlogRow))
     const filtered = options?.publishedOnly ? posts.filter((post) => post.isPublished) : posts
-    return sortNewest(mergeBlogSources(filtered, contentPosts))
+    return withoutArchivedFactoryPosts(sortNewest(mergeBlogSources(filtered, contentPosts)))
   } catch (error) {
     if (isRecoverableSupabaseReadError(error)) {
-      return fallbackFromStore((store) => {
-        const posts = options?.publishedOnly ? store.blogs.filter((post) => post.isPublished) : store.blogs
-        return sortNewest(mergeBlogSources(posts, contentPosts))
-      })
+      return withoutArchivedFactoryPosts(
+        await fallbackFromStore((store) => {
+          const posts = options?.publishedOnly ? store.blogs.filter((post) => post.isPublished) : store.blogs
+          return sortNewest(mergeBlogSources(posts, contentPosts))
+        }),
+      )
     }
     throw error
   }
 }
 
 export async function getBlogPostBySlug(slug: string) {
+  const archived = await listArchivedFactoryBlogSlugs()
+  if (archived.has(slug)) return null
+
   if (!isSupabaseReady()) {
     const store = await readStore()
-    return store.blogs.find((post) => post.slug === slug) ?? await getContentBlogPostBySlug(slug)
+    return store.blogs.find((post) => post.slug === slug) ?? (await getContentBlogPostBySlug(slug))
   }
 
   try {
@@ -845,7 +858,7 @@ export async function getBlogPostBySlug(slug: string) {
   } catch (error) {
     if (isRecoverableSupabaseReadError(error)) {
       const store = await readStore()
-      return store.blogs.find((post) => post.slug === slug) ?? await getContentBlogPostBySlug(slug)
+      return store.blogs.find((post) => post.slug === slug) ?? (await getContentBlogPostBySlug(slug))
     }
     throw error
   }
