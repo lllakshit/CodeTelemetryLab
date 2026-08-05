@@ -49,7 +49,7 @@ export async function POST(request: Request) {
   const result = await sendOutboundEmail(parsed.data)
 
   await createEmailLog({
-    recipient: parsed.data.to,
+    recipient: parsed.data.to.join(", "),
     cc: parsed.data.cc,
     bcc: parsed.data.bcc,
     subject: parsed.data.subject,
@@ -65,7 +65,10 @@ export async function POST(request: Request) {
 
   return NextResponse.json({
     ok: true,
-    message: "Email sent successfully",
+    message:
+      parsed.data.to.length > 1
+        ? `Email sent successfully to ${parsed.data.to.length} recipients`
+        : "Email sent successfully",
     id: result.id,
   })
 }
