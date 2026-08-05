@@ -15,7 +15,10 @@ function parseAddressList(value: unknown) {
 }
 
 export const outboundEmailSchema = z.object({
-  to: emailAddress,
+  to: z
+    .array(emailAddress)
+    .min(1, "Add at least one recipient")
+    .max(20, "Too many To recipients"),
   cc: z
     .array(emailAddress)
     .max(20, "Too many CC recipients")
@@ -32,8 +35,9 @@ export type OutboundEmailInput = z.infer<typeof outboundEmailSchema>
 
 export function parseOutboundEmailPayload(input: unknown) {
   const source = (input ?? {}) as Record<string, unknown>
+  const toValue = Array.isArray(source.to) ? source.to : parseAddressList(source.to)
   return outboundEmailSchema.safeParse({
-    to: source.to,
+    to: toValue,
     cc: parseAddressList(source.cc),
     bcc: parseAddressList(source.bcc),
     subject: source.subject,
@@ -68,7 +72,7 @@ export async function sendOutboundEmail(input: OutboundEmailInput): Promise<Outb
   const from = getOutboundEmailFrom()
   const payload: Record<string, unknown> = {
     from,
-    to: [input.to],
+    to: input.to,
     subject: input.subject,
     text: input.body,
     html: toHtmlBody(input.body),
