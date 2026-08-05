@@ -13,6 +13,7 @@ This maps the published articles in `content/blog/` into topic clusters. All oth
 
 ## SaaS & MVP
 
+- [How CodeTelemetryLab Helps Early-Stage Startups Turn an Idea into an MVP](/blog/how-codetelemetrylab-supports-early-stage-startups-idea-to-mvp)
 - [Build a Scalable SaaS MVP Without Overbuilding](/blog/build-scalable-saas-mvp-without-overbuilding)
 - [What MVP Development Actually Costs (and Why the Range Is So Wide)](/blog/mvp-development-cost-startup-founders)
 - [Why We Run a Discovery Phase Before Writing MVP Code](/blog/product-discovery-workshop-before-mvp-development)

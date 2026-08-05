@@ -31,11 +31,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/locations",
     "/privacy",
     "/terms",
+    "/llms.txt",
+    "/feed.xml",
   ].map((path) => ({
     url: absoluteUrl(path || "/"),
     lastModified: now,
-    changeFrequency: "weekly" as const,
-    priority: path === "" ? 1 : path === "/privacy" || path === "/terms" ? 0.3 : 0.8,
+    changeFrequency: path === "/blog" || path === "/feed.xml" ? ("daily" as const) : ("weekly" as const),
+    priority:
+      path === ""
+        ? 1
+        : path === "/privacy" || path === "/terms" || path === "/llms.txt"
+          ? 0.3
+          : path === "/blog" || path === "/feed.xml"
+            ? 0.75
+            : 0.8,
   }))
 
   const serviceRoutes = seoServices.map((service) => ({

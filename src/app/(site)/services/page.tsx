@@ -14,7 +14,7 @@ export const metadata: Metadata = buildPageMetadata({
 
 export default function ServicesPage() {
   return (
-    <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+    <div className="site-page">
       <SectionHeading
         eyebrow="Services"
         title="Engineering services for product launches and operating systems."

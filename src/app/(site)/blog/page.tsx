@@ -71,7 +71,7 @@ export default async function BlogPage({
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+    <div className="site-page">
       <div className="grid gap-10 lg:grid-cols-[0.88fr_1.12fr] lg:items-center">
         <SectionHeading
           eyebrow="Blog"
