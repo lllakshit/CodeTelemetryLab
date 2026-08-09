@@ -3,6 +3,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { format } from "date-fns"
 import { ArrowLeft, ArrowRight, Search } from "lucide-react"
+import { AiGeneratedContentLabel } from "@/components/ai-generated-content-label"
 import { BrandIllustration } from "@/components/brand-illustration"
 import { SectionHeading } from "@/components/section-heading"
 import { listBlogPosts } from "@/lib/cms"
@@ -182,9 +183,12 @@ export default async function BlogPage({
               ))}
             </div>
             <div className="border-t border-slate-200 pt-5">
-              <p className="text-sm text-slate-500">
-                {leadPost.publishedAt ? format(new Date(leadPost.publishedAt), "MMMM d, yyyy") : "Draft"}
-              </p>
+              <div className="flex flex-wrap items-center gap-2">
+                <AiGeneratedContentLabel />
+                <p className="text-sm text-slate-500">
+                  {leadPost.publishedAt ? format(new Date(leadPost.publishedAt), "MMMM d, yyyy") : "Draft"}
+                </p>
+              </div>
               <Link
                 href={`/blog/${leadPost.slug}`}
                 className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-slate-950"
@@ -205,6 +209,9 @@ export default async function BlogPage({
               <p className="mt-4 text-sm text-slate-500">
                 {post.publishedAt ? format(new Date(post.publishedAt), "MMMM d, yyyy") : "Draft"}
               </p>
+              <div className="mt-3">
+                <AiGeneratedContentLabel />
+              </div>
             </div>
             <div>
               <h3 className="text-2xl font-medium tracking-tight text-slate-950">{post.title}</h3>

@@ -33,6 +33,7 @@ This maps the published articles in `content/blog/` into topic clusters. Factory
 
 ## Delivery & Operations
 
+- [How CodeTelemetryLab Understands Client Requirements and Proposes Plans Aligned to Their Goals](/blog/how-codetelemetrylab-understands-requirements-and-proposes-business-plans)
 - [Outsourcing Web Development to a Remote Team: What Actually Determines Success](/blog/outsourcing-web-development-remote-team)
 - [What a Website Maintenance Plan Should Actually Cover](/blog/website-maintenance-plan-small-business)
 - [Questions to Ask a Developer About Security Before You Hire Them](/blog/website-security-checklist-before-hiring-developer)

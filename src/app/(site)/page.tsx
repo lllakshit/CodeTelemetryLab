@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import Image from "next/image"
 import Link from "next/link"
 import { ArrowRight, CheckCircle2 } from "lucide-react"
+import { AiGeneratedContentLabel } from "@/components/ai-generated-content-label"
 import { ProcessFlowDiagram } from "@/components/diagrams/engineering-diagrams"
 import { HeroPulse } from "@/components/hero-pulse"
 import { SectionHeading } from "@/components/section-heading"
@@ -336,7 +337,10 @@ export default async function HomePage() {
           <div className="mt-8 divide-y divide-slate-200">
             {blogs.slice(0, 3).map((blog) => (
               <article key={blog.id} className="py-5">
-                <p className="text-xs text-slate-500">{blog.category}</p>
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="text-xs text-slate-500">{blog.category}</p>
+                  <AiGeneratedContentLabel />
+                </div>
                 <h3 className="mt-2 text-xl font-semibold text-slate-950">
                   <Link href={`/blog/${blog.slug}`} className="hover:text-blue-700">
                     {blog.title}
