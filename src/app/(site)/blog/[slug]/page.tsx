@@ -8,6 +8,7 @@ import rehypeSlug from "rehype-slug"
 import remarkGfm from "remark-gfm"
 import { format } from "date-fns"
 import { ArrowLeft, ArrowRight } from "lucide-react"
+import { AiGeneratedContentLabel } from "@/components/ai-generated-content-label"
 import { BrandIllustration } from "@/components/brand-illustration"
 import { SectionHeading } from "@/components/section-heading"
 import { getBlogPostBySlug, listBlogPosts } from "@/lib/cms"
@@ -187,7 +188,8 @@ export default async function BlogDetailPage({
       <div className="mt-8 grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
         <div>
           <SectionHeading eyebrow={post.category} title={post.title} description={post.excerpt} level={1} />
-          <div className="mt-5 flex flex-wrap gap-2 text-xs text-slate-500">
+          <div className="mt-5 flex flex-wrap items-center gap-2 text-xs text-slate-500">
+            <AiGeneratedContentLabel />
             {post.tags.map((tag) => (
               <span key={tag} className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-slate-700">
                 {tag}
@@ -239,6 +241,9 @@ export default async function BlogDetailPage({
             </figure>
           ) : null}
           <div className="max-w-none">{content}</div>
+          <p className="mt-10 border-t border-slate-200 pt-5">
+            <AiGeneratedContentLabel />
+          </p>
         </article>
 
         <aside className="space-y-5">
