@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
+    "check:blog": "node scripts/check-blog-content.mjs",
     "cms:sync": "node scripts/cms-sync.mjs",
     "covers:wikimedia": "node scripts/migrate-blog-covers-wikimedia.mjs",
     "prisma:generate": "prisma generate",

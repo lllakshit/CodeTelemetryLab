@@ -18,7 +18,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     projects = []
   }
 
-  const now = new Date()
+  // Only claim a modification date we can prove: the newest article drives /blog; other pages omit it
+  // rather than reporting "modified now" on every crawl, which teaches crawlers to ignore lastmod.
+  const newestPost = posts.reduce<Date | undefined>((latest, post) => {
+    const updated = new Date(post.updatedAt)
+    return !latest || updated > latest ? updated : latest
+  }, undefined)
 
   const staticRoutes = [
     "",
@@ -35,7 +40,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/feed.xml",
   ].map((path) => ({
     url: absoluteUrl(path || "/"),
-    lastModified: now,
+    lastModified: path === "/blog" || path === "/feed.xml" ? newestPost : undefined,
     changeFrequency: path === "/blog" || path === "/feed.xml" ? ("daily" as const) : ("weekly" as const),
     priority:
       path === ""
@@ -49,14 +54,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const serviceRoutes = seoServices.map((service) => ({
     url: absoluteUrl(`/services/${service.slug}`),
-    lastModified: now,
     changeFrequency: "weekly" as const,
     priority: 0.9,
   }))
 
   const cityRoutes = seoCities.map((city) => ({
     url: absoluteUrl(`/locations/${city.slug}`),
-    lastModified: now,
     changeFrequency: "weekly" as const,
     priority: city.priority === "primary" ? 0.85 : 0.7,
   }))
