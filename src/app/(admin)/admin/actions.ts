@@ -79,6 +79,8 @@ export async function saveBlogAction(formData: FormData) {
   })
 
   revalidatePath("/blog")
+  revalidatePath("/blog/[slug]", "page")
+  revalidatePath("/sitemap.xml")
   revalidatePath("/projects")
   revalidatePath("/admin/blogs")
   revalidatePath("/admin/dashboard")
@@ -90,6 +92,8 @@ export async function deleteBlogAction(formData: FormData) {
   if (!id) throw new Error("Missing blog id")
   await deleteBlogPost(id)
   revalidatePath("/blog")
+  revalidatePath("/blog/[slug]", "page")
+  revalidatePath("/sitemap.xml")
   revalidatePath("/admin/blogs")
   revalidatePath("/admin/dashboard")
   redirect("/admin/blogs")

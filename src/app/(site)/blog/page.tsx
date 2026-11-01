@@ -1,21 +1,40 @@
 import type { Metadata } from "next"
-import Image from "next/image"
 import Link from "next/link"
 import { format } from "date-fns"
 import { ArrowLeft, ArrowRight, Search } from "lucide-react"
 import { BrandIllustration } from "@/components/brand-illustration"
+import { PostCover } from "@/components/post-cover"
 import { SectionHeading } from "@/components/section-heading"
 import { listBlogPosts } from "@/lib/cms"
-import { buildPageMetadata } from "@/lib/seo"
+import { absoluteUrl, buildPageMetadata } from "@/lib/seo"
 
 const POSTS_PER_PAGE = 12
 
-export const metadata: Metadata = buildPageMetadata({
-  title: "Blog | Engineering Notes on Software, AI & Delivery",
-  description:
-    "Articles from CodeTelemetryLab on AI automation, SaaS architecture, MVP delivery, and building systems operators can run.",
-  path: "/blog",
-})
+type BlogSearchParams = { q?: string; category?: string; page?: string }
+
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams?: Promise<BlogSearchParams>
+}): Promise<Metadata> {
+  const params = await searchParams
+  const page = Number.parseInt(params?.page ?? "1", 10)
+  const paged = Number.isFinite(page) && page > 1
+  const filtered = Boolean(params?.q?.trim() || params?.category?.trim())
+
+  const base = buildPageMetadata({
+    title: paged
+      ? `Blog, Page ${page} | Engineering Notes on Software, AI & Delivery`
+      : "Blog | Engineering Notes on Software, AI & Delivery",
+    description:
+      "Articles from CodeTelemetryLab on AI automation, SaaS architecture, MVP delivery, and building systems operators can run.",
+    // Each paginated page is its own canonical URL; search/filter views canonicalize to /blog.
+    path: paged && !filtered ? `/blog?page=${page}` : "/blog",
+  })
+
+  // Search and category views are thin, duplicate-prone result sets: keep them out of the index.
+  return filtered ? { ...base, robots: { index: false, follow: true } } : base
+}
 
 function postMatchesSearch(
   post: Awaited<ReturnType<typeof listBlogPosts>>[number],
@@ -43,7 +62,7 @@ function getPageNumber(value: string | undefined) {
 export default async function BlogPage({
   searchParams,
 }: {
-  searchParams?: Promise<{ q?: string; category?: string; page?: string }>
+  searchParams?: Promise<BlogSearchParams>
 }) {
   const posts = await listBlogPosts({ publishedOnly: true })
   const resolvedSearchParams = await searchParams
@@ -70,8 +89,29 @@ export default async function BlogPage({
     return queryString ? `/blog?${queryString}` : "/blog"
   }
 
+  const listJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: "CodeTelemetryLab Blog",
+    url: absoluteUrl("/blog"),
+    mainEntity: {
+      "@type": "ItemList",
+      itemListElement: paginatedPosts.map((post, index) => ({
+        "@type": "ListItem",
+        position: pageStart + index + 1,
+        url: absoluteUrl(`/blog/${post.slug}`),
+        name: post.title,
+      })),
+    },
+  }
+
   return (
     <div className="site-page">
+      <script
+        type="application/ld+json"
+        suppressHydrationWarning
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(listJsonLd) }}
+      />
       <div className="grid gap-10 lg:grid-cols-[0.88fr_1.12fr] lg:items-center">
         <SectionHeading
           eyebrow="Blog"
@@ -155,20 +195,21 @@ export default async function BlogPage({
       {leadPost ? (
         <article className="mt-16 grid gap-8 rounded-[2rem] border border-slate-200 bg-white p-6 lg:grid-cols-[0.92fr_1.08fr] lg:p-8">
           <div className="grid gap-6">
-            {leadPost.featuredImage && !leadPost.featuredImage.includes("og-image.svg") ? (
-              <div className="overflow-hidden rounded-[1.75rem] border border-slate-200 bg-slate-50">
-                <Image
-                  src={leadPost.featuredImage}
-                  alt=""
-                  width={1200}
-                  height={720}
-                  className="h-full w-full object-cover"
-                />
-              </div>
-            ) : null}
+            <Link href={`/blog/${leadPost.slug}`} tabIndex={-1} aria-hidden="true">
+              <PostCover
+                post={leadPost}
+                variant="card"
+                priority
+                sizes="(min-width: 1280px) 540px, (min-width: 1024px) 40vw, 100vw"
+              />
+            </Link>
             <div className="rounded-[1.75rem] bg-[linear-gradient(180deg,#f4f8ff,#eef6ff)] p-6">
               <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-blue-700">{leadPost.category}</p>
-              <h2 className="mt-4 text-3xl font-medium tracking-[-0.03em] text-slate-950">{leadPost.title}</h2>
+              <h2 className="mt-4 text-3xl font-medium tracking-[-0.03em] text-slate-950">
+                <Link href={`/blog/${leadPost.slug}`} className="transition hover:text-blue-700">
+                  {leadPost.title}
+                </Link>
+              </h2>
               <p className="mt-4 text-sm leading-7 text-slate-700">{leadPost.excerpt}</p>
             </div>
           </div>
@@ -199,15 +240,22 @@ export default async function BlogPage({
 
       <div className="mt-16 divide-y divide-slate-200 border-t border-slate-200">
         {remainingPosts.map((post) => (
-          <article key={post.id} className="grid gap-6 py-8 lg:grid-cols-[0.24fr_0.5fr_0.26fr]">
+          <article key={post.id} className="grid gap-6 py-8 lg:grid-cols-[0.26fr_0.46fr_0.28fr]">
             <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-blue-700">{post.category}</p>
-              <p className="mt-4 text-sm text-slate-500">
+              <Link href={`/blog/${post.slug}`} tabIndex={-1} aria-hidden="true">
+                <PostCover post={post} variant="thumb" sizes="(min-width: 1280px) 300px, (min-width: 1024px) 24vw, 100vw" />
+              </Link>
+              <p className="mt-4 text-[11px] font-semibold uppercase tracking-[0.28em] text-blue-700">{post.category}</p>
+              <p className="mt-2 text-sm text-slate-500">
                 {post.publishedAt ? format(new Date(post.publishedAt), "MMMM d, yyyy") : "Draft"}
               </p>
             </div>
             <div>
-              <h3 className="text-2xl font-medium tracking-tight text-slate-950">{post.title}</h3>
+              <h3 className="text-2xl font-medium tracking-tight text-slate-950">
+                <Link href={`/blog/${post.slug}`} className="transition hover:text-blue-700">
+                  {post.title}
+                </Link>
+              </h3>
               <p className="mt-3 text-sm leading-7 text-slate-600">{post.excerpt}</p>
             </div>
             <div className="flex flex-col gap-4">
