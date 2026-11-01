@@ -193,17 +193,19 @@ export default async function BlogPage({
       ) : null}
 
       {leadPost ? (
-        <article className="mt-16 grid gap-8 rounded-[2rem] border border-slate-200 bg-white p-6 lg:grid-cols-[0.92fr_1.08fr] lg:p-8">
-          <div className="grid gap-6">
-            <Link href={`/blog/${leadPost.slug}`} tabIndex={-1} aria-hidden="true">
-              <PostCover
-                post={leadPost}
-                variant="card"
-                priority
-                sizes="(min-width: 1280px) 540px, (min-width: 1024px) 40vw, 100vw"
-              />
-            </Link>
-            <div className="rounded-[1.75rem] bg-[linear-gradient(180deg,#f4f8ff,#eef6ff)] p-6">
+        <article className="mt-16 grid gap-8 rounded-[2rem] border border-slate-200 bg-white p-6 lg:grid-cols-[0.92fr_1.08fr] lg:items-stretch lg:p-8">
+          <Link href={`/blog/${leadPost.slug}`} tabIndex={-1} aria-hidden="true" className="block self-center">
+            <PostCover
+              post={leadPost}
+              variant="card"
+              priority
+              sizes="(min-width: 1280px) 540px, (min-width: 1024px) 40vw, 100vw"
+            />
+          </Link>
+
+          {/* One text panel beside the cover: the card height follows the image, so there is no dead space. */}
+          <div className="flex flex-col justify-center gap-5 rounded-[1.75rem] bg-[linear-gradient(180deg,#f4f8ff,#eef6ff)] p-6 lg:p-8">
+            <div>
               <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-blue-700">{leadPost.category}</p>
               <h2 className="mt-4 text-3xl font-medium tracking-[-0.03em] text-slate-950">
                 <Link href={`/blog/${leadPost.slug}`} className="transition hover:text-blue-700">
@@ -212,23 +214,20 @@ export default async function BlogPage({
               </h2>
               <p className="mt-4 text-sm leading-7 text-slate-700">{leadPost.excerpt}</p>
             </div>
-          </div>
-
-          <div className="flex flex-col justify-between gap-5">
             <div className="flex flex-wrap gap-2">
               {leadPost.tags.map((tag) => (
-                <span key={tag} className="rounded-full bg-slate-100 px-3 py-2 text-xs font-medium text-slate-700">
+                <span key={tag} className="rounded-full bg-white/80 px-3 py-2 text-xs font-medium text-slate-700">
                   {tag}
                 </span>
               ))}
             </div>
-            <div className="border-t border-slate-200 pt-5">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-blue-100 pt-5">
               <p className="text-sm text-slate-500">
                 {leadPost.publishedAt ? format(new Date(leadPost.publishedAt), "MMMM d, yyyy") : "Draft"}
               </p>
               <Link
                 href={`/blog/${leadPost.slug}`}
-                className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-slate-950"
+                className="inline-flex items-center gap-2 text-sm font-semibold text-slate-950"
               >
                 Read article
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
