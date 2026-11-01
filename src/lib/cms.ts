@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto"
 import { isAfter, parseISO } from "date-fns"
 import seed from "../../data/cms-store.json"
+import { cleanSeoDescription, hasTemplateLeak, stripInternalSections } from "@/lib/blog-quality"
 import { getContentBlogPostBySlug, listArchivedFactoryBlogSlugs, listContentBlogPosts } from "@/lib/content-blog"
 import { slugify } from "@/lib/utils"
 import {
@@ -201,12 +202,39 @@ function sortNewest<T extends { createdAt?: string; updatedAt?: string; publishe
   })
 }
 
+/**
+ * A CMS row that still carries template-generated SEO-brief text must not shadow the
+ * hand-edited MDX article that shares its slug. With no MDX twin, the leak is stripped.
+ */
+function resolveTemplateLeak(post: BlogPost, contentBySlug: Map<string, BlogPost>): BlogPost {
+  if (!hasTemplateLeak(post)) return post
+
+  const twin = contentBySlug.get(post.slug)
+  if (twin) return twin
+
+  return {
+    ...post,
+    content: stripInternalSections(post.content),
+    seoDescription: cleanSeoDescription(post),
+  }
+}
+
 function mergeBlogSources(cmsPosts: BlogPost[], contentPosts: BlogPost[]) {
   const cmsSlugs = new Set(cmsPosts.map((post) => post.slug))
+  const contentBySlug = new Map(contentPosts.map((post) => [post.slug, post]))
   return [
-    ...cmsPosts.map((post) => ({ ...post, source: post.source ?? "cms" as const })),
+    ...cmsPosts.map((post) => ({
+      ...resolveTemplateLeak(post, contentBySlug),
+      source: post.source ?? ("cms" as const),
+    })),
     ...contentPosts.filter((post) => !cmsSlugs.has(post.slug)),
   ]
+}
+
+async function resolveSinglePost(post: BlogPost) {
+  if (!hasTemplateLeak(post)) return post
+  const twin = await getContentBlogPostBySlug(post.slug)
+  return resolveTemplateLeak(post, new Map(twin ? [[twin.slug, twin]] : []))
 }
 
 async function withoutArchivedFactoryPosts(posts: BlogPost[]) {
@@ -854,7 +882,7 @@ export async function getBlogPostBySlug(slug: string) {
     await ensureSupabaseSeeded()
     const { data, error } = await supabaseClient.from(TABLES.blogs).select("*").eq("slug", slug).maybeSingle()
     if (error) throw error
-    return data ? fromBlogRow(data as BlogRow) : await getContentBlogPostBySlug(slug)
+    return data ? await resolveSinglePost(fromBlogRow(data as BlogRow)) : await getContentBlogPostBySlug(slug)
   } catch (error) {
     if (isRecoverableSupabaseReadError(error)) {
       const store = await readStore()

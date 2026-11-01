@@ -56,7 +56,33 @@ export const mdxComponents = {
     <img
       {...props}
       alt={props.alt ?? ""}
-      className="mt-8 w-full rounded-[1.75rem] border border-slate-200 bg-slate-50 object-cover shadow-[0_14px_40px_rgba(15,23,42,0.06)]"
+      loading="lazy"
+      decoding="async"
+      className="mt-8 h-auto w-full rounded-[1.75rem] border border-slate-200 bg-slate-50 object-cover shadow-[0_14px_40px_rgba(15,23,42,0.06)]"
     />
+  ),
+  h4: (props: ComponentPropsWithoutRef<"h4">) => (
+    <Heading {...props} level={4} className="mt-6 text-lg font-semibold tracking-tight text-slate-950" />
+  ),
+  strong: (props: ComponentPropsWithoutRef<"strong">) => (
+    <strong {...props} className="font-semibold text-slate-950" />
+  ),
+  pre: (props: ComponentPropsWithoutRef<"pre">) => (
+    <pre
+      {...props}
+      className="mt-6 overflow-x-auto rounded-2xl border border-slate-800 bg-slate-950 p-5 text-sm leading-7 text-slate-100 [&_code]:bg-transparent [&_code]:p-0 [&_code]:text-slate-100"
+    />
+  ),
+  table: (props: ComponentPropsWithoutRef<"table">) => (
+    <div className="mt-6 overflow-x-auto rounded-2xl border border-slate-200">
+      <table {...props} className="w-full min-w-[32rem] border-collapse text-left text-sm text-slate-700" />
+    </div>
+  ),
+  thead: (props: ComponentPropsWithoutRef<"thead">) => <thead {...props} className="bg-slate-50 text-slate-950" />,
+  th: (props: ComponentPropsWithoutRef<"th">) => (
+    <th {...props} className="border-b border-slate-200 px-4 py-3 font-semibold" />
+  ),
+  td: (props: ComponentPropsWithoutRef<"td">) => (
+    <td {...props} className="border-b border-slate-100 px-4 py-3 align-top leading-7" />
   ),
 }
