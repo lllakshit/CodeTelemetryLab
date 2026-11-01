@@ -3,6 +3,10 @@ import { listBlogPosts, listProjects } from "@/lib/cms"
 import { absoluteUrl } from "@/lib/seo"
 import { seoCities, seoServices } from "@/lib/seo-markets"
 
+// Built per request, not at deploy time: a build-time snapshot silently fell back to the 21 MDX
+// files when the CMS read failed during the build, leaving 58 database articles out of the sitemap.
+export const dynamic = "force-dynamic"
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let posts: Awaited<ReturnType<typeof listBlogPosts>> = []
   let projects: Awaited<ReturnType<typeof listProjects>> = []
