@@ -1,6 +1,8 @@
 import type { Metadata } from "next"
 import { IBM_Plex_Mono, Plus_Jakarta_Sans } from "next/font/google"
 import "./globals.css"
+import { CookieConsent } from "@/components/cookie-consent"
+import { JourneyTracker } from "@/components/journey-tracker"
 import { BRAND_NAME, SITE_URL, absoluteUrl } from "@/lib/seo"
 
 const plusJakartaSans = Plus_Jakarta_Sans({
@@ -98,6 +100,8 @@ export default function RootLayout({
     >
       <body className="min-h-screen bg-background text-foreground antialiased">
         {children}
+        <CookieConsent />
+        <JourneyTracker />
       </body>
     </html>
   )

@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next"
 import { listBlogPosts, listProjects } from "@/lib/cms"
 import { absoluteUrl } from "@/lib/seo"
+import { jobOpenings } from "@/lib/careers"
 import { seoCities, seoServices } from "@/lib/seo-markets"
 
 // Built per request, not at deploy time: a build-time snapshot silently fell back to the 21 MDX
@@ -36,6 +37,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/process",
     "/about",
     "/blog",
+    "/careers",
     "/contact",
     "/locations",
     "/privacy",
@@ -71,6 +73,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // City × service combo pages stay reachable for users but are excluded from the sitemap
   // so Google concentrates on unique service, city, project, and blog URLs.
 
+  const careerRoutes = jobOpenings.map((job) => ({
+    url: absoluteUrl(`/careers/${job.slug}`),
+    changeFrequency: "monthly" as const,
+    priority: 0.6,
+  }))
+
   const blogRoutes = posts.map((post) => ({
     url: absoluteUrl(`/blog/${post.slug}`),
     lastModified: new Date(post.updatedAt),
@@ -89,6 +97,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...staticRoutes,
     ...serviceRoutes,
     ...cityRoutes,
+    ...careerRoutes,
     ...blogRoutes,
     ...projectRoutes,
   ]

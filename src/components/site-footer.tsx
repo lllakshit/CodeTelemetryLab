@@ -2,6 +2,7 @@ import Link from "next/link"
 import { Mail, MapPin } from "lucide-react"
 import { siteNav } from "@/lib/navigation"
 import { DesignMark } from "@/components/design-mark"
+import { CookieSettingsButton } from "@/components/cookie-consent"
 import { CONTACT_DISPLAY_EMAIL } from "@/lib/contact"
 import { seoCities, seoServices } from "@/lib/seo-markets"
 
@@ -111,6 +112,10 @@ export function SiteFooter() {
             <Link href="/locations" className="transition hover:text-slate-950">
               Locations
             </Link>
+            <Link href="/careers" className="transition hover:text-slate-950">
+              Careers
+            </Link>
+            <CookieSettingsButton className="transition hover:text-slate-950" />
             <Link href="/contact" className="transition hover:text-slate-950">
               Send a brief
             </Link>
