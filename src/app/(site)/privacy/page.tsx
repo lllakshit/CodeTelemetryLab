@@ -22,7 +22,42 @@ export default function PrivacyPage() {
       <div className="mt-12 space-y-8 text-sm leading-7 text-slate-700">
         <section>
           <h2 className="text-xl font-semibold text-slate-950">Last updated</h2>
-          <p className="mt-3">22 July 2026</p>
+          <p className="mt-3">2 November 2026</p>
+        </section>
+        <section>
+          <h2 className="text-xl font-semibold text-slate-950">Cookies and visitor journeys</h2>
+          <p className="mt-3">
+            We use essential cookies to remember your cookie choice and keep forms working. If you choose &ldquo;Accept
+            all&rdquo; (or switch on analytics in Cookie settings), we also set two analytics cookies and record how
+            you move through the site: the pages you view, links and buttons you click, form activity (not what you
+            type), how far you scroll, how long you stay, the page you arrived from, the page where your visit ends,
+            and your approximate country and city, browser, and device type. We store a daily-rotating hash instead of
+            your IP address.
+          </p>
+          <ul className="mt-3 list-disc space-y-2 pl-6">
+            <li>
+              <strong>ct_consent</strong> (12 months): stores your cookie choice.
+            </li>
+            <li>
+              <strong>ct_vid</strong> (12 months): a random visitor ID, set only with analytics consent.
+            </li>
+            <li>
+              <strong>ct_sid</strong> (30 minutes): a random visit ID, set only with analytics consent.
+            </li>
+          </ul>
+          <p className="mt-3">
+            If you choose &ldquo;Essential only&rdquo;, no analytics cookie is set and no journey is recorded. You can change
+            your choice at any time with &ldquo;Cookie settings&rdquo; in the footer. Journey data is used to understand
+            which content helps visitors and where the site needs work; it is visible only to authorized operators.
+          </p>
+        </section>
+        <section>
+          <h2 className="text-xl font-semibold text-slate-950">Job applications</h2>
+          <p className="mt-3">
+            If you apply for a role, we store the details you submit and your résumé in a private location, visible only
+            to authorized team members, to evaluate you for the role you chose and for future openings. Ask us to delete
+            your application at any time using the email address below.
+          </p>
         </section>
         <section>
           <h2 className="text-xl font-semibold text-slate-950">Information we collect</h2>
