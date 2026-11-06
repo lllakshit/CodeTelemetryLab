@@ -28,6 +28,7 @@ export const sendSchema = z.object({
   subject: z.string().transform(noControlChars).pipe(z.string().min(1, "Subject is required").max(300, "Subject is too long")),
   body: z.string().trim().min(1, "Message body is required").max(20000, "Message body is too long"),
   signature: z.string().max(2000, "Signature is too long").default(""),
+  showFooter: z.boolean().default(true),
   attachments: z.unknown().optional(),
 })
 
@@ -110,6 +111,7 @@ export async function sendOutreach(input: unknown): Promise<SendOutreachResult> 
     brandName: BRAND_NAME,
     siteUrl: SITE_URL,
     logoUrl: EMAIL_FOOTER_LOGO_URL,
+    showFooter: data.showFooter,
   })
 
   let message: OutreachMessage

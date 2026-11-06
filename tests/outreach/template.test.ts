@@ -81,3 +81,13 @@ test("the plain text version keeps the message readable", () => {
 test("escapeHtml covers the five special characters", () => {
   assert.equal(escapeHtml(`<>&"'`), "&lt;&gt;&amp;&quot;&#39;")
 })
+
+test("the brand footer can be left out", () => {
+  const withFooter = renderOutreachEmail(base)
+  const without = renderOutreachEmail({ ...base, showFooter: false })
+  assert.match(withFooter.html, new RegExp(base.logoUrl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")))
+  assert.doesNotMatch(without.html, new RegExp(base.logoUrl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")))
+  assert.doesNotMatch(without.text, /--\nLakshit Mathur · CodeTelemetryLab/)
+  assert.match(withFooter.text, /--\nLakshit Mathur · CodeTelemetryLab/)
+  assert.match(without.html, /Hello/)
+})
