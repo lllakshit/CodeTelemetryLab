@@ -18,6 +18,8 @@ export type OutreachTemplateInput = {
   brandName: string
   siteUrl: string
   logoUrl: string
+  /** false drops the brand footer (logo, site, sender line) for mail that goes out under another name. Default true. */
+  showFooter?: boolean
 }
 
 export function escapeHtml(value: string) {
@@ -164,6 +166,7 @@ function attachmentsHtml(attachments: TemplateAttachment[]) {
 export function renderOutreachEmail(input: OutreachTemplateInput) {
   const siteHost = input.siteUrl.replace(/^https?:\/\//, "").replace(/\/$/, "")
   const signature = input.signature?.trim() ?? ""
+  const showFooter = input.showFooter !== false
   const preheader = input.body.replace(/\s+/g, " ").trim().slice(0, 140)
 
   const html = `<!DOCTYPE html>
@@ -187,7 +190,7 @@ export function renderOutreachEmail(input: OutreachTemplateInput) {
               ${signature ? `<div style="margin-top:18px;">${blocksHtml(signature)}</div>` : ""}
             </td>
           </tr>
-          <tr>
+          ${showFooter ? `          <tr>
             <td style="padding-top:18px;border-top:1px solid #e2e8f0;">
               <table role="presentation" cellpadding="0" cellspacing="0">
                 <tr>
@@ -196,7 +199,7 @@ export function renderOutreachEmail(input: OutreachTemplateInput) {
                       <img src="${escapeHtml(input.logoUrl)}" alt="${escapeHtml(input.brandName)}" width="40" height="40" style="display:block;width:40px;height:40px;border-radius:8px;border:1px solid #e2e8f0;background:#ffffff;" />
                     </a>
                   </td>
-                  <td style="vertical-align:middle;font-family:${FONT};font-size:12px;line-height:1.5;color:#64748b;">
+                  <td style="vertical-align:middle;font-family:\${FONT};font-size:12px;line-height:1.5;color:#64748b;">
                     <strong style="color:#0f172a;">${escapeHtml(input.senderName)}</strong> · ${escapeHtml(input.brandName)}<br />
                     <a href="${escapeHtml(input.siteUrl)}" style="color:#0064e0;text-decoration:none;">${escapeHtml(siteHost)}</a>
                     &nbsp;·&nbsp;
@@ -206,6 +209,7 @@ export function renderOutreachEmail(input: OutreachTemplateInput) {
               </table>
             </td>
           </tr>
+` : ""}
         </table>
       </td>
     </tr>
@@ -218,7 +222,7 @@ export function renderOutreachEmail(input: OutreachTemplateInput) {
         .map((item) => `- ${item.name} (${item.label}): ${item.url}${item.note ? ` [${item.note}]` : ""}`)
         .join("\n")}`
     : ""
-  const text = `${blocksText(input.body)}${attachmentLines}${signature ? `\n\n${blocksText(signature)}` : ""}\n\n--\n${input.senderName} · ${input.brandName}\n${input.siteUrl}`
+  const text = `${blocksText(input.body)}${attachmentLines}${signature ? `\n\n${blocksText(signature)}` : ""}${showFooter ? `\n\n--\n${input.senderName} · ${input.brandName}\n${input.siteUrl}` : ""}`
 
   return { html, text }
 }
