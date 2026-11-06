@@ -1,10 +1,11 @@
 "use client"
 
-import { useMemo, useRef, useState, type FormEvent, type KeyboardEvent } from "react"
-import { Loader2, Send, X } from "lucide-react"
+import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent, type KeyboardEvent } from "react"
+import { Loader2, RefreshCw, Send, X } from "lucide-react"
 import {
   adminAccentButton,
   adminFieldLabel,
+  adminGhostButton,
   adminHint,
   adminInputClassName,
   adminSurface,
@@ -12,6 +13,7 @@ import {
   adminTextareaClassName,
 } from "@/lib/admin-ui"
 import type { EmailLog } from "@/lib/store"
+import { describeStatus } from "@/lib/outreach/status"
 
 type FieldErrors = Partial<Record<"to" | "cc" | "bcc" | "subject" | "body", string[]>>
 
@@ -122,6 +124,30 @@ export function AdminEmailComposer({ initialLogs, fromAddress }: AdminEmailCompo
       // Keep existing logs if refresh fails.
     }
   }
+
+  // Delivery status is read back from Resend automatically while any sent email is still unsettled.
+  const [checkingStatus, setCheckingStatus] = useState(false)
+  const [statusReadable, setStatusReadable] = useState(true)
+  const refreshStatuses = useCallback(async () => {
+    setCheckingStatus(true)
+    try {
+      const response = await fetch("/api/admin/email/refresh", { method: "POST" })
+      if (!response.ok) return
+      const data = (await response.json()) as { logs?: EmailLog[]; readable?: boolean }
+      if (Array.isArray(data.logs)) setLogs(data.logs)
+      if (data.readable === false) setStatusReadable(false)
+    } catch {
+      // Keep what is on screen.
+    } finally {
+      setCheckingStatus(false)
+    }
+  }, [])
+  // Check once when the page opens (and on the Refresh button). No background polling here: this page shares
+  // Resend's rate limit with real contact sends, and a send-only key can never report status anyway.
+  useEffect(() => {
+    const first = setTimeout(() => void refreshStatuses(), 0)
+    return () => clearTimeout(first)
+  }, [refreshStatuses])
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -334,7 +360,12 @@ export function AdminEmailComposer({ initialLogs, fromAddress }: AdminEmailCompo
       <section className={`${adminSurface} p-6`}>
         <p className="text-xs font-semibold uppercase tracking-[0.24em] text-blue-700">Recent sends</p>
         <h2 className="mt-3 text-xl font-semibold text-slate-950">Email log</h2>
-        <p className="mt-2 text-sm text-slate-600">Internal audit trail for outbound founder emails.</p>
+        <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
+          <p className="text-sm text-slate-600">Internal audit trail for outbound founder emails, with delivery status from Resend.</p>
+          <button type="button" className={adminGhostButton} onClick={() => void refreshStatuses()} disabled={checkingStatus}>
+            <RefreshCw className={`mr-2 h-4 w-4 ${checkingStatus ? "animate-spin" : ""}`} /> Refresh status
+          </button>
+        </div>
 
         <div className="mt-6 space-y-3">
           {logs.length === 0 ? (
@@ -349,18 +380,29 @@ export function AdminEmailComposer({ initialLogs, fromAddress }: AdminEmailCompo
                     {log.cc.length ? <p className="text-xs text-slate-500">CC: {log.cc.join(", ")}</p> : null}
                     {log.bcc.length ? <p className="text-xs text-slate-500">BCC: {log.bcc.join(", ")}</p> : null}
                   </div>
-                  <span
-                    className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] ${
-                      log.status === "sent"
+                  {(() => {
+                    const info = log.status === "sent" ? describeStatus(log.deliveryStatus ?? "sent") : describeStatus("failed")
+                    // Until Resend reports a delivery status, keep the original look: a green "sent".
+                    const unknown = log.status === "sent" && !log.deliveryStatus
+                    const tone =
+                      info.tone === "good" || unknown
                         ? "border border-emerald-200 bg-emerald-50 text-emerald-700"
-                        : "border border-rose-200 bg-rose-50 text-rose-700"
-                    }`}
-                  >
-                    {log.status}
-                  </span>
+                        : info.tone === "pending"
+                          ? "border border-amber-200 bg-amber-50 text-amber-700"
+                          : "border border-rose-200 bg-rose-50 text-rose-700"
+                    return (
+                      <span
+                        title={log.statusNote || info.hint}
+                        className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] ${tone}`}
+                      >
+                        {info.label}
+                      </span>
+                    )
+                  })()}
                 </div>
                 <p className="mt-3 text-xs text-slate-500">{new Date(log.createdAt).toLocaleString()}</p>
                 {log.errorMessage ? <p className="mt-2 text-xs text-rose-600">{log.errorMessage}</p> : null}
+                {log.statusNote && !log.errorMessage && statusReadable ? <p className="mt-2 text-xs text-amber-700">{log.statusNote}</p> : null}
               </article>
             ))
           )}

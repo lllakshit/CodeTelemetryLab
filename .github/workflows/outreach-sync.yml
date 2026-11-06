@@ -1,0 +1,73 @@
+name: Outreach sender sync
+
+# Hands the Resend API key stored in the RESEND_API_TOKEN secret to the live app, which encrypts it and keeps it
+# in the database as the sender account lakshit@codetelemetrylab.me. After that the key lives in the database and
+# new accounts are added from the admin Outreach screen, so this only needs to run when the secret changes.
+#
+# No password is shared: the workflow proves who it is with a GitHub-signed token that the app checks
+# (repository, main branch, this workflow file). Re-run it from the Actions tab after rotating the secret.
+# A key set by hand in the admin Outreach screen is never overwritten by this workflow.
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/outreach-sync.yml"
+      - "src/app/api/outreach/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: outreach-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    name: Sync sender account
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Send the sender account to the app
+        env:
+          RESEND_API_TOKEN: ${{ secrets.RESEND_API_TOKEN }}
+          APP_URL: https://www.codetelemetrylab.me
+          FROM_EMAIL: lakshit@codetelemetrylab.me
+          DISPLAY_NAME: Lakshit Mathur
+        run: |
+          set -u
+          if [ -z "${RESEND_API_TOKEN}" ]; then
+            echo "::notice::The RESEND_API_TOKEN secret is not set, so there is nothing to sync."
+            exit 0
+          fi
+          SIGNATURE=$(printf 'Warm regards,\nLakshit Mathur\nFounder, CodeTelemetryLab\nJaipur, Rajasthan, India\n%s' "${FROM_EMAIL}")
+          # The app deploys after the merge, so wait for the endpoint to exist (404) and retry.
+          for attempt in $(seq 1 40); do
+            OIDC=$(curl -sS -H "Authorization: bearer ${ACTIONS_ID_TOKEN_REQUEST_TOKEN}" \
+              "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=codetelemetrylab-outreach-sync" | jq -r '.value')
+            if [ -z "${OIDC}" ] || [ "${OIDC}" = "null" ]; then
+              echo "::error::Could not get a GitHub identity token."
+              exit 1
+            fi
+            # The key goes through stdin, not the command line, so it never shows in a process list.
+            CODE=$(jq -n --arg email "${FROM_EMAIL}" --arg name "${DISPLAY_NAME}" --arg key "${RESEND_API_TOKEN}" --arg sig "${SIGNATURE}" \
+              '{fromEmail: $email, displayName: $name, apiKey: $key, signature: $sig}' \
+              | curl -sS -o response.json -w '%{http_code}' -X POST "${APP_URL}/api/outreach/bootstrap" \
+                -H "Authorization: Bearer ${OIDC}" -H "Content-Type: application/json" --data @-) || CODE="000"
+            case "${CODE}" in
+              200)
+                echo "Sender account synced: $(jq -r '"key ending " + .keyLast4 + (if .skipped then " (kept the key set in the admin screen)" elif .created then " (created)" else " (updated)" end)' response.json)"
+                exit 0 ;;
+              404|429|500|000|502|503|504)
+                echo "Attempt ${attempt}: app not ready yet (HTTP ${CODE}); waiting 30s."
+                sleep 30 ;;
+              *)
+                echo "::error::The app refused the sync (HTTP ${CODE})."
+                jq -r '.error // empty' response.json 2>/dev/null || true
+                exit 1 ;;
+            esac
+          done
+          echo "::error::The app did not become ready in time. Re-run this workflow once the deploy finishes."
+          exit 1

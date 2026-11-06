@@ -1,6 +1,8 @@
 import { randomUUID } from "node:crypto"
 import { createSupabaseAdminClient, getSupabaseConfig } from "@/lib/supabase"
 import { readStore, updateStore, type EmailLog } from "@/lib/store"
+import { getResendEmail } from "@/lib/outreach/resend"
+import { normalizeResendEvent } from "@/lib/outreach/status"
 
 const TABLE = "email_logs"
 
@@ -14,6 +16,9 @@ type EmailLogRow = {
   status: string
   error_message: string | null
   resend_id: string | null
+  delivery_status?: string | null
+  status_checked_at?: string | null
+  status_note?: string | null
   created_at: string
 }
 
@@ -33,6 +38,8 @@ function fromRow(row: EmailLogRow): EmailLog {
     status: row.status === "sent" ? "sent" : "failed",
     errorMessage: row.error_message,
     resendId: row.resend_id,
+    deliveryStatus: row.delivery_status ?? null,
+    statusNote: row.status_note ?? null,
     createdAt: row.created_at,
   }
 }
@@ -147,4 +154,65 @@ export async function createEmailLog(input: {
   }
 
   return log
+}
+
+const FINAL = ["delivered", "opened", "clicked", "bounced", "complained", "canceled", "failed"]
+
+/**
+ * Reads back delivery status for logged emails that are not settled yet, using the same Resend key that sent
+ * them (RESEND_API_KEY). Read-only: it never sends and never changes any Resend setting.
+ */
+export async function refreshEmailLogStatuses() {
+  const apiKey = process.env.RESEND_API_KEY?.trim()
+  if (!apiKey || !isSupabaseReady()) return { checked: 0, readable: false }
+
+  const supabase = createSupabaseAdminClient()
+  const since = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString()
+  const { data, error } = await supabase
+    .from(TABLE)
+    .select("*")
+    .eq("status", "sent")
+    .not("resend_id", "is", null)
+    .gte("created_at", since)
+    .order("created_at", { ascending: false })
+    .limit(40)
+  if (error) {
+    if (isMissingTableError(error)) return { checked: 0, readable: false }
+    throw error
+  }
+
+  let checked = 0
+  let readable = true
+  // At most 5 lookups per refresh: Resend's rate limit is shared with real sends, so stay far below it.
+  for (const row of (data as EmailLogRow[]).filter(
+    (item) => !FINAL.includes(item.delivery_status ?? "") && !(item.status_note ?? "").includes("only send") && (!item.status_checked_at || Date.now() - Date.parse(item.status_checked_at) > 10_000),
+  ).slice(0, 5)) {
+    if (!row.resend_id) continue
+    const result = await getResendEmail(apiKey, row.resend_id)
+    const now = new Date().toISOString()
+    checked += 1
+    if (!result.ok) {
+      if (result.keyCannotRead) readable = false
+      await supabase
+        .from(TABLE)
+        .update({
+          status_checked_at: now,
+          status_note: result.keyCannotRead
+            ? "This API key can only send, so Resend will not share delivery status."
+            : `Could not read status from Resend (${result.status}).`,
+        })
+        .eq("id", row.id)
+      continue
+    }
+    await supabase
+      .from(TABLE)
+      .update({
+        delivery_status: normalizeResendEvent(result.lastEvent) ?? row.delivery_status ?? "sent",
+        last_event_at: now,
+        status_checked_at: now,
+        status_note: null,
+      })
+      .eq("id", row.id)
+  }
+  return { checked, readable }
 }

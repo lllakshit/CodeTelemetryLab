@@ -167,6 +167,9 @@ export type EmailLog = {
   status: "sent" | "failed"
   errorMessage?: string | null
   resendId?: string | null
+  /** Latest delivery status read back from Resend (delivered, bounced, ...). */
+  deliveryStatus?: string | null
+  statusNote?: string | null
   createdAt: string
 }
 
