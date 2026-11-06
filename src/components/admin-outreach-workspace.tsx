@@ -81,6 +81,7 @@ export function AdminOutreachWorkspace({ initialAccounts, initialMessages, brand
   // null means "follow the selected sender's signature"; a string is what the writer typed for this email.
   const [signatureDraft, setSignatureDraft] = useState<string | null>(null)
   const signature = signatureDraft ?? account?.signature ?? ""
+  const [showFooter, setShowFooter] = useState(true)
   const [attachments, setAttachments] = useState<DraftAttachment[]>([])
   const [linkName, setLinkName] = useState("")
   const [linkUrl, setLinkUrl] = useState("")
@@ -108,8 +109,9 @@ export function AdminOutreachWorkspace({ initialAccounts, initialMessages, brand
       brandName: brand.name,
       siteUrl: brand.siteUrl,
       logoUrl: brand.logoUrl,
+      showFooter,
     })
-  }, [account, attachments, body, brand, signature, subject])
+  }, [account, attachments, body, brand, showFooter, signature, subject])
 
   const refreshMessages = useCallback(async (withStatus: boolean) => {
     if (withStatus) setRefreshing(true)
@@ -252,6 +254,7 @@ export function AdminOutreachWorkspace({ initialAccounts, initialMessages, brand
           subject,
           body,
           signature,
+          showFooter,
           attachments: attachments.map(toPayload),
         }),
       })
@@ -349,6 +352,13 @@ export function AdminOutreachWorkspace({ initialAccounts, initialMessages, brand
                 onChange={(event) => setSignatureDraft(event.target.value)}
               />
               <span className={adminHint}>Prefilled from the sender account. Edit it here for this email only, or change it permanently under Sender accounts.</span>
+            </label>
+            <label className="flex items-start gap-3 text-sm text-slate-700">
+              <input type="checkbox" className="mt-1" checked={showFooter} onChange={(event) => setShowFooter(event.target.checked)} />
+              <span>
+                Show the {brand.name} footer (logo, site and sender line)
+                <span className={`${adminHint} block`}>Turn this off for email that goes out under another name, such as a different project.</span>
+              </span>
             </label>
 
             <div className={`${adminSurfaceSoft} space-y-4 p-4`}>
