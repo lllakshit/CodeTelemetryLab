@@ -14,6 +14,7 @@ export const adminNav = [
   { href: "/admin/applications", label: "Applications" },
   { href: "/admin/journeys", label: "Customer Journey" },
   { href: "/admin/email", label: "Email" },
+  { href: "/admin/outreach", label: "Outreach" },
   { href: "/admin/blogs", label: "Blogs" },
   { href: "/admin/projects", label: "Projects" },
   { href: "/admin/homepage", label: "Homepage" },

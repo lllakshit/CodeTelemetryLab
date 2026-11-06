@@ -27,3 +27,6 @@ mobile/build/
 .env*
 .cover-work/
 supabase/.temp/
+
+# TypeScript incremental build cache
+*.tsbuildinfo
