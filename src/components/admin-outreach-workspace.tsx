@@ -22,6 +22,7 @@ import {
   toEmailAttachments,
   type OutreachAttachment,
 } from "@/lib/outreach/attachments"
+import { AdminOutreachBulk } from "@/components/admin-outreach-bulk"
 import { describeStatus, isFinalStatus } from "@/lib/outreach/status"
 import { renderOutreachEmail } from "@/lib/outreach/template"
 import type { OutreachAccount, OutreachMessage } from "@/lib/outreach/store"
@@ -462,6 +463,8 @@ export function AdminOutreachWorkspace({ initialAccounts, initialMessages, brand
           </>
         )}
       </form>
+
+      <AdminOutreachBulk accounts={accounts} brand={brand} onSent={() => void refreshMessages(false)} />
 
       <section className={`${adminSurface} p-6`}>
         <div className="flex flex-wrap items-start justify-between gap-3">
