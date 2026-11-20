@@ -37,6 +37,7 @@ export function Home3D() {
       return
     }
 
+    root.dataset.h3dStage = "effect"
     let cancelled = false
     let handle: HomeSceneHandle | null = null
     let idleId: number | undefined
@@ -50,8 +51,10 @@ export function Home3D() {
 
     const start = async () => {
       if (cancelled) return
+      root.dataset.h3dStage = "start"
       try {
         const { mountHomeScene } = await import("./home-scene")
+        root.dataset.h3dStage = "loaded"
         // Run the next step in its own task: loading the scene code and creating the GL context are separate chunks of work.
         await new Promise<void>((resolve) => window.setTimeout(resolve, 0))
         if (cancelled) return
@@ -62,7 +65,10 @@ export function Home3D() {
           cursor,
           fontFamily: getComputedStyle(document.body).fontFamily,
           onReady: () => {
-            if (!cancelled) root.dataset.h3d = "on"
+            if (!cancelled) {
+              root.dataset.h3d = "on"
+              root.dataset.h3dStage = "ready"
+            }
           },
           onFail: () => {
             if (!cancelled) fallBack()
@@ -78,8 +84,10 @@ export function Home3D() {
     // so loading it never competes with hydration, the cookie banner or the visitor's first scroll or tap.
     const schedule = () => {
       if (cancelled) return
+      root.dataset.h3dStage = "scheduled"
       timer = window.setTimeout(() => {
         if (cancelled) return
+        root.dataset.h3dStage = "idle-wait"
         if (typeof window.requestIdleCallback === "function") idleId = window.requestIdleCallback(() => void start(), { timeout: 2500 })
         else void start()
       }, 1500)
