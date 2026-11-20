@@ -50,7 +50,8 @@ Saving a blog post, a project or the homepage record in the admin refreshes `/` 
 - The scenes are built one per idle slice; textures are uploaded as they are built; rendering stops while no scene is on screen.
 - Phones: pixel ratio 1.5 at most, fewer particles and globe points, smaller card textures, no antialiasing.
 - The dashboard image is lazy and visually hidden in 3D mode; the scene reuses the same optimised file as its texture.
-- Check Lighthouse (mobile and desktop) before and after any change to this folder. Performance, SEO, accessibility and best practices were 94–100 at launch.
+- Check Lighthouse (mobile and desktop) before and after any change to this folder. Measured at launch on one machine, production code vs this page: mobile performance 94 vs 92, desktop 100 vs 100; SEO, accessibility and best practices 100 in both; LCP unchanged; CLS 0. The 2-point mobile difference is the cost of creating a WebGL context in Lighthouse's software renderer (about 120 ms of blocking time); real GPUs take a few milliseconds.
+- The wrapper records the start-up stage in `data-h3d-stage` (`effect`, `scheduled`, `idle-wait`, `start`, `loaded`, `ready`) and the scene sets `performance.mark("h3d:first-frame")` and `performance.mark("h3d:ready")`. Use them to diagnose a page that stays in the plain layout.
 
 ## Testing
 

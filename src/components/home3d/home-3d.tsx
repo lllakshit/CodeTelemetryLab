@@ -93,12 +93,30 @@ export function Home3D() {
       }, 1500)
     }
 
-    if (document.readyState === "complete") schedule()
-    else window.addEventListener("load", schedule, { once: true })
+    // Start after the load event, but do not depend on it: a slow third-party request must not keep the scene waiting.
+    let started = false
+    const kick = () => {
+      if (started) return
+      started = true
+      schedule()
+    }
+    let loadFallback: number | undefined
+    if (document.readyState === "complete") kick()
+    else {
+      window.addEventListener("load", kick, { once: true })
+      loadFallback = window.setTimeout(kick, 3500)
+    }
+    // If the scene has not started drawing 15 s after the page loaded (a stalled chunk request, for example), give the
+    // visitor the plain layout instead of leaving the page waiting for it.
+    const watchdog = window.setTimeout(() => {
+      if (!cancelled && root.dataset.h3d === "pending") fallBack()
+    }, 15000)
 
     return () => {
       cancelled = true
-      window.removeEventListener("load", schedule)
+      window.removeEventListener("load", kick)
+      window.clearTimeout(loadFallback)
+      window.clearTimeout(watchdog)
       if (idleId !== undefined && typeof window.cancelIdleCallback === "function") window.cancelIdleCallback(idleId)
       if (timer !== undefined) window.clearTimeout(timer)
       handle?.destroy()
