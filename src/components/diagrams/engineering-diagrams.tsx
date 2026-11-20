@@ -2,6 +2,15 @@ type DiagramProps = {
   className?: string
 }
 
+/** The five delivery steps. Shared by this diagram and the home page, so the wording lives in one place. */
+export const processSteps = [
+  { label: "Discover", sub: "Scope & constraints" },
+  { label: "Architect", sub: "Boundaries & data" },
+  { label: "Build", sub: "Vertical slices" },
+  { label: "Harden", sub: "Test & review" },
+  { label: "Operate", sub: "Monitor & iterate" },
+] as const
+
 export function ProcessFlowDiagram({ className }: DiagramProps) {
   return (
     <svg
@@ -11,13 +20,7 @@ export function ProcessFlowDiagram({ className }: DiagramProps) {
       aria-label="Delivery process from discovery through maintenance"
     >
       <rect width="720" height="220" rx="24" fill="#F8FBFF" />
-      {[
-        { x: 24, label: "Discover", sub: "Scope & constraints" },
-        { x: 156, label: "Architect", sub: "Boundaries & data" },
-        { x: 288, label: "Build", sub: "Vertical slices" },
-        { x: 420, label: "Harden", sub: "Test & review" },
-        { x: 552, label: "Operate", sub: "Monitor & iterate" },
-      ].map((step, index) => (
+      {processSteps.map((step, index) => ({ ...step, x: 24 + index * 132 })).map((step, index) => (
         <g key={step.label}>
           <rect x={step.x} y="58" width="120" height="104" rx="18" fill="#FFFFFF" stroke="#D7E3F4" />
           <text x={step.x + 60} y="98" textAnchor="middle" fill="#0064E0" fontSize="12" fontWeight="700">
