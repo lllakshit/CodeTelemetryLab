@@ -11,7 +11,7 @@ export function SiteFooter() {
   const featuredCities = seoCities.filter((city) => city.priority === "primary").slice(0, 7)
 
   return (
-    <footer className="border-t border-slate-200 bg-white">
+    <footer className="relative z-[3] border-t border-slate-200 bg-white">
       <div className="site-page !py-16">
         <div className="grid gap-12 lg:grid-cols-[1.2fr_0.7fr_0.7fr_0.8fr]">
           <div className="max-w-xl">

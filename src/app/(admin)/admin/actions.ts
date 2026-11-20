@@ -78,6 +78,7 @@ export async function saveBlogAction(formData: FormData) {
     publishedAt: existing?.publishedAt,
   })
 
+  revalidatePath("/")
   revalidatePath("/blog")
   revalidatePath("/blog/[slug]", "page")
   revalidatePath("/sitemap.xml")
@@ -91,6 +92,7 @@ export async function deleteBlogAction(formData: FormData) {
   const id = String(formData.get("id") ?? "")
   if (!id) throw new Error("Missing blog id")
   await deleteBlogPost(id)
+  revalidatePath("/")
   revalidatePath("/blog")
   revalidatePath("/blog/[slug]", "page")
   revalidatePath("/sitemap.xml")
@@ -149,6 +151,7 @@ export async function saveProjectAction(formData: FormData) {
     createdAt: existing?.createdAt,
   })
 
+  revalidatePath("/")
   revalidatePath("/projects")
   revalidatePath("/admin/projects")
   revalidatePath("/admin/dashboard")
@@ -159,6 +162,7 @@ export async function deleteProjectAction(formData: FormData) {
   const id = String(formData.get("id") ?? "")
   if (!id) throw new Error("Missing project id")
   await deleteProject(id)
+  revalidatePath("/")
   revalidatePath("/projects")
   revalidatePath("/admin/projects")
   revalidatePath("/admin/dashboard")

@@ -19,7 +19,7 @@ export function SiteHeader() {
           <DesignMark priority labelClassName="hidden sm:inline-flex flex-col leading-none" />
         </Link>
 
-        <nav className="hidden items-center gap-8 md:flex" aria-label="Primary">
+        <nav className="hidden items-center gap-8 lg:flex" aria-label="Primary">
           {siteNav.map((item) => {
             const active = pathname === item.href || pathname.startsWith(`${item.href}/`)
             return (
@@ -38,7 +38,7 @@ export function SiteHeader() {
           })}
         </nav>
 
-        <div className="hidden md:block">
+        <div className="hidden lg:block">
           <Link
             href="/contact"
             className="inline-flex items-center justify-center rounded-full border border-slate-900 bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-700"
@@ -49,7 +49,7 @@ export function SiteHeader() {
 
         <button
           type="button"
-          className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-900 md:hidden"
+          className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-900 lg:hidden"
           aria-label={open ? "Close navigation" : "Open navigation"}
           aria-expanded={open}
           onClick={() => setOpen((value) => !value)}
@@ -59,7 +59,7 @@ export function SiteHeader() {
       </div>
 
       {open ? (
-        <div className="border-t border-slate-200 bg-white/95 px-4 py-4 md:hidden">
+        <div className="border-t border-slate-200 bg-white/95 px-4 py-4 lg:hidden">
           <div className="mx-auto flex max-w-7xl flex-col gap-3">
             {siteNav.map((item) => (
               <Link
