@@ -52,6 +52,8 @@ export function Home3D() {
       if (cancelled) return
       try {
         const { mountHomeScene } = await import("./home-scene")
+        // Run the next step in its own task: loading the scene code and creating the GL context are separate chunks of work.
+        await new Promise<void>((resolve) => window.setTimeout(resolve, 0))
         if (cancelled) return
         handle = mountHomeScene({
           root,
@@ -72,10 +74,15 @@ export function Home3D() {
       }
     }
 
+    // The page text is complete and interactive first. The 3D scene starts 1.5 s after load, when the browser is idle,
+    // so loading it never competes with hydration, the cookie banner or the visitor's first scroll or tap.
     const schedule = () => {
       if (cancelled) return
-      if (typeof window.requestIdleCallback === "function") idleId = window.requestIdleCallback(() => void start(), { timeout: 3000 })
-      else timer = window.setTimeout(() => void start(), 1200)
+      timer = window.setTimeout(() => {
+        if (cancelled) return
+        if (typeof window.requestIdleCallback === "function") idleId = window.requestIdleCallback(() => void start(), { timeout: 2500 })
+        else void start()
+      }, 1500)
     }
 
     if (document.readyState === "complete") schedule()

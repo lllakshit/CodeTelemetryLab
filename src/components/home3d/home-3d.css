@@ -175,6 +175,8 @@
   .h3d-hud { display: none; }
   .h3d-dock-wrap { display: block; pointer-events: auto; }
   .h3d-dock { position: fixed; z-index: 45; left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom)); display: grid; grid-template-columns: repeat(5, 1fr); align-items: end; padding: 8px 6px; border-radius: 26px; background: rgba(255, 255, 255, 0.9); border: 1px solid var(--line); box-shadow: 0 18px 44px -18px rgba(2, 6, 24, 0.45); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
+  .h3d-dock { transition: transform 0.3s ease, opacity 0.3s ease; }
+  .h3d-dock[data-hidden="true"] { transform: translateY(calc(100% + 24px)); opacity: 0; pointer-events: none; }
   .h3d-dock a, .h3d-dock button { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 2px; font-size: 10.5px; font-weight: 600; color: var(--fg3); border-radius: 16px; min-height: 48px; justify-content: center; }
   .h3d-dock svg { width: 20px; height: 20px; }
   .h3d-dock a[aria-current="true"] { color: var(--blue); background: var(--blue-lt); }

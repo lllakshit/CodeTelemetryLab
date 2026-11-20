@@ -105,7 +105,6 @@ function pickHeroImageUrl(img: HTMLImageElement | null): string {
 }
 
 export function mountHomeScene(o: HomeSceneOptions): HomeSceneHandle {
-  mark("h3d:mount")
   const { root, canvas, tip, cursor: cur } = o
   const $ = <T extends Element>(s: string, r: ParentNode = root) => r.querySelector<T>(s)
   const $$ = <T extends Element>(s: string, r: ParentNode = root) => Array.from(r.querySelectorAll<T>(s))
@@ -138,7 +137,6 @@ export function mountHomeScene(o: HomeSceneOptions): HomeSceneHandle {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: !touch, alpha: true, powerPreference: "high-performance" })
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, touch ? 1.5 : 1.75))
   renderer.setClearColor(0, 0)
-  mark("h3d:renderer")
   const scene = new THREE.Scene()
   const CAMZ = 16.5
   const FOV = 32
@@ -711,7 +709,8 @@ export function mountHomeScene(o: HomeSceneOptions): HomeSceneHandle {
     x.fillRect(0, 0, 256, 256)
     return tex(cv)
   }
-  const shadowTex = () => shadowTexture()
+  let sharedShadow: THREE.Texture | null = null
+  const shadowTex = () => (sharedShadow ??= shadowTexture())
 
   /* ---------- shared 3D pieces ---------- */
   const hexGeo = new THREE.CylinderGeometry(1, 1, 0.26, 6)
@@ -720,8 +719,15 @@ export function mountHomeScene(o: HomeSceneOptions): HomeSceneHandle {
   const hexEdges = new THREE.EdgesGeometry(hexGeo)
   disposables.push(hexGeo, hexEdges)
   let glyphTex: THREE.Texture[] = []
+  /** The icon tokens are only needed by the services and next-step scenes, so their textures are drawn on first use. */
+  function ensureGlyphs() {
+    if (glyphTex.length) return
+    // One texture per service, in list order: the icon is chosen by glyph index, the number by list position.
+    glyphTex = SVC_SHORT.map((n, i) => glyphTexture(SVC_GLYPH[i] ?? i, n, i))
+  }
 
   function makeToken(i: number) {
+    ensureGlyphs()
     const group = new THREE.Group()
     const bodyMat = new THREE.MeshStandardMaterial({
       color: 0xffffff,
@@ -773,6 +779,7 @@ export function mountHomeScene(o: HomeSceneOptions): HomeSceneHandle {
     const inner = new THREE.Group()
     g.add(inner)
     const SZ = 4.4
+    const heroUrl = pickHeroImageUrl($<HTMLImageElement>(".h3d-shot img"))
     const slab = (h: number, color: number, ec: number, eo: number) => {
       const geo = new THREE.BoxGeometry(SZ, h, SZ)
       const m = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ color, roughness: 0.5, metalness: 0.05, transparent: true }))
@@ -814,13 +821,25 @@ export function mountHomeScene(o: HomeSceneOptions): HomeSceneHandle {
     inst.instanceColor!.needsUpdate = true
     logic.add(inst)
     ui.add(slab(0.22, 0xffffff, C.blue, 0.8))
-    const uiMat = new THREE.MeshBasicMaterial({ map: uiCard(0, 800, 450, 0), transparent: true })
+    const placeholder = () => {
+      const cv = mkCanvas(256, 144)
+      const x = cv.getContext("2d")!
+      x.fillStyle = "#f3f6fd"
+      x.fillRect(0, 0, 256, 144)
+      x.fillStyle = "#dbe3f5"
+      for (let i = 0; i < 6; i++) x.fillRect(14, 22 + i * 18, 40, 8)
+      x.fillStyle = "#1447e6"
+      x.fillRect(72, 22, 170, 8)
+      x.fillStyle = "#eef2fb"
+      x.fillRect(72, 44, 170, 80)
+      return tex(cv)
+    }
+    const uiMat = new THREE.MeshBasicMaterial({ map: heroUrl ? placeholder() : uiCard(0, 800, 450, 0), transparent: true })
     const uiPlane = new THREE.Mesh(new THREE.PlaneGeometry(SZ * 0.92, (SZ * 0.92 * 450) / 800), uiMat)
     uiPlane.rotation.x = -Math.PI / 2
     uiPlane.position.y = 0.115
     ui.add(uiPlane)
     // Use the real dashboard image (the one the page already loads) as the texture. Same origin, so no CORS.
-    const heroUrl = pickHeroImageUrl($<HTMLImageElement>(".h3d-shot img"))
     if (heroUrl) {
       const im = new Image()
       im.onload = () => {
@@ -1583,7 +1602,6 @@ export function mountHomeScene(o: HomeSceneOptions): HomeSceneHandle {
   let announcedReady = false
   function frame(now: number) {
     if (destroyed) return
-    if (!announcedReady) mark("h3d:frame1-start")
     raf = requestAnimationFrame(frame)
     const t = now / 1000
     const dt = Math.min(0.05, t - last)
@@ -1611,9 +1629,18 @@ export function mountHomeScene(o: HomeSceneOptions): HomeSceneHandle {
     const V = viewSize()
     const ctx: Ctx = { t, dt, px: ptr.sx, py: ptr.sy, aspect: camera.aspect, p: 0, pf: 0, pin: 0 }
     let anyVisible = false
+    let builtNow = false
     S.forEach((sc, i) => {
       const g = groups[i]
-      if (!sc || !g) return
+      if (!g) return
+      if (!sc) {
+        // Needed before the idle builder reached it (fast scroll): build it now, one per frame.
+        if (!builtNow && builders[i] && g.w > 0.003) {
+          addScene(i)
+          builtNow = true
+        }
+        return
+      }
       const vis = g.w > 0.003
       sc.g.visible = vis
       if (!vis) return
@@ -1652,7 +1679,7 @@ export function mountHomeScene(o: HomeSceneOptions): HomeSceneHandle {
       wasDrawing = anyVisible
     }
     if (!announcedReady) {
-      mark("h3d:frame1-end")
+      mark("h3d:first-frame")
       announcedReady = true
       o.onReady?.()
     }
@@ -1660,6 +1687,25 @@ export function mountHomeScene(o: HomeSceneOptions): HomeSceneHandle {
 
   /* ---------- init ---------- */
   const resizeObserver = typeof ResizeObserver !== "undefined" ? new ResizeObserver(() => measure()) : null
+  /** Resolves on the first scroll, wheel, touch, pointer press or key press, or after 12 s. */
+  function firstInteraction() {
+    return new Promise<void>((resolve) => {
+      const events = ["scroll", "wheel", "touchstart", "pointerdown", "keydown"]
+      let timer = 0
+      const done = () => {
+        events.forEach((e) => window.removeEventListener(e, done))
+        window.clearTimeout(timer)
+        resolve()
+      }
+      events.forEach((e) => window.addEventListener(e, done, { passive: true, once: true }))
+      timer = window.setTimeout(done, 12000)
+      cleanups.push(() => {
+        events.forEach((e) => window.removeEventListener(e, done))
+        window.clearTimeout(timer)
+        resolve()
+      })
+    })
+  }
   type Builder = (() => SceneObj) | null
   const builders: Builder[] = [buildHero, N_SVC ? buildServices : null, N_STEP ? buildProcess : null, N_CASE ? buildProjects : null, buildGlobe, N_SVC ? buildCta : null]
   function addScene(i: number) {
@@ -1670,7 +1716,6 @@ export function mountHomeScene(o: HomeSceneOptions): HomeSceneHandle {
     scene.add(sc.g)
     S[i] = sc
     uploadFresh()
-    mark("h3d:scene-" + i)
   }
   async function init() {
     try {
@@ -1680,27 +1725,23 @@ export function mountHomeScene(o: HomeSceneOptions): HomeSceneHandle {
       /* fonts are optional for the textures */
     }
     if (destroyed) return
-    mark("h3d:fonts")
-    // One texture per service, in list order: the icon is chosen by glyph index, the number by list position.
-    glyphTex = SVC_SHORT.map((n, i) => glyphTexture(SVC_GLYPH[i] ?? i, n, i))
     builders.forEach((_, i) => {
       S[i] = null
     })
     await idle()
     if (destroyed) return
-    mark("h3d:hero-start")
     addScene(0)
-    mark("h3d:hero-end")
     resize()
-    mark("h3d:resized")
     on(window, "resize", resize)
     on(window, "load", measure)
     resizeObserver?.observe(document.body)
-    mark("h3d:observed")
     raf = requestAnimationFrame(frame)
-    // The other scenes are built one at a time while the browser is idle, in page order; a scene that is not
-    // ready yet simply does not draw until it is.
+    // The other scenes are built one at a time while the browser is idle, starting when the visitor first scrolls,
+    // taps or presses a key (or after 12 s). Until then only the hero costs anything. A scene that is not ready
+    // when it is needed is built on the spot by the frame loop.
+    await firstInteraction()
     for (let i = 1; i < builders.length; i++) {
+      if (destroyed) return
       await idle()
       if (destroyed) return
       addScene(i)

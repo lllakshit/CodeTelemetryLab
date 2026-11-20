@@ -4,6 +4,7 @@ import Link from "next/link"
 import { ProcessFlowDiagram, processSteps } from "@/components/diagrams/engineering-diagrams"
 import { HeroPulse } from "@/components/hero-pulse"
 import { Home3D } from "@/components/home3d/home-3d"
+import { serviceMeta, spotlightSlugs } from "@/components/home3d/home-data"
 import { SceneNav } from "@/components/home3d/scene-nav"
 import { getHomeContent, listBlogPosts, listProjects } from "@/lib/cms"
 import { seoServices } from "@/lib/seo-markets"
@@ -65,16 +66,6 @@ const homeFaqs = [
   },
 ]
 
-/** Short label and icon (index into the 3D token icons) for each spotlight service. The names and links come from seoServices. */
-const serviceMeta: Record<string, { short: string; glyph: number }> = {
-  "ai-development": { short: "AI Development", glyph: 0 },
-  "ai-automation": { short: "AI Automation", glyph: 1 },
-  "custom-software-development": { short: "Custom Software", glyph: 2 },
-  "saas-development": { short: "SaaS", glyph: 3 },
-  "mvp-development": { short: "MVP", glyph: 4 },
-  "api-development": { short: "API", glyph: 5 },
-}
-
 /**
  * Runs before the page is painted. Picks the plain layout for people who asked for less motion, turned on
  * data saver, or are on a very low-memory device, so they never see the 3D layout flash first.
@@ -90,11 +81,7 @@ export default async function HomePage() {
   ])
 
   const featuredProjects = projects.filter((project) => project.featured).slice(0, 3)
-  const spotlightServices = seoServices.filter((s) =>
-    ["ai-development", "ai-automation", "saas-development", "custom-software-development", "mvp-development", "api-development"].includes(
-      s.slug,
-    ),
-  )
+  const spotlightServices = seoServices.filter((s) => (spotlightSlugs as readonly string[]).includes(s.slug))
   const recentPosts = blogs.slice(0, 3)
 
   return (

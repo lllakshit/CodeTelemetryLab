@@ -4,34 +4,9 @@ import Link from "next/link"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { Handshake, House, Layers, LayoutGrid, FolderKanban, X } from "lucide-react"
 import { siteNav } from "@/lib/navigation"
+import { homeSections as ALL, homeStops as STOPS } from "./home-data"
 
 /** In-page navigation for the home page: dots on desktop, a bottom dock plus sheet on phones and tablets. */
-
-type Section = { id: string; label: string }
-
-/** Every anchor on the page, top to bottom (the notes section is added only when the page has it). */
-const ALL: Section[] = [
-  { id: "hero", label: "Overview" },
-  { id: "who", label: "Who we help" },
-  { id: "services", label: "Services" },
-  { id: "process", label: "Process" },
-  { id: "tech", label: "Technologies" },
-  { id: "work", label: "Work" },
-  { id: "why", label: "Why teams work with us" },
-  { id: "faq", label: "Questions" },
-  { id: "contact", label: "Contact" },
-  { id: "notes", label: "Notes" },
-]
-
-/** The six stops shown as desktop dots. Each owns the neighbouring sections that share its 3D scene. */
-const STOPS: Array<Section & { owns: string[] }> = [
-  { id: "hero", label: "Overview", owns: ["hero", "who"] },
-  { id: "services", label: "Services", owns: ["services"] },
-  { id: "process", label: "Process", owns: ["process", "tech"] },
-  { id: "work", label: "Work", owns: ["work"] },
-  { id: "why", label: "Delivery", owns: ["why", "faq"] },
-  { id: "contact", label: "Contact", owns: ["contact", "notes"] },
-]
 
 function useActiveSection(ids: string[]) {
   const [active, setActive] = useState(ids[0])
@@ -59,10 +34,24 @@ function useActiveSection(ids: string[]) {
   return active
 }
 
+/** True while the site footer is on screen, so the dock can step aside and never cover footer links. */
+function useFooterVisible() {
+  const [visible, setVisible] = useState(false)
+  useEffect(() => {
+    const footer = document.querySelector("footer")
+    if (!footer || typeof IntersectionObserver === "undefined") return
+    const io = new IntersectionObserver(([entry]) => setVisible(entry.isIntersecting), { rootMargin: "0px 0px -96px 0px", threshold: 0 })
+    io.observe(footer)
+    return () => io.disconnect()
+  }, [])
+  return visible
+}
+
 export function SceneNav({ hasNotes }: { hasNotes: boolean }) {
   const sections = useMemo(() => (hasNotes ? ALL : ALL.filter((s) => s.id !== "notes")), [hasNotes])
   const ids = useMemo(() => sections.map((s) => s.id), [sections])
   const active = useActiveSection(ids)
+  const atFooter = useFooterVisible()
   const [sheet, setSheet] = useState(false)
   const opener = useRef<HTMLElement | null>(null)
   const sheetRef = useRef<HTMLDivElement>(null)
@@ -120,7 +109,7 @@ export function SceneNav({ hasNotes }: { hasNotes: boolean }) {
       </nav>
 
       <div className="h3d-dock-wrap">
-        <nav className="h3d-dock" aria-label="Quick navigation">
+        <nav className="h3d-dock" aria-label="Quick navigation" data-hidden={atFooter && !sheet ? "true" : undefined}>
           <a href="#hero" aria-current={owner === "hero" ? "true" : undefined}>
             <House aria-hidden="true" />
             Overview
