@@ -2,15 +2,16 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { format } from "date-fns"
 import { ArrowLeft, ArrowRight, Search } from "lucide-react"
-import { BrandIllustration } from "@/components/brand-illustration"
-import { PostCover } from "@/components/post-cover"
-import { SectionHeading } from "@/components/section-heading"
+import { Site3DPage, vars } from "@/components/site3d/site-3d-page"
+import { SceneHero, revealDelay } from "@/components/site3d/site-3d-ui"
 import { listBlogPosts } from "@/lib/cms"
 import { absoluteUrl, buildPageMetadata } from "@/lib/seo"
+import { BlogCover } from "./blog-cover"
 
 const POSTS_PER_PAGE = 12
 
 type BlogSearchParams = { q?: string; category?: string; page?: string }
+type Post = Awaited<ReturnType<typeof listBlogPosts>>[number]
 
 export async function generateMetadata({
   searchParams,
@@ -36,20 +37,17 @@ export async function generateMetadata({
   return filtered ? { ...base, robots: { index: false, follow: true } } : base
 }
 
-function postMatchesSearch(
-  post: Awaited<ReturnType<typeof listBlogPosts>>[number],
-  query: string,
-  category: string,
-) {
+/** The text the server search looks through. The client filter (data-text) uses the same text, so both agree. */
+function searchText(post: Post) {
+  return [post.title, post.excerpt, post.category, post.tags.join(" ")].filter(Boolean).join(" ").toLowerCase()
+}
+
+function postMatchesSearch(post: Post, query: string, category: string) {
   const normalizedQuery = query.trim().toLowerCase()
   const normalizedCategory = category.trim().toLowerCase()
-  const haystack = [post.title, post.excerpt, post.category, post.tags.join(" ")]
-    .filter(Boolean)
-    .join(" ")
-    .toLowerCase()
 
   return (
-    (!normalizedQuery || haystack.includes(normalizedQuery)) &&
+    (!normalizedQuery || searchText(post).includes(normalizedQuery)) &&
     (!normalizedCategory || post.category.toLowerCase() === normalizedCategory)
   )
 }
@@ -58,6 +56,38 @@ function getPageNumber(value: string | undefined) {
   const page = Number.parseInt(value ?? "1", 10)
   return Number.isFinite(page) && page > 0 ? page : 1
 }
+
+function postDate(post: Post) {
+  return post.publishedAt ? format(new Date(post.publishedAt), "MMMM d, yyyy") : "Draft"
+}
+
+/** Data the page behaviours read: the search filter (text, category, tags) and the 3D sheets in the hero. */
+function postData(post: Post) {
+  return {
+    "data-text": searchText(post),
+    "data-cat": post.category,
+    "data-tags": `|${post.tags.map((t) => t.toLowerCase()).join("|")}|`,
+    "data-sheet-title": post.title,
+    "data-sheet-cat": post.category,
+    "data-sheet-date": postDate(post),
+  }
+}
+
+function PostTime({ post }: { post: Post }) {
+  return <time dateTime={post.publishedAt ?? undefined}>{postDate(post)}</time>
+}
+
+function Tags({ tags, className }: { tags: string[]; className?: string }) {
+  return (
+    <ul className={className ? `tags ${className}` : "tags"}>
+      {tags.map((tag, i) => (
+        <li key={`${tag}-${i}`}>{tag}</li>
+      ))}
+    </ul>
+  )
+}
+
+const linkStyle = { color: "var(--accent)", fontWeight: 600 }
 
 export default async function BlogPage({
   searchParams,
@@ -105,218 +135,239 @@ export default async function BlogPage({
     },
   }
 
+  const prevDisabled = currentPage === 1
+  const nextDisabled = currentPage === totalPages
+
   return (
-    <div className="site-page">
+    <Site3DPage>
       <script
         type="application/ld+json"
         suppressHydrationWarning
         dangerouslySetInnerHTML={{ __html: JSON.stringify(listJsonLd) }}
       />
-      <div className="grid gap-10 lg:grid-cols-[0.88fr_1.12fr] lg:items-center">
-        <SectionHeading
+      <div className="wrap">
+        <SceneHero
+          id="h1-blog"
           eyebrow="Blog"
           title="Notes on building software that has to survive contact with operators."
-          description="Architecture trade-offs, delivery patterns, and product decisions we see across AI, automation, and SaaS work."
-          level={1}
+          lead="Architecture trade-offs, delivery patterns, and product decisions we see across AI, automation, and SaaS work."
+          scene="blog"
+          label="Interactive 3D fan of recent articles"
+          hint="Drag · tap a sheet · tap again to read"
+          dots={paginatedPosts.slice(0, 5).map((post) => post.title)}
         />
-        <BrandIllustration variant="blog" />
-      </div>
 
-      <p className="mt-6 max-w-3xl text-sm leading-7 text-slate-600">
-        Most of these posts come out of client work: a data model that needed rethinking, an automation that broke
-        quietly, a launch checklist we wished existed sooner. If a post overlaps with something you are scoping, our{" "}
-        <Link href="/services" className="font-medium text-blue-700 underline decoration-slate-300 underline-offset-2 hover:text-blue-900">
-          services
-        </Link>{" "}
-        pages go deeper on approach, and the{" "}
-        <Link href="/process" className="font-medium text-blue-700 underline decoration-slate-300 underline-offset-2 hover:text-blue-900">
-          process
-        </Link>{" "}
-        page explains how an engagement actually runs.
-      </p>
-
-      <form
-        action="/blog"
-        className="mt-12 grid gap-3 rounded-[1.5rem] border border-slate-200 bg-white p-4 sm:grid-cols-[1fr_14rem_auto]"
-      >
-        <label className="relative block">
-          <span className="sr-only">Search articles</span>
-          <Search
-            className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
-            aria-hidden="true"
-          />
-          <input
-            name="q"
-            defaultValue={query}
-            className="h-12 w-full rounded-xl border border-slate-200 bg-white pl-10 pr-4 text-sm text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-600/10"
-            placeholder="Search articles by topic"
-          />
-        </label>
-        <select
-          name="category"
-          defaultValue={selectedCategory}
-          aria-label="Filter by category"
-          className="h-12 rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-700 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-600/10"
-        >
-          <option value="">All categories</option>
-          {categories.map((category) => (
-            <option key={category} value={category}>
-              {category}
-            </option>
-          ))}
-        </select>
-        <div className="flex gap-2">
-          <button
-            type="submit"
-            className="inline-flex h-12 items-center justify-center rounded-xl bg-slate-950 px-5 text-sm font-semibold text-white transition hover:bg-slate-700"
-          >
-            Search
-          </button>
-          {query || selectedCategory ? (
-            <Link
-              href="/blog"
-              className="inline-flex h-12 items-center justify-center rounded-xl border border-slate-200 px-5 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
-            >
-              Clear
-            </Link>
-          ) : null}
-        </div>
-      </form>
-
-      {visiblePosts.length ? (
-        <p className="mt-5 text-sm text-slate-600">
-          Showing {showingStart}-{showingEnd} of {visiblePosts.length} article
-          {visiblePosts.length === 1 ? "" : "s"}
-          {selectedCategory ? ` in ${selectedCategory}` : ""}
-          {query ? ` matching “${query}”` : ""}.
-        </p>
-      ) : null}
-
-      {leadPost ? (
-        <article className="mt-16 grid gap-8 rounded-[2rem] border border-slate-200 bg-white p-6 lg:grid-cols-[0.92fr_1.08fr] lg:items-stretch lg:p-8">
-          <Link href={`/blog/${leadPost.slug}`} tabIndex={-1} aria-hidden="true" className="block self-center">
-            <PostCover
-              post={leadPost}
-              variant="card"
-              priority
-              sizes="(min-width: 1280px) 540px, (min-width: 1024px) 40vw, 100vw"
-            />
-          </Link>
-
-          {/* One text panel beside the cover: the card height follows the image, so there is no dead space. */}
-          <div className="flex flex-col justify-center gap-5 rounded-[1.75rem] bg-[linear-gradient(180deg,#f4f8ff,#eef6ff)] p-6 lg:p-8">
-            <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-blue-700">{leadPost.category}</p>
-              <h2 className="mt-4 text-3xl font-medium tracking-[-0.03em] text-slate-950">
-                <Link href={`/blog/${leadPost.slug}`} className="transition hover:text-blue-700">
-                  {leadPost.title}
-                </Link>
-              </h2>
-              <p className="mt-4 text-sm leading-7 text-slate-700">{leadPost.excerpt}</p>
+        <section className="sec">
+          <div className="card edit rv" data-tilt="2">
+            <div className="z2">
+              <div className="ws" role="img" aria-label="CodeTelemetryLab editorial workspace for engineering articles">
+                <div className="ws-in" data-tilt="9" aria-hidden="true">
+                  <div className="ws-p a">
+                    <span className="tg">GUIDE</span>
+                    <span className="tg">SAAS</span>
+                    <div className="ln x" style={{ marginTop: 14 }} />
+                    <div className="ln m" />
+                    <div className="ln x" />
+                    <div className="ln s" />
+                    <div className="ln m" />
+                  </div>
+                  <div className="ws-p b">
+                    <div className="ln m" />
+                    <div className="ln x" />
+                    <div className="ln s" />
+                  </div>
+                  <div className="ws-p c">
+                    <span className="tg">AI</span>
+                    <div className="ln x" style={{ marginTop: 12 }} />
+                    <div className="ln m" />
+                  </div>
+                  <span className="ws-dot" style={{ left: "12%", top: "8%" }} />
+                  <span className="ws-dot" style={{ right: "14%", bottom: "18%", animationDelay: "-2s" }} />
+                </div>
+              </div>
             </div>
-            <div className="flex flex-wrap gap-2">
-              {leadPost.tags.map((tag) => (
-                <span key={tag} className="rounded-full bg-white/80 px-3 py-2 text-xs font-medium text-slate-700">
-                  {tag}
-                </span>
+            <div className="z1">
+              <p className="eyebrow-s">Editorial system</p>
+              <h2 className="h2">Writing that documents how we build and operate software systems.</h2>
+              <p className="muted">
+                Most of these posts come out of client work: a data model that needed rethinking, an automation that
+                broke quietly, a launch checklist we wished existed sooner. If a post overlaps with something you are
+                scoping, our{" "}
+                <Link href="/services" style={linkStyle}>
+                  services
+                </Link>{" "}
+                pages go deeper on approach, and the{" "}
+                <Link href="/process" style={linkStyle}>
+                  process
+                </Link>{" "}
+                page explains how an engagement actually runs.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section className="sec" style={{ paddingTop: 0 }} aria-label="Articles">
+          {/* Submits to the server (data-server), which searches every page; typing filters this page's posts at once. */}
+          <form action="/blog" className="card filters rv" id="blogFilter" data-tilt="2" data-server="1" role="search">
+            <div className="z1">
+              <label htmlFor="bq">Search articles</label>
+              <div style={{ position: "relative" }}>
+                <Search
+                  aria-hidden="true"
+                  style={{
+                    position: "absolute",
+                    left: 15,
+                    top: "50%",
+                    width: 16,
+                    height: 16,
+                    translate: "0 -50%",
+                    color: "#8a97a8",
+                    pointerEvents: "none",
+                  }}
+                />
+                <input
+                  className="inp"
+                  id="bq"
+                  name="q"
+                  type="search"
+                  defaultValue={query}
+                  placeholder="Search articles by topic"
+                  autoComplete="off"
+                  style={{ paddingLeft: 40 }}
+                />
+              </div>
+            </div>
+            <div className="z1">
+              <select className="inp" name="category" defaultValue={selectedCategory} aria-label="Filter by category">
+                <option value="">All categories</option>
+                {categories.map((category) => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="z2" style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+              <button className="btn" type="submit">
+                Search
+              </button>
+              {query || selectedCategory ? (
+                <Link className="btn ghost" href="/blog">
+                  Clear
+                </Link>
+              ) : null}
+            </div>
+          </form>
+
+          {visiblePosts.length ? (
+            <p className="count" id="blogCount">
+              Showing {showingStart}-{showingEnd} of {visiblePosts.length} article
+              {visiblePosts.length === 1 ? "" : "s"}
+              {selectedCategory ? ` in ${selectedCategory}` : ""}
+              {query ? ` matching “${query}”` : ""}.
+            </p>
+          ) : null}
+          {paginatedPosts.length ? (
+            <p className="empty" id="blogEmpty">
+              No articles match that search on this page. Press Search to look through every page.
+            </p>
+          ) : null}
+
+          {leadPost ? (
+            <article className="card feat rv" data-tilt="2" {...postData(leadPost)}>
+              <Link href={`/blog/${leadPost.slug}`} tabIndex={-1} aria-hidden="true" className="z2">
+                <BlogCover
+                  post={leadPost}
+                  index={0}
+                  priority
+                  sizes="(min-width: 1280px) 600px, (min-width: 981px) 50vw, 100vw"
+                />
+              </Link>
+              <div className="pane z1">
+                <p className="cat">{leadPost.category}</p>
+                <h2 className="h2" style={{ fontSize: "clamp(24px,3vw,34px)" }}>
+                  <Link href={`/blog/${leadPost.slug}`}>{leadPost.title}</Link>
+                </h2>
+                <p className="muted">{leadPost.excerpt}</p>
+                <Tags tags={leadPost.tags} />
+                <div className="foot">
+                  <PostTime post={leadPost} />
+                  <Link className="rc" href={`/blog/${leadPost.slug}`}>
+                    Read article
+                  </Link>
+                </div>
+              </div>
+            </article>
+          ) : null}
+
+          {remainingPosts.length ? (
+            <div className="posts">
+              {remainingPosts.map((post, i) => (
+                <article
+                  key={post.id}
+                  className="card post rv"
+                  data-tilt="5"
+                  style={vars({ "--d": revealDelay(i + 1) })}
+                  {...postData(post)}
+                >
+                  <Link href={`/blog/${post.slug}`} tabIndex={-1} aria-hidden="true">
+                    <BlogCover
+                      post={post}
+                      index={i + 1}
+                      sizes="(min-width: 1280px) 400px, (min-width: 981px) 33vw, (min-width: 621px) 50vw, 100vw"
+                    />
+                  </Link>
+                  <p className="cat z1">{post.category}</p>
+                  <PostTime post={post} />
+                  <h3 className="h3">
+                    <Link href={`/blog/${post.slug}`}>{post.title}</Link>
+                  </h3>
+                  <p className="ex">{post.excerpt}</p>
+                  <Tags tags={post.tags} className="z1" />
+                  <div className="foot z2">
+                    <Link className="rc" href={`/blog/${post.slug}`}>
+                      Read article
+                    </Link>
+                  </div>
+                </article>
               ))}
             </div>
-            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-blue-100 pt-5">
-              <p className="text-sm text-slate-500">
-                {leadPost.publishedAt ? format(new Date(leadPost.publishedAt), "MMMM d, yyyy") : "Draft"}
-              </p>
+          ) : null}
+
+          {totalPages > 1 ? (
+            <nav className="pager" aria-label="Blog pagination">
+              <span>
+                Page {currentPage} of {totalPages}
+              </span>
               <Link
-                href={`/blog/${leadPost.slug}`}
-                className="inline-flex items-center gap-2 text-sm font-semibold text-slate-950"
+                className="btn"
+                href={pageHref(Math.max(1, currentPage - 1))}
+                aria-disabled={prevDisabled}
+                tabIndex={prevDisabled ? -1 : undefined}
               >
-                Read article
+                <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+                Previous
+              </Link>
+              <Link
+                className="btn"
+                href={pageHref(Math.min(totalPages, currentPage + 1))}
+                aria-disabled={nextDisabled}
+                tabIndex={nextDisabled ? -1 : undefined}
+              >
+                Next
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
-            </div>
-          </div>
-        </article>
-      ) : null}
+            </nav>
+          ) : null}
 
-      <div className="mt-16 divide-y divide-slate-200 border-t border-slate-200">
-        {remainingPosts.map((post) => (
-          <article key={post.id} className="grid gap-6 py-8 lg:grid-cols-[0.26fr_0.46fr_0.28fr]">
-            <div>
-              <Link href={`/blog/${post.slug}`} tabIndex={-1} aria-hidden="true">
-                <PostCover post={post} variant="thumb" sizes="(min-width: 1280px) 300px, (min-width: 1024px) 24vw, 100vw" />
-              </Link>
-              <p className="mt-4 text-[11px] font-semibold uppercase tracking-[0.28em] text-blue-700">{post.category}</p>
-              <p className="mt-2 text-sm text-slate-500">
-                {post.publishedAt ? format(new Date(post.publishedAt), "MMMM d, yyyy") : "Draft"}
-              </p>
+          {!visiblePosts.length ? (
+            <div className="card rv" style={{ textAlign: "center", marginTop: 12 }}>
+              <p className="h3">No articles found</p>
+              <p className="muted">Try a different topic or clear the filters.</p>
             </div>
-            <div>
-              <h3 className="text-2xl font-medium tracking-tight text-slate-950">
-                <Link href={`/blog/${post.slug}`} className="transition hover:text-blue-700">
-                  {post.title}
-                </Link>
-              </h3>
-              <p className="mt-3 text-sm leading-7 text-slate-600">{post.excerpt}</p>
-            </div>
-            <div className="flex flex-col gap-4">
-              <div className="flex flex-wrap gap-2">
-                {post.tags.map((tag) => (
-                  <span key={tag} className="rounded-full bg-slate-100 px-3 py-2 text-xs font-medium text-slate-700">
-                    {tag}
-                  </span>
-                ))}
-              </div>
-              <Link href={`/blog/${post.slug}`} className="inline-flex items-center gap-2 text-sm font-semibold text-slate-950">
-                Read article
-                <ArrowRight className="h-4 w-4" aria-hidden="true" />
-              </Link>
-            </div>
-          </article>
-        ))}
+          ) : null}
+        </section>
       </div>
-
-      {totalPages > 1 ? (
-        <nav
-          aria-label="Blog pagination"
-          className="mt-10 flex flex-col gap-4 border-t border-slate-200 pt-8 sm:flex-row sm:items-center sm:justify-between"
-        >
-          <p className="text-sm text-slate-600">
-            Page {currentPage} of {totalPages}
-          </p>
-          <div className="flex flex-wrap gap-2">
-            <Link
-              href={pageHref(Math.max(1, currentPage - 1))}
-              aria-disabled={currentPage === 1}
-              className={`inline-flex h-11 items-center gap-2 rounded-xl border px-4 text-sm font-semibold transition ${
-                currentPage === 1
-                  ? "pointer-events-none border-slate-200 text-slate-300"
-                  : "border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-50"
-              }`}
-            >
-              <ArrowLeft className="h-4 w-4" aria-hidden="true" />
-              Previous
-            </Link>
-            <Link
-              href={pageHref(Math.min(totalPages, currentPage + 1))}
-              aria-disabled={currentPage === totalPages}
-              className={`inline-flex h-11 items-center gap-2 rounded-xl border px-4 text-sm font-semibold transition ${
-                currentPage === totalPages
-                  ? "pointer-events-none border-slate-200 text-slate-300"
-                  : "border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-50"
-              }`}
-            >
-              Next
-              <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </Link>
-          </div>
-        </nav>
-      ) : null}
-
-      {!visiblePosts.length ? (
-        <div className="mt-12 rounded-[1.5rem] border border-slate-200 bg-slate-50 p-8 text-center">
-          <p className="text-lg font-semibold text-slate-950">No articles found</p>
-          <p className="mt-2 text-sm leading-6 text-slate-600">Try a different topic or clear the filters.</p>
-        </div>
-      ) : null}
-    </div>
+    </Site3DPage>
   )
 }
