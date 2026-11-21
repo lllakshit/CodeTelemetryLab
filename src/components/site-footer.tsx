@@ -5,20 +5,21 @@ import { DesignMark } from "@/components/design-mark"
 import { CookieSettingsButton } from "@/components/cookie-consent"
 import { CONTACT_DISPLAY_EMAIL } from "@/lib/contact"
 import { seoCities, seoServices } from "@/lib/seo-markets"
+import "./site-chrome.css"
 
 export function SiteFooter() {
   const featuredServices = seoServices.slice(0, 6)
   const featuredCities = seoCities.filter((city) => city.priority === "primary").slice(0, 7)
 
   return (
-    <footer className="relative z-[3] border-t border-slate-200 bg-white">
+    <footer className="sf relative z-[3]">
       <div className="site-page !py-16">
         <div className="grid gap-12 lg:grid-cols-[1.2fr_0.7fr_0.7fr_0.8fr]">
           <div className="max-w-xl">
             <div className="mb-5">
               <DesignMark size="lg" />
             </div>
-            <h2 className="text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">
+            <h2 className="sf-tag text-2xl tracking-tight text-slate-950 sm:text-3xl">
               Engineering partner for AI, SaaS, automation, and custom product work.
             </h2>
             <p className="mt-4 max-w-lg text-sm leading-6 text-slate-600">
@@ -31,7 +32,7 @@ export function SiteFooter() {
             <p className="text-sm font-semibold text-slate-900">Navigate</p>
             <div className="mt-4 flex flex-col gap-3">
               {siteNav.map((item) => (
-                <Link key={item.href} href={item.href} className="text-sm text-slate-600 transition hover:text-slate-950">
+                <Link key={item.href} href={item.href} className="sf-link text-sm text-slate-600">
                   {item.label}
                 </Link>
               ))}
@@ -45,12 +46,12 @@ export function SiteFooter() {
                 <Link
                   key={service.slug}
                   href={`/services/${service.slug}`}
-                  className="text-sm text-slate-600 transition hover:text-slate-950"
+                  className="sf-link text-sm text-slate-600"
                 >
                   {service.name}
                 </Link>
               ))}
-              <Link href="/services" className="text-sm font-medium text-blue-700 transition hover:text-blue-900">
+              <Link href="/services" className="sf-link text-sm font-semibold text-blue-700">
                 All services
               </Link>
             </div>
@@ -72,26 +73,26 @@ export function SiteFooter() {
             </div>
             <p className="mt-6 text-sm font-semibold text-slate-900">Also</p>
             <div className="mt-3 flex flex-col gap-3">
-              <Link href="/process" className="text-sm text-slate-600 transition hover:text-slate-950">
+              <Link href="/process" className="sf-link text-sm text-slate-600">
                 Process
               </Link>
-              <Link href="/locations" className="text-sm text-slate-600 transition hover:text-slate-950">
+              <Link href="/locations" className="sf-link text-sm text-slate-600">
                 Locations
               </Link>
-              <Link href="/sitemap.xml" className="text-sm text-slate-600 transition hover:text-slate-950">
+              <Link href="/sitemap.xml" className="sf-link text-sm text-slate-600">
                 Sitemap
               </Link>
-              <Link href="/feed.xml" className="text-sm text-slate-600 transition hover:text-slate-950">
+              <Link href="/feed.xml" className="sf-link text-sm text-slate-600">
                 RSS feed
               </Link>
             </div>
             <p className="mt-6 text-sm font-semibold text-slate-900">Markets we serve</p>
-            <div className="mt-3 flex flex-wrap gap-2">
+            <div className="sf-chips mt-3 flex flex-wrap gap-2">
               {featuredCities.map((city) => (
                 <Link
                   key={city.slug}
                   href={`/locations/${city.slug}`}
-                  className="rounded-full border border-slate-200 px-3 py-1 text-xs text-slate-600 transition hover:border-slate-400 hover:text-slate-950"
+                  className="sf-chip"
                 >
                   {city.name}
                 </Link>
