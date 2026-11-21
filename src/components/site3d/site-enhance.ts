@@ -268,7 +268,8 @@ export function enhanceSite(root: HTMLElement, opts: { motion: boolean }): () =>
       let n = 0
       items.forEach((it) => {
         const okT = !term || (it.dataset.text ?? "").includes(term)
-        const okC = !cat || (it.dataset.cat ?? "").toLowerCase() === cat || (it.dataset.tags ?? "").toLowerCase().includes(`|${cat}|`)
+        // Category only, the same rule the server applies when the form is submitted.
+        const okC = !cat || (it.dataset.cat ?? "").toLowerCase() === cat
         const show = okT && okC
         const was = !it.classList.contains("hide")
         it.classList.toggle("hide", !show)
@@ -319,7 +320,14 @@ export function enhanceSite(root: HTMLElement, opts: { motion: boolean }): () =>
             }
           }
         })
-        if (h) h.textContent = team ? `${n} ${n === 1 ? "opening" : "openings"}` : (h.dataset.orig ?? h.textContent)
+        if (h) h.textContent = team ? `${n} ${n === 1 ? "opening" : "openings"} in ${team}` : (h.dataset.orig ?? h.textContent)
+        // Keep the address in step, so a filtered view can be shared and works on reload (the page filters ?team= too).
+        try {
+          const url = new URL(a.href, window.location.href)
+          window.history.replaceState(window.history.state, "", url.pathname + url.search + window.location.hash)
+        } catch {
+          /* keep the current address */
+        }
       }),
     )
   })

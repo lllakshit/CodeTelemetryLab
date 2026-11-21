@@ -98,8 +98,8 @@ export function SceneHero({
         </div>
         {dots?.length ? (
           <div className="flow-dots" role="group" aria-label={label}>
-            {dots.map((d) => (
-              <button key={d} type="button" aria-label={d} />
+            {dots.map((d, i) => (
+              <button key={`${i}-${d}`} type="button" aria-label={d} />
             ))}
           </div>
         ) : null}

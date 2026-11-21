@@ -993,7 +993,10 @@ export function mountSiteScenes(o: SiteScenesOptions): SiteScenesHandle {
      ========================================================= */
   function blogScene(box: HTMLElement) {
     const arts = $$<HTMLElement>("[data-sheet-title]").slice(0, 5)
-    if (!arts.length) return
+    if (!arts.length) {
+      box.classList.add("noitems") // a search with no results: no empty glass box
+      return
+    }
     const n = arts.length
     carousel(box, {
       mode: "flow",
