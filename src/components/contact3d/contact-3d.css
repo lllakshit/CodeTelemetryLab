@@ -1,0 +1,251 @@
+/* ==========================================================================
+   Contact page — 3D layout.
+   Everything is scoped under .c3d (and prefixed c-) so nothing leaks into the header, footer or other pages.
+   Ported from the approved prototype ("CodeTelemetryLab — 3D Contact Page Prototype"). The site header and footer are
+   the real ones; the prototype's own header and footer were stand-ins for them.
+
+   Modes (data-c3d on the wrapper):
+     pending  server layout, scene not loaded yet (same sizes as "on", so nothing shifts when it arrives)
+     on       scene running
+     static   no 3D (reduced motion, data saver, no WebGL, failure): the five steps are a plain list, everything visible
+   ========================================================================== */
+.c3d {
+  --ink: #0a1317;
+  --muted: #536270;
+  --line: rgba(24, 48, 110, 0.1);
+  --accent: #2b4fe0;
+  --accent-2: #6d8dff;
+  --navy: #0c1a2b;
+  --glass: rgba(255, 255, 255, 0.74);
+  --r: 26px;
+  --shadow: 0 1px 0 rgba(255, 255, 255, 0.9) inset, 0 22px 50px -24px rgba(30, 55, 140, 0.35), 0 6px 16px -8px rgba(30, 55, 140, 0.18);
+  position: relative;
+  color: var(--ink);
+  font-size: 16px;
+  line-height: 1.55;
+}
+/* Resets use :where() so they have no weight and never beat the page's own classes. */
+:where(.c3d) :is(p, h1, h2, figure) { margin: 0; }
+:where(.c3d) :is(ul, ol) { list-style: none; margin: 0; padding: 0; }
+:where(.c3d) a { color: inherit; text-decoration: none; }
+:where(.c3d) :is(button, input, select, textarea) { font: inherit; color: inherit; }
+.c3d [hidden] { display: none !important; }
+.c-sr { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+
+/* The site shell clips overflow, which stops position:sticky (the form card) from working. Clip sideways only on this page. */
+.site-shell:has(.c3d) { overflow: clip visible; }
+
+/* ---- fixed background layers ---- */
+.c-fill { position: fixed; inset: 0; z-index: 0; background: linear-gradient(180deg, #fbfcff 0%, #f1f5fd 55%, #f7f9fe 100%); }
+.c-bg { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: 0; transition: opacity 0.9s ease; }
+.c3d[data-c3d="on"] .c-bg[data-live="1"] { opacity: 1; }
+.c-page { position: relative; z-index: 1; }
+
+/* Same left edge as the site header and footer (max-w-7xl with 16 / 24 / 32 px gutters). */
+.c-wrap { max-width: 1280px; margin: 0 auto; padding: 0 16px; }
+@media (min-width: 640px) { .c-wrap { padding: 0 24px; } }
+@media (min-width: 1024px) { .c-wrap { padding: 0 32px; } }
+
+/* ---- hero ---- */
+.c-hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.08fr); gap: clamp(20px, 4vw, 56px); align-items: center; padding: clamp(34px, 6vw, 84px) 0 clamp(26px, 4vw, 46px); }
+.c-eyebrow { display: flex; align-items: center; gap: 14px; font-size: 12px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: var(--accent); }
+.c-eyebrow i { width: 34px; height: 1px; background: rgba(43, 79, 224, 0.5); }
+.c-eyebrow.sm { letter-spacing: 0.2em; font-size: 11px; }
+.c-eyebrow.sm i { display: none; }
+.c-h1 { font-size: clamp(38px, 5.4vw, 68px); line-height: 1.02; letter-spacing: -0.035em; font-weight: 800; margin: 18px 0 20px !important; perspective: 700px; max-width: none; }
+.c-h1 .c-w { display: inline-block; transform-origin: 50% 100%; }
+.c3d[data-c3d="pending"] .c-h1 .c-w, .c3d[data-c3d="on"] .c-h1 .c-w { animation: c-wordIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+@keyframes c-wordIn { from { opacity: 0; transform: rotateX(-80deg) translateY(30px); } to { opacity: 1; transform: none; } }
+/* The lead paragraph is the largest text painted first, so it must appear with the first paint (no entrance animation). */
+.c-lead { font-size: clamp(18px, 1.6vw, 19px); line-height: 1.6; color: var(--muted); max-width: 34em; }
+
+/* Status line for phones and tablets, where the form card can be below the fold after a send. */
+.c-top-note { display: none; margin-top: 22px; padding: 12px 16px; border-radius: 16px; font-size: 14px; font-weight: 600; border: 1px solid; }
+.c-top-note.ok { color: #065f46; background: #ecfdf5; border-color: #a7f3d0; }
+.c-top-note.err { color: #78350f; background: #fffbeb; border-color: #fde68a; }
+
+/* ---- glass 3D cards ---- */
+.c-card { position: relative; border-radius: var(--r); padding: clamp(20px, 2.6vw, 30px); transform-style: preserve-3d; }
+.c-card::before { content: ""; position: absolute; inset: 0; z-index: 0; border-radius: inherit; background: var(--glass); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border: 1px solid rgba(255, 255, 255, 0.95); box-shadow: var(--shadow); outline: 1px solid var(--line); outline-offset: -1px; }
+.c-card::after { content: ""; position: absolute; inset: 0; z-index: 2; border-radius: inherit; pointer-events: none; opacity: 0; transition: opacity 0.3s; background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 50%), rgba(255, 255, 255, 0.65), transparent 55%); }
+.c-card > *:not(.c-sent) { position: relative; z-index: 1; }
+[data-tilt] { transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1); }
+[data-tilt].tilting { transition: transform 0.08s linear; }
+[data-tilt].tilting::after { opacity: 1; }
+/* Depth offsets only where a mouse can tilt the card; on touch screens they would only soften the text. */
+@media (hover: hover) and (pointer: fine) {
+  .c-z1 { transform: translateZ(14px); }
+  .c-z2 { transform: translateZ(28px); }
+  .c-z3 { transform: translateZ(44px); }
+  [data-tilt] { will-change: transform; }
+}
+
+/* Scroll reveal. Only hidden once the page script has run, and never in the plain layout. */
+.c3d[data-js="1"]:not([data-c3d="static"]) .c-rv { opacity: 0; translate: 0 46px; rotate: x -10deg; transition: opacity 0.9s ease, translate 0.9s cubic-bezier(0.2, 0.8, 0.2, 1), rotate 0.9s cubic-bezier(0.2, 0.8, 0.2, 1); transition-delay: var(--d, 0s); }
+.c3d[data-js="1"]:not([data-c3d="static"]) .c-rv.in { opacity: 1; translate: 0 0; rotate: x 0deg; }
+
+/* ---- inquiry flow (3D scene) ---- */
+.c-flow { margin: 0 !important; padding: 18px 18px 16px; border-radius: 30px; }
+.c-flow-top { display: flex; justify-content: space-between; align-items: center; padding: 2px 6px 8px; }
+.c-dots { display: flex; gap: 6px; }
+.c-dots i { width: 9px; height: 9px; border-radius: 50%; background: #d7def2; }
+.c-stage { position: relative; height: clamp(330px, 40vw, 420px); border-radius: 20px; background: radial-gradient(120% 90% at 50% 10%, #ffffff, #eef2fd 70%); overflow: hidden; box-shadow: inset 0 0 0 1px var(--line); }
+.c-gl { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: pan-y pinch-zoom; cursor: grab; opacity: 0; transition: opacity 0.6s ease; outline: none; }
+.c-gl:focus-visible { box-shadow: inset 0 0 0 3px var(--accent-2); border-radius: 20px; }
+.c-gl.drag { cursor: grabbing; }
+.c3d[data-c3d="on"] .c-gl { opacity: 1; }
+.c-hint { position: absolute; left: 50%; top: 12px; translate: -50% 0; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; color: #5b6b85; background: rgba(255, 255, 255, 0.85); padding: 5px 12px; border-radius: 999px; box-shadow: 0 4px 14px -6px rgba(30, 55, 140, 0.4); pointer-events: none; transition: opacity 0.6s; display: none; white-space: nowrap; }
+.c3d[data-c3d="on"] .c-hint { display: block; }
+.c-flow.touched .c-hint { opacity: 0; }
+.c-flow-dots { display: none; justify-content: center; gap: 8px; padding: 14px 0 0; }
+.c3d[data-c3d="on"] .c-flow-dots { display: flex; }
+.c-flow-dots button { position: relative; width: 30px; height: 8px; border-radius: 99px; border: 0; background: #cfd8f3; cursor: pointer; transition: width 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), background 0.3s; padding: 0; }
+.c-flow-dots button::after { content: ""; position: absolute; inset: -14px -3px; }
+.c-flow-dots button[aria-current="true"] { width: 46px; background: var(--accent); }
+.c-cap { padding: 12px 8px 2px; font-size: 14px; color: var(--muted); }
+/* The five steps as text: the poster inside the stage before the scene arrives, and the plain list when there is no 3D. */
+.c-flow-steps { position: absolute; inset: 0; display: grid; align-content: center; justify-content: center; gap: 12px; padding: 24px; font-weight: 700; font-size: 15px; counter-reset: s; transition: opacity 0.5s ease; }
+.c-flow-steps li { counter-increment: s; display: flex; gap: 12px; align-items: center; }
+.c-flow-steps li::before { content: "0" counter(s); color: var(--accent); font-weight: 800; min-width: 1.6em; }
+.c3d[data-c3d="on"] .c-flow-steps { opacity: 0; pointer-events: none; }
+.c3d[data-c3d="static"] .c-gl, .c3d[data-c3d="static"] .c-hint, .c3d[data-c3d="static"] .c-flow-dots { display: none; }
+.c3d[data-c3d="static"] .c-stage { height: auto; background: none; box-shadow: none; overflow: visible; }
+.c3d[data-c3d="static"] .c-flow-steps { position: static; padding: 12px 4px 0; justify-content: start; }
+
+/* ---- main grid ---- */
+.c-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.02fr); gap: 24px; align-items: start; padding: 10px 0 70px; perspective: 1400px; }
+.c-left { display: flex; flex-direction: column; gap: 24px; }
+.c-right { position: sticky; top: 96px; }
+/* A form taller than the window (optional fields open, or a short window) must scroll with the page, or its lower fields could not be reached. */
+.c-right:has(.c-opt[open]) { position: static; }
+@media (max-height: 780px) { .c-right { position: static; } }
+.c-eyebrow-s { font-size: 11px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 14px; }
+
+.c-inc li { display: flex; align-items: center; gap: 14px; padding: 12px 14px; margin: 0 -4px; border-radius: 16px; background: rgba(255, 255, 255, 0.7); border: 1px solid var(--line); font-size: 14.5px; font-weight: 500; transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.35s, background 0.3s; transform-style: preserve-3d; }
+.c-inc li + li { margin-top: 10px; }
+@media (hover: hover) and (pointer: fine) { .c-inc li:hover { transform: translateZ(26px) translateX(6px) rotateY(-5deg); background: #fff; box-shadow: 0 18px 30px -18px rgba(43, 79, 224, 0.5); } }
+.c-inc .n { flex: none; width: 30px; height: 30px; border-radius: 10px; display: grid; place-items: center; font-size: 12px; font-weight: 800; color: #fff; background: linear-gradient(135deg, var(--accent-2), var(--accent)); box-shadow: 0 8px 14px -8px rgba(43, 79, 224, 0.8); }
+
+.c-line { display: flex; gap: 14px; align-items: flex-start; }
+.c-line + .c-line { margin-top: 16px; }
+.c-ico { flex: none; width: 44px; height: 44px; border-radius: 14px; display: grid; place-items: center; background: linear-gradient(145deg, #fff, #e6ecff); box-shadow: 0 12px 18px -10px rgba(43, 79, 224, 0.55), inset 0 0 0 1px var(--line); animation: c-floaty 5s ease-in-out infinite; }
+.c-line:nth-child(2) .c-ico { animation-delay: -2.4s; }
+@keyframes c-floaty { 50% { translate: 0 -5px; } }
+.c-line a { font-weight: 700; color: var(--accent); overflow-wrap: anywhere; }
+.c-line a:hover { text-decoration: underline; }
+.c-line p { color: #33434f; font-weight: 500; }
+.c-line > div, .c-line > p { min-height: 44px; display: flex; align-items: center; }
+
+/* ---- coverflow strip (engagement expectations) ---- */
+.c-cover { display: flex; gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 26px 4px 34px; margin: 6px -6px -4px; perspective: 900px; scrollbar-width: none; position: relative; cursor: grab; overscroll-behavior-x: contain; }
+.c-cover::-webkit-scrollbar { display: none; }
+.c-cover.grabbing { cursor: grabbing; scroll-snap-type: none; }
+.c-cover:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; border-radius: 18px; }
+.c-cov { flex: 0 0 min(76%, 250px); scroll-snap-align: center; padding: 20px 18px; border-radius: 20px; background: linear-gradient(160deg, #fff, #edf1ff); border: 1px solid var(--line); box-shadow: 0 26px 36px -26px rgba(30, 55, 140, 0.55); font-weight: 500; font-size: 14.5px; line-height: 1.5; transition: transform 0.25s ease-out; user-select: none; }
+.c-cov .k { width: 38px; height: 38px; border-radius: 12px; margin-bottom: 14px; background: linear-gradient(135deg, var(--accent-2), var(--accent)); display: grid; place-items: center; box-shadow: 0 10px 16px -8px rgba(43, 79, 224, 0.8); }
+@media (hover: hover) and (pointer: fine) { .c-cov { will-change: transform; } }
+
+/* ---- FAQ ---- */
+.c-faq-item { border-radius: 18px; background: rgba(255, 255, 255, 0.72); border: 1px solid var(--line); transition: box-shadow 0.4s, background 0.3s; }
+.c-faq-item + .c-faq-item { margin-top: 10px; }
+.c-faq-item.open { box-shadow: 0 22px 34px -22px rgba(43, 79, 224, 0.55); background: #fff; }
+.c-q { width: 100%; min-height: 52px; display: flex; justify-content: space-between; align-items: center; gap: 14px; text-align: left; border: 0; background: none; padding: 14px 18px; cursor: pointer; font-weight: 700; font-size: 15px; border-radius: 18px; }
+.c-q:focus-visible { outline: 2px solid var(--accent-2); outline-offset: -2px; }
+.c-chev { flex: none; width: 28px; height: 28px; border-radius: 50%; background: #eef2ff; position: relative; transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), background 0.3s; }
+.c-chev::before, .c-chev::after { content: ""; position: absolute; left: 8px; top: 13px; width: 12px; height: 2px; border-radius: 2px; background: var(--accent); transition: transform 0.4s; }
+.c-chev::after { transform: rotate(90deg); }
+.open .c-chev { transform: rotate(180deg); background: var(--accent); }
+.open .c-chev::before, .open .c-chev::after { background: #fff; }
+.open .c-chev::after { transform: rotate(0); }
+.c-a { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.35s; }
+.open .c-a { grid-template-rows: 1fr; opacity: 1; }
+.c-a > div { overflow: hidden; min-height: 0; }
+.c-a p { padding: 0 18px 18px; color: var(--muted); font-size: 14.5px; }
+/* Without script every answer stays open. */
+.c3d:not([data-js="1"]) .c-a { grid-template-rows: 1fr; opacity: 1; }
+
+/* ---- form ---- */
+.c-form-card { padding: clamp(20px, 2.6vw, 32px); }
+.c-progress { display: flex; gap: 16px; justify-content: flex-end; margin: -4px 6px 10px 0; perspective: 400px; }
+.c-cube { width: 22px; height: 22px; position: relative; transform-style: preserve-3d; transition: transform 0.8s cubic-bezier(0.2, 1.3, 0.3, 1); transform: rotateY(-24deg) rotateX(-12deg); }
+.c-cube.ok { transform: rotateY(180deg) rotateX(-12deg); }
+.c-cube i { position: absolute; inset: 0; border-radius: 5px; backface-visibility: hidden; }
+.c-cube .f { background: linear-gradient(135deg, #eef2ff, #d5defa); box-shadow: inset 0 0 0 1px #c3cdf0; transform: translateZ(11px); }
+.c-cube .b { background: linear-gradient(135deg, #31c48d, #14a06d); transform: rotateY(180deg) translateZ(11px); }
+.c-cube .l { background: #aebbe8; transform: rotateY(-90deg) translateZ(11px); backface-visibility: visible; }
+.c-cube .r { background: #aebbe8; transform: rotateY(90deg) translateZ(11px); backface-visibility: visible; }
+.c-cube .b::after { content: "\2713"; position: absolute; inset: 0; display: grid; place-items: center; color: #fff; font-weight: 800; font-size: 14px; transform: scaleX(-1); }
+.c-form { display: grid; gap: 16px; }
+.c-field { display: grid; gap: 7px; min-width: 0; }
+.c-field label { font-weight: 700; font-size: 14px; }
+.c-field label span { color: #6a7a8a; font-weight: 500; }
+.c-inp { width: 100%; min-width: 0; min-height: 50px; border: 1px solid #dbe2f3; background: linear-gradient(180deg, #f2f5fd, #f8faff); border-radius: 14px; padding: 14px 16px; outline: 0; box-shadow: inset 0 2px 5px rgba(30, 55, 140, 0.07); transition: border-color 0.25s, box-shadow 0.3s, background 0.3s; font-size: 16px; }
+.c-inp::placeholder { color: #75849a; }
+.c-inp:focus { border-color: var(--accent-2); background: #fff; box-shadow: 0 0 0 4px rgba(109, 141, 255, 0.22), 0 18px 26px -18px rgba(43, 79, 224, 0.55); }
+textarea.c-inp { min-height: 150px; resize: vertical; display: block; }
+select.c-inp { appearance: none; -webkit-appearance: none; background-image: linear-gradient(45deg, transparent 50%, #5b6b85 50%), linear-gradient(135deg, #5b6b85 50%, transparent 50%); background-position: calc(100% - 20px) 55%, calc(100% - 14px) 55%; background-size: 6px 6px; background-repeat: no-repeat; padding-right: 38px; text-overflow: ellipsis; }
+.c-hp { display: none; }
+.c-opt { border: 1px dashed #cdd7f3; border-radius: 16px; background: rgba(255, 255, 255, 0.55); }
+.c-opt summary { list-style: none; cursor: pointer; min-height: 52px; padding: 14px 16px; font-weight: 700; font-size: 14.5px; display: flex; justify-content: space-between; align-items: center; border-radius: 16px; }
+.c-opt summary:focus-visible { outline: 2px solid var(--accent-2); outline-offset: -2px; }
+.c-opt summary::-webkit-details-marker { display: none; }
+.c-opt summary::after { content: "+"; width: 26px; height: 26px; border-radius: 50%; background: #eef2ff; color: var(--accent); display: grid; place-items: center; font-size: 18px; line-height: 1; transition: transform 0.4s; }
+.c-opt[open] summary::after { transform: rotate(135deg); }
+.c-opt-note { padding: 0 16px; font-size: 12px; line-height: 1.5; color: #64748b; }
+.c-opt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; padding: 12px 16px 18px; animation: c-unfold 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); transform-origin: 50% 0; }
+.c-opt-grid .full { grid-column: 1 / -1; }
+@keyframes c-unfold { from { opacity: 0; transform: rotateX(-30deg); } to { opacity: 1; transform: none; } }
+
+.c-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 0; cursor: pointer; background: linear-gradient(180deg, #14283f, var(--navy)); color: #fff; font-weight: 700; border-radius: 999px; padding: 12px 22px; box-shadow: 0 5px 0 #040b14, 0 16px 26px -12px rgba(12, 26, 43, 0.6); transition: transform 0.15s, box-shadow 0.15s, filter 0.2s; position: relative; min-height: 46px; }
+.c-btn:hover { transform: translateY(-2px); filter: brightness(1.12); }
+.c-btn:active { transform: translateY(4px); box-shadow: 0 1px 0 #040b14, 0 6px 12px -8px rgba(12, 26, 43, 0.6); }
+.c-btn:focus-visible { outline: 3px solid var(--accent-2); outline-offset: 3px; }
+.c-btn[aria-disabled="true"] { filter: grayscale(0.4) brightness(1.25); cursor: progress; }
+.c-btn.sm { padding: 10px 18px; font-size: 14px; box-shadow: 0 4px 0 #040b14, 0 12px 20px -12px rgba(12, 26, 43, 0.6); }
+.c-submit { width: 100%; padding: 16px 22px; font-size: 16px; min-height: 54px; }
+.c-submit svg { transition: transform 0.4s; }
+.c-submit:hover svg { transform: translateX(5px) rotate(-8deg); }
+
+.c-alert { margin-bottom: 16px; padding: 12px 16px; border-radius: 14px; font-size: 14px; font-weight: 600; background: #fffbeb; border: 1px solid #fde68a; color: #78350f; }
+.c-sent { position: absolute; inset: 0; z-index: 5; border-radius: inherit; display: grid; place-content: center; justify-items: center; gap: 16px; text-align: center; padding: 30px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); animation: c-flipIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1); }
+@keyframes c-flipIn { from { opacity: 0; transform: rotateY(-90deg); } to { opacity: 1; transform: none; } }
+.c-plane { width: 92px; height: 92px; animation: c-fly 1.6s cubic-bezier(0.3, 0.7, 0.2, 1) both; }
+@keyframes c-fly { 0% { transform: translate3d(-120px, 90px, 0) rotate(-20deg) scale(0.4); opacity: 0; } 40% { opacity: 1; } 70% { transform: translate3d(10px, -14px, 40px) rotate(-6deg) scale(1.15); } 100% { transform: none; } }
+.c-sent p { max-width: 26em; font-weight: 600; color: #2a3944; }
+.c-sent .c-btn { box-shadow: 0 4px 0 #040b14; }
+
+/* ---- phone button: jump to the form ---- */
+.c-fab { display: none; position: fixed; z-index: 40; left: 50%; bottom: max(16px, env(safe-area-inset-bottom)); translate: -50% 24px; opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 0.3s, translate 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0s 0.35s; white-space: nowrap; }
+.c3d[data-fab="1"]:not([data-state="sent"]) .c-fab { opacity: 1; visibility: visible; translate: -50% 0; pointer-events: auto; transition-delay: 0s; }
+.c3d[data-state="sent"] .c-progress { visibility: hidden; }
+
+/* ---- tablets and phones ---- */
+@media (max-width: 980px) {
+  .c-hero { grid-template-columns: minmax(0, 1fr); }
+  .c-grid { grid-template-columns: minmax(0, 1fr); gap: 22px; }
+  .c-left, .c-right { display: contents; }
+  .c-inc-card { order: 1; }
+  .c-form-card { order: 2; position: relative; scroll-margin-top: 92px; }
+  .c-contact-card { order: 3; }
+  .c-exp-card { order: 4; }
+  .c-faq-card { order: 5; }
+  .c-top-note { display: block; }
+  .c-fab { display: inline-flex; }
+}
+@media (min-width: 981px) { #brief { scroll-margin-top: 92px; } }
+@media (max-width: 560px) {
+  .c-opt-grid { grid-template-columns: 1fr; padding: 12px 14px 16px; }
+  .c-flow { padding: 12px 12px 12px; border-radius: 24px; }
+  .c-stage { height: 330px; }
+  .c-grid { padding-bottom: 96px; }
+  .c-progress { margin-right: 2px; }
+  .c-card { padding: 20px 16px; }
+  .c-form-card { padding: 20px 16px 22px; }
+}
+@media (max-width: 380px) {
+  .c-h1 { font-size: 34px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .c3d *, .c3d *::before, .c3d *::after { animation: none !important; transition: none !important; }
+}
