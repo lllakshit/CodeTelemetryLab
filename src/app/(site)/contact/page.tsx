@@ -1,7 +1,26 @@
+import type { CSSProperties } from "react"
+import { Fragment } from "react"
 import type { Metadata } from "next"
-import { CheckCircle2, Mail, MapPin } from "lucide-react"
-import { BrandIllustration } from "@/components/brand-illustration"
-import { SectionHeading } from "@/components/section-heading"
+import Link from "next/link"
+import { ArrowDown, Check, Clock, Mail, MapPin, MessageCircle, Send } from "lucide-react"
+import { Contact3D } from "@/components/contact3d/contact-3d"
+import {
+  budgetOptions,
+  contactFaqs,
+  contactHeading,
+  contactLead,
+  contactLocation,
+  contactMethodOptions,
+  includeHints,
+  inquiryCaption,
+  inquirySteps,
+  invalidMessage,
+  projectTypeOptions,
+  responseNotes,
+  sentMessage,
+  timelineOptions,
+} from "@/components/contact3d/contact-data"
+import "@/components/contact3d/contact-3d.css"
 import { CONTACT_DISPLAY_EMAIL } from "@/lib/contact"
 import { attributionFromSearchParams } from "@/lib/lead-capture"
 import { buildPageMetadata } from "@/lib/seo"
@@ -13,33 +32,13 @@ export const metadata: Metadata = buildPageMetadata({
   path: "/contact",
 })
 
-const responseNotes = [
-  "Reply within one business day from someone who can discuss the work",
-  "Clarifying questions or a proposed first slice—not a scripted pitch",
-  "Optional details help scope; name, email, and message are enough to start",
-]
+/**
+ * Runs before first paint. Marks the page as script-enabled (so the reveal animation can start hidden) and chooses the
+ * plain layout for reduced motion, data saver, small-memory devices and browsers without WebGL.
+ */
+const layoutChoice = `(function(){try{var r=document.currentScript&&document.currentScript.parentElement;if(!r)return;r.setAttribute("data-js","1");var c=navigator.connection;var m=navigator.deviceMemory;if(matchMedia("(prefers-reduced-motion: reduce)").matches||(c&&c.saveData)||(m&&m<=2)||!window.WebGLRenderingContext)r.setAttribute("data-c3d","static")}catch(e){}})()`
 
-const includeHints = [
-  "The problem operators feel today",
-  "Who uses the system and who owns decisions",
-  "Deadline or launch window, even if approximate",
-  "Tools that must connect (CRM, auth, payments, docs)",
-]
-
-const contactFaqs = [
-  {
-    q: "What happens after I submit?",
-    a: "We read the brief, check fit, and reply by email. If the work is a match, we propose a discovery call or a written first-slice plan. If it is not a match, we say so.",
-  },
-  {
-    q: "What should I expect on a discovery call?",
-    a: "Thirty to forty-five minutes on users, constraints, and success criteria. We will not pressure you into a package. Notes and next steps follow in writing.",
-  },
-  {
-    q: "Do you sign NDAs?",
-    a: "Yes for serious evaluations. Send the document with your brief or after the first reply.",
-  },
-]
+const delay = (value: string) => ({ "--d": value }) as CSSProperties
 
 export default async function ContactPage({
   searchParams,
@@ -49,286 +48,319 @@ export default async function ContactPage({
   const resolvedSearchParams = await searchParams
   const sent = resolvedSearchParams?.sent === "1"
   const invalidSubmission = resolvedSearchParams?.error === "invalid"
+  const state = sent ? "sent" : invalidSubmission ? "error" : undefined
   const attribution = attributionFromSearchParams(resolvedSearchParams)
-  const serviceFromQuery =
-    typeof resolvedSearchParams?.service === "string" ? resolvedSearchParams.service : ""
+  const serviceFromQuery = typeof resolvedSearchParams?.service === "string" ? resolvedSearchParams.service : ""
   const defaultProjectType = attribution.serviceInterestedIn || serviceFromQuery || ""
-  const projectTypeOptions = [
-    "AI Development",
-    "AI Automation",
-    "LLM Applications",
-    "AI Agents",
-    "Custom Software Development",
-    "SaaS Development",
-    "MVP Development",
-    "Full Stack Development",
-    "React Development",
-    "Next.js Development",
-    "Node.js Development",
-    "Python Development",
-    "Workflow Automation",
-    "CRM Development",
-    "API Development",
-    "Business Automation",
-    "Startup Product Development",
-    "Website Development",
-    "Enterprise Software",
-  ]
+  const flowLabel = `Interactive 3D inquiry flow: ${inquirySteps.map((s) => s.replace(/&/g, "and")).join(", ")}`
 
   return (
-    <div className="site-page">
-      <div className="grid gap-10 lg:grid-cols-[0.88fr_1.12fr] lg:items-center">
-        <SectionHeading
-          eyebrow="Contact"
-          title="Send a brief. Get a grounded reply."
-          description="Name, email, and a short description of the problem are enough. We respond within one business day with questions or a proposed next step."
-          level={1}
-        />
-        <BrandIllustration variant="contact" />
-      </div>
+    <div className="c3d" data-c3d="pending" data-state={state} suppressHydrationWarning>
+      <script dangerouslySetInnerHTML={{ __html: layoutChoice }} />
+      <Contact3D />
 
-      {sent ? (
-        <div className="mt-8 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
-          <div className="flex items-center gap-2">
-            <CheckCircle2 className="h-4 w-4" />
-            Your inquiry was received. We will review it and reply in your inbox.
-          </div>
-        </div>
-      ) : null}
-
-      {invalidSubmission ? (
-        <div className="mt-8 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-          Please add a valid email, your name, and a short message so we can route the inquiry correctly.
-        </div>
-      ) : null}
-
-      <div className="mt-12 grid gap-8 lg:grid-cols-[0.86fr_1.14fr]">
-        <div className="space-y-6">
-          <div className="rounded-[2rem] border border-slate-200 bg-white p-6">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-blue-700">What to include</p>
-            <ul className="mt-5 space-y-3 text-sm leading-7 text-slate-600">
-              {includeHints.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
-
-            <div className="mt-8 space-y-4 border-t border-slate-200 pt-6 text-sm text-slate-700">
-              <p className="flex items-center gap-2">
-                <Mail className="h-4 w-4 text-blue-600" />
-                <a href={`mailto:${CONTACT_DISPLAY_EMAIL}`} className="transition hover:text-slate-950">
-                  {CONTACT_DISPLAY_EMAIL}
-                </a>
+      <div className="c-page">
+        <div className="c-wrap">
+          {/* ---- hero: heading and the 3D inquiry flow ---- */}
+          <section className="c-hero" aria-labelledby="c-h1">
+            <div className="c-copy">
+              <p className="c-eyebrow">
+                <i aria-hidden="true" />
+                Contact
               </p>
-              <p className="flex items-center gap-2">
-                <MapPin className="h-4 w-4 text-blue-600" />
-                Jaipur-based · remote delivery across NA, Europe, UAE & Australia
-              </p>
+              <h1 className="c-h1" id="c-h1">
+                {contactHeading.split(" ").map((word, i) => (
+                  <Fragment key={`${word}-${i}`}>
+                    {i > 0 ? " " : null}
+                    <span className="c-w" style={{ animationDelay: `${(0.1 + i * 0.07).toFixed(2)}s` }}>
+                      {word}
+                    </span>
+                  </Fragment>
+                ))}
+              </h1>
+              <p className="c-lead">{contactLead}</p>
+              {sent ? (
+                <p className="c-top-note ok" role="status">
+                  {sentMessage}
+                </p>
+              ) : null}
+              {invalidSubmission ? (
+                <p className="c-top-note err" role="alert">
+                  {invalidMessage}
+                </p>
+              ) : null}
             </div>
-          </div>
 
-          <div className="rounded-[2rem] bg-slate-950 p-6 text-white">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-blue-300">Engagement expectations</p>
-            <div className="mt-5 space-y-4">
-              {responseNotes.map((item) => (
-                <div key={item} className="flex items-start gap-3 text-sm text-slate-200">
-                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-blue-300" />
-                  <span>{item}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="rounded-[2rem] border border-slate-200 bg-white p-6">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-blue-700">Contact FAQs</p>
-            <div className="mt-5 space-y-5">
-              {contactFaqs.map((item) => (
-                <div key={item.q}>
-                  <p className="text-sm font-semibold text-slate-950">{item.q}</p>
-                  <p className="mt-2 text-sm leading-6 text-slate-600">{item.a}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <form
-          action="/api/contact"
-          method="post"
-          className="rounded-[2rem] border border-slate-200 bg-white p-6 lg:p-8"
-        >
-          <input type="hidden" name="source" value="contact-page" />
-          {attribution.landingPageUrl ? (
-            <input type="hidden" name="referrer" value={attribution.landingPageUrl} />
-          ) : null}
-          {attribution.utmSource ? <input type="hidden" name="utmSource" value={attribution.utmSource} /> : null}
-          {attribution.utmMedium ? <input type="hidden" name="utmMedium" value={attribution.utmMedium} /> : null}
-          {attribution.utmCampaign ? (
-            <input type="hidden" name="utmCampaign" value={attribution.utmCampaign} />
-          ) : null}
-          {attribution.utmTerm ? <input type="hidden" name="utmTerm" value={attribution.utmTerm} /> : null}
-          {attribution.utmContent ? <input type="hidden" name="utmContent" value={attribution.utmContent} /> : null}
-          <label className="hidden">
-            Leave this field blank
-            <input name="fax" tabIndex={-1} autoComplete="off" />
-          </label>
-
-          <div className="grid gap-5">
-            <label className="grid gap-2 text-sm">
-              <span className="text-slate-700">
-                Name <span className="text-slate-400">(required)</span>
-              </span>
-              <input
-                name="name"
-                required
-                autoComplete="name"
-                className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-blue-400/40 focus:bg-white"
-                placeholder="Your name"
-              />
-            </label>
-            <label className="grid gap-2 text-sm">
-              <span className="text-slate-700">
-                Email <span className="text-slate-400">(required)</span>
-              </span>
-              <input
-                type="email"
-                name="email"
-                required
-                autoComplete="email"
-                className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-blue-400/40 focus:bg-white"
-                placeholder="you@company.com"
-              />
-            </label>
-            <label className="grid gap-2 text-sm">
-              <span className="text-slate-700">
-                Message <span className="text-slate-400">(required)</span>
-              </span>
-              <textarea
-                name="message"
-                required
-                rows={6}
-                className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-blue-400/40 focus:bg-white"
-                placeholder="Describe the problem, timeline, and what a successful first release looks like."
-              />
-            </label>
-          </div>
-
-          <details className="mt-6 rounded-2xl border border-slate-200 bg-slate-50/80 p-4">
-            <summary className="cursor-pointer text-sm font-semibold text-slate-900">
-              Optional project details
-            </summary>
-            <p className="mt-2 text-xs leading-5 text-slate-500">
-              These fields stay optional. If you leave them blank, we still create the lead and follow up.
-            </p>
-            <div className="mt-4 grid gap-5 sm:grid-cols-2">
-              <label className="grid gap-2 text-sm">
-                <span className="text-slate-700">Company</span>
-                <input
-                  name="company"
-                  className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-blue-400/40"
-                  placeholder="Company or startup name"
-                />
-              </label>
-              <label className="grid gap-2 text-sm">
-                <span className="text-slate-700">Phone</span>
-                <input
-                  name="phone"
-                  className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-blue-400/40"
-                  placeholder="Best number for follow-up"
-                />
-              </label>
-              <label className="grid gap-2 text-sm">
-                <span className="text-slate-700">Country</span>
-                <input
-                  name="country"
-                  className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-blue-400/40"
-                  placeholder="United States, Canada, or your region"
-                />
-              </label>
-              <label className="grid gap-2 text-sm">
-                <span className="text-slate-700">Service interested in</span>
-                <select
-                  name="projectType"
-                  className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-950 outline-none transition focus:border-blue-400/40"
-                  defaultValue={
-                    projectTypeOptions.includes(defaultProjectType) ? defaultProjectType : ""
-                  }
-                >
-                  <option value="">General project inquiry</option>
-                  {projectTypeOptions.map((option) => (
-                    <option key={option} value={option}>
-                      {option}
-                    </option>
+            <figure className="c-flow c-card c-rv" id="c-flow" data-tilt="4" style={delay(".15s")}>
+              <div className="c-flow-top">
+                <p className="c-eyebrow sm">Inquiry flow</p>
+                <span className="c-dots" aria-hidden="true">
+                  <i />
+                  <i />
+                  <i />
+                </span>
+              </div>
+              <div className="c-stage">
+                <canvas id="c-flow-canvas" className="c-gl" role="img" aria-label={flowLabel} />
+                <span className="c-hint" aria-hidden="true">
+                  Drag · tap a step
+                </span>
+                <ol className="c-flow-steps">
+                  {inquirySteps.map((step) => (
+                    <li key={step}>{step}</li>
                   ))}
-                </select>
-              </label>
-              <label className="grid gap-2 text-sm">
-                <span className="text-slate-700">Budget</span>
-                <select
-                  name="budget"
-                  className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-950 outline-none transition focus:border-blue-400/40"
-                  defaultValue=""
-                >
-                  <option value="">Prefer not to say yet</option>
-                  <option>$5k - $10k</option>
-                  <option>$10k - $25k</option>
-                  <option>$25k - $50k</option>
-                  <option>$50k+</option>
-                </select>
-              </label>
-              <label className="grid gap-2 text-sm">
-                <span className="text-slate-700">Timeline</span>
-                <select
-                  name="timeline"
-                  className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-950 outline-none transition focus:border-blue-400/40"
-                  defaultValue=""
-                >
-                  <option value="">Select a launch window</option>
-                  <option>As soon as possible</option>
-                  <option>2-4 weeks</option>
-                  <option>1-2 months</option>
-                  <option>3+ months</option>
-                  <option>Exploring options</option>
-                </select>
-              </label>
-              <label className="grid gap-2 text-sm">
-                <span className="text-slate-700">Preferred contact</span>
-                <select
-                  name="preferredContactMethod"
-                  className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-950 outline-none transition focus:border-blue-400/40"
-                  defaultValue="Email"
-                >
-                  <option>Email</option>
-                  <option>Phone</option>
-                  <option>Video call</option>
-                </select>
-              </label>
-              <label className="grid gap-2 text-sm">
-                <span className="text-slate-700">Website URL</span>
-                <input
-                  name="websiteUrl"
-                  className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-blue-400/40"
-                  placeholder="https://company.com"
-                />
-              </label>
-              <label className="grid gap-2 text-sm sm:col-span-2">
-                <span className="text-slate-700">Subject</span>
-                <input
-                  name="subject"
-                  className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-blue-400/40"
-                  placeholder="Example: SaaS MVP rebuild with lead workflow"
-                />
-              </label>
-            </div>
-          </details>
+                </ol>
+              </div>
+              <div className="c-flow-dots" role="group" aria-label="Inquiry steps">
+                {inquirySteps.map((step, i) => (
+                  <button key={step} type="button" aria-label={`Step ${i + 1}: ${step}`} aria-current={i === 2 ? "true" : "false"} />
+                ))}
+              </div>
+              <figcaption className="c-cap">{inquiryCaption}</figcaption>
+            </figure>
+          </section>
 
-          <button
-            type="submit"
-            className="mt-6 inline-flex items-center justify-center rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-700"
-          >
-            Send project brief
-          </button>
-        </form>
+          <div className="c-grid">
+            <div className="c-left">
+              {/* ---- what to include ---- */}
+              <section className="c-card c-inc-card c-rv" data-tilt="5">
+                <p className="c-eyebrow-s c-z1">What to include</p>
+                <ul className="c-inc c-z1">
+                  {includeHints.map((item, i) => (
+                    <li key={item}>
+                      <span className="n" aria-hidden="true">
+                        {i + 1}
+                      </span>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+
+              {/* ---- email and location ---- */}
+              <section className="c-card c-contact-card c-rv" data-tilt="6" style={delay(".08s")}>
+                <div className="c-line">
+                  <span className="c-ico" aria-hidden="true">
+                    <Mail size={22} strokeWidth={1.9} color="#2b4fe0" />
+                  </span>
+                  <div className="c-z2">
+                    <a href={`mailto:${CONTACT_DISPLAY_EMAIL}`}>{CONTACT_DISPLAY_EMAIL}</a>
+                  </div>
+                </div>
+                <div className="c-line">
+                  <span className="c-ico" aria-hidden="true">
+                    <MapPin size={22} strokeWidth={1.9} color="#2b4fe0" />
+                  </span>
+                  <p className="c-z2">{contactLocation}</p>
+                </div>
+              </section>
+
+              {/* ---- engagement expectations ---- */}
+              <section className="c-card c-exp-card c-rv" data-tilt="3">
+                <p className="c-eyebrow-s c-z1">Engagement expectations</p>
+                <div className="c-cover" id="c-cover" tabIndex={0} role="group" aria-label="Engagement expectations">
+                  {[Clock, MessageCircle, Check].map((Icon, i) => (
+                    <div className="c-cov" key={responseNotes[i]}>
+                      <span className="k" aria-hidden="true">
+                        <Icon size={20} strokeWidth={2} color="#fff" />
+                      </span>
+                      {responseNotes[i]}
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              {/* ---- FAQ ---- */}
+              <section className="c-card c-faq-card c-rv" data-tilt="3">
+                <p className="c-eyebrow-s c-z1">Contact FAQs</p>
+                <div className="c-z1">
+                  {contactFaqs.map((item, i) => (
+                    <div className={`c-faq-item${i === 0 ? " open" : ""}`} key={item.q}>
+                      <button type="button" className="c-q" id={`c-q${i}`} aria-expanded={i === 0} aria-controls={`c-a${i}`}>
+                        <span>{item.q}</span>
+                        <i className="c-chev" aria-hidden="true" />
+                      </button>
+                      <div className="c-a" id={`c-a${i}`} role="region" aria-labelledby={`c-q${i}`}>
+                        <div>
+                          <p>{item.a}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            </div>
+
+            {/* ---- the form: a normal POST to /api/contact ---- */}
+            <div className="c-right">
+              <section className="c-card c-form-card c-rv" data-tilt="2.5" id="brief" style={delay(".1s")}>
+                <div className="c-progress c-z3" aria-hidden="true">
+                  {["name", "email", "message"].map((field) => (
+                    <span className="c-cube" data-cube={field} key={field}>
+                      <i className="f" />
+                      <i className="b" />
+                      <i className="l" />
+                      <i className="r" />
+                    </span>
+                  ))}
+                </div>
+
+                {invalidSubmission ? (
+                  <p className="c-alert" role="alert">
+                    {invalidMessage}
+                  </p>
+                ) : null}
+
+                <form id="c-form" className="c-form" action="/api/contact" method="post">
+                  <input type="hidden" name="source" value="contact-page" />
+                  {attribution.landingPageUrl ? <input type="hidden" name="referrer" value={attribution.landingPageUrl} /> : null}
+                  {attribution.utmSource ? <input type="hidden" name="utmSource" value={attribution.utmSource} /> : null}
+                  {attribution.utmMedium ? <input type="hidden" name="utmMedium" value={attribution.utmMedium} /> : null}
+                  {attribution.utmCampaign ? <input type="hidden" name="utmCampaign" value={attribution.utmCampaign} /> : null}
+                  {attribution.utmTerm ? <input type="hidden" name="utmTerm" value={attribution.utmTerm} /> : null}
+                  {attribution.utmContent ? <input type="hidden" name="utmContent" value={attribution.utmContent} /> : null}
+                  <div className="c-hp" aria-hidden="true">
+                    <label>
+                      Leave this field blank
+                      <input name="fax" tabIndex={-1} autoComplete="off" />
+                    </label>
+                  </div>
+
+                  <div className="c-field">
+                    <label htmlFor="c-name">
+                      Name <span>(required)</span>
+                    </label>
+                    <input className="c-inp" id="c-name" name="name" type="text" required autoComplete="name" placeholder="Your name" />
+                  </div>
+                  <div className="c-field">
+                    <label htmlFor="c-email">
+                      Email <span>(required)</span>
+                    </label>
+                    <input className="c-inp" id="c-email" name="email" type="email" required autoComplete="email" placeholder="you@company.com" />
+                  </div>
+                  <div className="c-field">
+                    <label htmlFor="c-message">
+                      Message <span>(required)</span>
+                    </label>
+                    <textarea
+                      className="c-inp"
+                      id="c-message"
+                      name="message"
+                      required
+                      rows={6}
+                      placeholder="Describe the problem, timeline, and what a successful first release looks like."
+                    />
+                  </div>
+
+                  <details className="c-opt">
+                    <summary>Optional project details</summary>
+                    <p className="c-opt-note">
+                      These fields stay optional. If you leave them blank, we still create the lead and follow up.
+                    </p>
+                    <div className="c-opt-grid">
+                      <div className="c-field">
+                        <label htmlFor="c-company">Company</label>
+                        <input className="c-inp" id="c-company" name="company" type="text" autoComplete="organization" placeholder="Company or startup name" />
+                      </div>
+                      <div className="c-field">
+                        <label htmlFor="c-phone">Phone</label>
+                        <input className="c-inp" id="c-phone" name="phone" type="tel" autoComplete="tel" placeholder="Best number for follow-up" />
+                      </div>
+                      <div className="c-field full">
+                        <label htmlFor="c-country">Country</label>
+                        <input className="c-inp" id="c-country" name="country" type="text" autoComplete="country-name" placeholder="United States, Canada, or your region" />
+                      </div>
+                      <div className="c-field full">
+                        <label htmlFor="c-projectType">Service interested in</label>
+                        <select
+                          className="c-inp"
+                          id="c-projectType"
+                          name="projectType"
+                          defaultValue={(projectTypeOptions as readonly string[]).includes(defaultProjectType) ? defaultProjectType : ""}
+                        >
+                          <option value="">General project inquiry</option>
+                          {projectTypeOptions.map((option) => (
+                            <option key={option} value={option}>
+                              {option}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="c-field">
+                        <label htmlFor="c-budget">Budget</label>
+                        <select className="c-inp" id="c-budget" name="budget" defaultValue="">
+                          <option value="">Prefer not to say yet</option>
+                          {budgetOptions.map((option) => (
+                            <option key={option}>{option}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="c-field">
+                        <label htmlFor="c-timeline">Timeline</label>
+                        <select className="c-inp" id="c-timeline" name="timeline" defaultValue="">
+                          <option value="">Select a launch window</option>
+                          {timelineOptions.map((option) => (
+                            <option key={option}>{option}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="c-field full">
+                        <label htmlFor="c-pcm">Preferred contact</label>
+                        <select className="c-inp" id="c-pcm" name="preferredContactMethod" defaultValue="Email">
+                          {contactMethodOptions.map((option) => (
+                            <option key={option}>{option}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="c-field full">
+                        <label htmlFor="c-websiteUrl">Website URL</label>
+                        <input
+                          className="c-inp"
+                          id="c-websiteUrl"
+                          name="websiteUrl"
+                          type="text"
+                          inputMode="url"
+                          autoCapitalize="none"
+                          autoComplete="url"
+                          placeholder="https://company.com"
+                        />
+                      </div>
+                      <div className="c-field full">
+                        <label htmlFor="c-subject">Subject</label>
+                        <input className="c-inp" id="c-subject" name="subject" type="text" placeholder="Example: SaaS MVP rebuild with lead workflow" />
+                      </div>
+                    </div>
+                  </details>
+
+                  <button className="c-btn c-submit" type="submit">
+                    <span className="c-submit-label">Send project brief</span>
+                    <Send size={18} strokeWidth={2.2} aria-hidden="true" />
+                  </button>
+                </form>
+
+                {sent ? (
+                  <div className="c-sent" role="status">
+                    <svg className="c-plane" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+                      <path d="M58 6 6 28l18 7 7 18z" fill="#eaf0ff" stroke="#2b4fe0" strokeWidth="3" strokeLinejoin="round" />
+                      <path d="M58 6 24 35" stroke="#2b4fe0" strokeWidth="3" strokeLinecap="round" />
+                    </svg>
+                    <p>{sentMessage}</p>
+                    <Link className="c-btn sm" href="/contact" scroll={false}>
+                      Send another brief
+                    </Link>
+                  </div>
+                ) : null}
+              </section>
+            </div>
+          </div>
+        </div>
       </div>
+
+      {/* Phones and tablets: a button that jumps to the form while it is off screen. */}
+      <a className="c-btn c-fab" href="#brief" data-go-form>
+        Send a brief
+        <ArrowDown size={18} strokeWidth={2.4} aria-hidden="true" />
+      </a>
     </div>
   )
 }
