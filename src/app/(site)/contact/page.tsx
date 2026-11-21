@@ -33,10 +33,10 @@ export const metadata: Metadata = buildPageMetadata({
 })
 
 /**
- * Runs before first paint. Marks the page as script-enabled (so the reveal animation can start hidden) and chooses the
- * plain layout for reduced motion, data saver, small-memory devices and browsers without WebGL.
+ * Runs before first paint. Marks the page as script-enabled (so the reveal animation can start hidden; if the page
+ * script has not started 4 s later the mark is removed again, so nothing stays hidden) and chooses the plain layout for reduced motion, data saver, small-memory devices and browsers without WebGL.
  */
-const layoutChoice = `(function(){try{var r=document.currentScript&&document.currentScript.parentElement;if(!r)return;r.setAttribute("data-js","1");var c=navigator.connection;var m=navigator.deviceMemory;if(matchMedia("(prefers-reduced-motion: reduce)").matches||(c&&c.saveData)||(m&&m<=2)||!window.WebGLRenderingContext)r.setAttribute("data-c3d","static")}catch(e){}})()`
+const layoutChoice = `(function(){try{var r=document.currentScript&&document.currentScript.parentElement;if(!r)return;r.setAttribute("data-js","1");setTimeout(function(){if(!r.hasAttribute("data-enh"))r.removeAttribute("data-js")},4000);var c=navigator.connection;var m=navigator.deviceMemory;if(matchMedia("(prefers-reduced-motion: reduce)").matches||(c&&c.saveData)||(m&&m<=2)||!window.WebGLRenderingContext)r.setAttribute("data-c3d","static")}catch(e){}})()`
 
 const delay = (value: string) => ({ "--d": value }) as CSSProperties
 
@@ -211,7 +211,7 @@ export default async function ContactPage({
                   </p>
                 ) : null}
 
-                <form id="c-form" className="c-form" action="/api/contact" method="post">
+                <form id="c-form" className="c-form" action="/api/contact" method="post" inert={sent}>
                   <input type="hidden" name="source" value="contact-page" />
                   {attribution.landingPageUrl ? <input type="hidden" name="referrer" value={attribution.landingPageUrl} /> : null}
                   {attribution.utmSource ? <input type="hidden" name="utmSource" value={attribution.utmSource} /> : null}

@@ -90,7 +90,7 @@
 .c-dots { display: flex; gap: 6px; }
 .c-dots i { width: 9px; height: 9px; border-radius: 50%; background: #d7def2; }
 .c-stage { position: relative; height: clamp(330px, 40vw, 420px); border-radius: 20px; background: radial-gradient(120% 90% at 50% 10%, #ffffff, #eef2fd 70%); overflow: hidden; box-shadow: inset 0 0 0 1px var(--line); }
-.c-gl { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: pan-y; cursor: grab; opacity: 0; transition: opacity 0.6s ease; outline: none; }
+.c-gl { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: pan-y pinch-zoom; cursor: grab; opacity: 0; transition: opacity 0.6s ease; outline: none; }
 .c-gl:focus-visible { box-shadow: inset 0 0 0 3px var(--accent-2); border-radius: 20px; }
 .c-gl.drag { cursor: grabbing; }
 .c3d[data-c3d="on"] .c-gl { opacity: 1; }
@@ -184,7 +184,7 @@
 .c-inp:focus { border-color: var(--accent-2); background: #fff; box-shadow: 0 0 0 4px rgba(109, 141, 255, 0.22), 0 18px 26px -18px rgba(43, 79, 224, 0.55); }
 textarea.c-inp { min-height: 150px; resize: vertical; display: block; }
 select.c-inp { appearance: none; -webkit-appearance: none; background-image: linear-gradient(45deg, transparent 50%, #5b6b85 50%), linear-gradient(135deg, #5b6b85 50%, transparent 50%); background-position: calc(100% - 20px) 55%, calc(100% - 14px) 55%; background-size: 6px 6px; background-repeat: no-repeat; padding-right: 38px; text-overflow: ellipsis; }
-.c-hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+.c-hp { display: none; }
 .c-opt { border: 1px dashed #cdd7f3; border-radius: 16px; background: rgba(255, 255, 255, 0.55); }
 .c-opt summary { list-style: none; cursor: pointer; min-height: 52px; padding: 14px 16px; font-weight: 700; font-size: 14.5px; display: flex; justify-content: space-between; align-items: center; border-radius: 16px; }
 .c-opt summary:focus-visible { outline: 2px solid var(--accent-2); outline-offset: -2px; }
@@ -215,8 +215,9 @@ select.c-inp { appearance: none; -webkit-appearance: none; background-image: lin
 .c-sent .c-btn { box-shadow: 0 4px 0 #040b14; }
 
 /* ---- phone button: jump to the form ---- */
-.c-fab { display: none; position: fixed; z-index: 40; left: 50%; bottom: max(16px, env(safe-area-inset-bottom)); translate: -50% 24px; opacity: 0; pointer-events: none; transition: opacity 0.3s, translate 0.35s cubic-bezier(0.2, 0.8, 0.2, 1); white-space: nowrap; }
-.c3d[data-fab="1"]:not([data-state="sent"]) .c-fab { opacity: 1; translate: -50% 0; pointer-events: auto; }
+.c-fab { display: none; position: fixed; z-index: 40; left: 50%; bottom: max(16px, env(safe-area-inset-bottom)); translate: -50% 24px; opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 0.3s, translate 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0s 0.35s; white-space: nowrap; }
+.c3d[data-fab="1"]:not([data-state="sent"]) .c-fab { opacity: 1; visibility: visible; translate: -50% 0; pointer-events: auto; transition-delay: 0s; }
+.c3d[data-state="sent"] .c-progress { visibility: hidden; }
 
 /* ---- tablets and phones ---- */
 @media (max-width: 980px) {

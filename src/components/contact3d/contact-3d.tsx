@@ -38,31 +38,44 @@ export function Contact3D() {
 
     root.dataset.c3dStage = "effect"
     let cancelled = false
+    let gaveUp = false
     let handle: ContactSceneHandle | null = null
     let idleId: number | undefined
     let timer: number | undefined
 
+    let watchdog: number | undefined
+    let detach = () => {}
+    // Once the page has fallen back to the plain layout it stays there: a load that finishes later is thrown away.
     const fallBack = () => {
+      gaveUp = true
+      detach()
+      window.clearTimeout(watchdog)
       handle?.destroy()
       handle = null
       root.dataset.c3d = "static"
     }
 
     const start = async () => {
-      if (cancelled) return
+      if (cancelled || gaveUp) return
       root.dataset.c3dStage = "start"
+      // If the carousel has not drawn 15 s after loading started (a stalled chunk request, for example), give the visitor
+      // the plain layout instead of leaving the poster waiting.
+      watchdog = window.setTimeout(() => {
+        if (!cancelled && root.dataset.c3d === "pending") fallBack()
+      }, 15000)
       try {
         const { mountContactScene } = await import("./contact-scene")
         root.dataset.c3dStage = "loaded"
         // Loading the scene code and creating the GL context are separate chunks of work.
         await new Promise<void>((resolve) => window.setTimeout(resolve, 0))
-        if (cancelled) return
+        if (cancelled || gaveUp) return
         handle = mountContactScene({
           root,
           bgCanvas: bg,
           fontFamily: getComputedStyle(document.body).fontFamily,
           onReady: () => {
-            if (!cancelled) {
+            if (!cancelled && !gaveUp) {
+              window.clearTimeout(watchdog)
               root.dataset.c3d = "on"
               root.dataset.c3dStage = "ready"
             }
@@ -99,11 +112,11 @@ export function Contact3D() {
     }
     if (document.readyState === "complete") arm()
     else window.addEventListener("load", arm, { once: true })
-    // If the carousel has not drawn 15 s after the page loaded (a stalled chunk request, for example), give the visitor
-    // the plain layout instead of leaving a blank stage.
-    const watchdog = window.setTimeout(() => {
-      if (!cancelled && root.dataset.c3d === "pending") fallBack()
-    }, 15000)
+    detach = () => {
+      events.forEach((e) => window.removeEventListener(e, trigger))
+      window.removeEventListener("load", arm)
+      window.clearTimeout(loadFallback)
+    }
 
     return () => {
       cancelled = true

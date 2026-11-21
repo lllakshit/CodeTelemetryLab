@@ -16,6 +16,8 @@ export function enhanceContact(root: HTMLElement, opts: { motion: boolean }): ()
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches
   const coarse = window.matchMedia("(pointer: coarse)").matches
   const motion = opts.motion && !reduce
+  // Tells the inline script in the page that the page script is running, so it keeps the reveal animation on.
+  root.dataset.enh = "1"
 
   /* ---------- scroll reveal ---------- */
   const rv = $$<HTMLElement>(".c-rv")
@@ -175,6 +177,9 @@ export function enhanceContact(root: HTMLElement, opts: { motion: boolean }): ()
       form.dataset.sending = "1"
       btn?.setAttribute("aria-disabled", "true")
       if (label) label.textContent = "Sending…"
+      // If the send is stopped (Esc, Stop, a stalled network), let the visitor try again instead of staying locked.
+      const t = window.setTimeout(release, 10000)
+      cleanups.push(() => window.clearTimeout(t))
     })
     // Coming back with the browser's back button restores the page from memory; let the visitor send again.
     on(window, "pageshow", (e: PageTransitionEvent) => {
@@ -192,8 +197,10 @@ export function enhanceContact(root: HTMLElement, opts: { motion: boolean }): ()
     // Wait two frames: the phone menu closes on the same click, and its height must be gone before measuring the scroll.
     requestAnimationFrame(() =>
       requestAnimationFrame(() => {
-        card.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "center" })
-        if (!coarse) {
+        // A card taller than the window would centre with its top under the sticky header; align its top instead.
+        const tall = card.offsetHeight > window.innerHeight - 110
+        card.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: tall ? "start" : "center" })
+        if (!coarse && root.dataset.state !== "sent") {
           const t = window.setTimeout(() => $<HTMLInputElement>("#c-name")?.focus({ preventScroll: true }), 500)
           cleanups.push(() => window.clearTimeout(t))
         }
@@ -237,7 +244,9 @@ export function enhanceContact(root: HTMLElement, opts: { motion: boolean }): ()
 
   /* ---------- after a send or a rejected send, bring the form into view ---------- */
   if (root.dataset.state && card && window.scrollY < 80) {
-    const raf = requestAnimationFrame(() => card.scrollIntoView({ block: "center" }))
+    const raf = requestAnimationFrame(() =>
+      card.scrollIntoView({ block: card.offsetHeight > window.innerHeight - 110 ? "start" : "center" }),
+    )
     cleanups.push(() => cancelAnimationFrame(raf))
   }
 
