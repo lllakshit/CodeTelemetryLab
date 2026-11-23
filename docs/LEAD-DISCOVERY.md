@@ -50,7 +50,7 @@ day ("not scored in time" in the run summary).
 | Variable | Needed | Notes |
 | --- | --- | --- |
 | `GROQ_API_KEY` | Yes | Vercel, Production + Preview. Without it the screen shows a notice and runs return 503. |
-| `GROQ_MODEL` | No | Default `llama-3.3-70b-versatile`. |
+| `GROQ_MODEL` | No | Tried first. Then `llama-3.3-70b-versatile`, `openai/gpt-oss-120b`, `openai/gpt-oss-20b`, `llama-3.1-8b-instant`: a model the key may not use is skipped. |
 | `TAVILY_API_KEY`, `SERPER_API_KEY` | No | Extra search coverage. |
 | `CRON_SECRET` | Already set | Same secret as the Supabase keepalive cron. |
 
