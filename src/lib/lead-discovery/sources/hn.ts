@@ -25,7 +25,8 @@ export function parseLaunchHits(hits: AlgoliaHit[], context: Pick<SourceContext,
     if (!match || !hit.created_at || Date.parse(hit.created_at) < since) continue
     const company = match[1].replace(/\s*\((?:YC\s*)?[A-Z]\d{2}\)\s*$/i, "").trim()
     const storyHtml = hit.story_text ?? ""
-    const links = [...(hit.url ? [hit.url] : []), ...extractLinks(storyHtml, "https://news.ycombinator.com/")]
+    const postUrl = hit.url && /^https?:\/\//i.test(hit.url) ? hit.url : null
+    const links = [...(postUrl ? [postUrl] : []), ...extractLinks(storyHtml, "https://news.ycombinator.com/")]
     const text = htmlToText(storyHtml)
     out.push({
       source: "hn-launch",
@@ -35,7 +36,7 @@ export function parseLaunchHits(hits: AlgoliaHit[], context: Pick<SourceContext,
       evidenceUrl: itemUrl(hit.objectID),
       signalDate: hit.created_at,
       companyHint: company || null,
-      websiteUrl: hit.url && !isExcludedDomain(hit.url) ? hit.url : pickCompanyWebsite(links, company || null, itemUrl(hit.objectID)),
+      websiteUrl: postUrl && !isExcludedDomain(postUrl) ? postUrl : pickCompanyWebsite(links, company || null, itemUrl(hit.objectID)),
       region: regionFromText(text, "US"),
       linkedUrls: links,
       text: `${title}\n${text}`.slice(0, 6000),

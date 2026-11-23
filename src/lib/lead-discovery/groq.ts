@@ -15,7 +15,11 @@ export function groqModel() {
   return process.env.GROQ_MODEL?.trim() || DEFAULT_GROQ_MODEL
 }
 
-export type GroqResult = { ok: true; json: unknown; tokens: number } | { ok: false; error: string; rateLimited?: boolean }
+/**
+ * rateLimited: try this candidate another day. fatal: the key or model is wrong, so every call will fail; stop the
+ * run instead of marking candidates as rejected.
+ */
+export type GroqResult = { ok: true; json: unknown; tokens: number } | { ok: false; error: string; rateLimited?: boolean; fatal?: boolean }
 
 function waitMs(response: Response, attempt: number) {
   const header = response.headers.get("retry-after")
@@ -31,7 +35,7 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 export async function groqJson(input: { system: string; user: string; maxTokens: number; deadline: number; temperature?: number }): Promise<GroqResult> {
   const key = process.env.GROQ_API_KEY?.trim()
-  if (!key) return { ok: false, error: "GROQ_API_KEY is not set" }
+  if (!key) return { ok: false, error: "GROQ_API_KEY is not set", fatal: true }
   for (let attempt = 0; attempt < 4; attempt += 1) {
     const remaining = input.deadline - Date.now()
     if (remaining < 8000) return { ok: false, error: "Out of time for this run", rateLimited: true }
@@ -54,12 +58,12 @@ export async function groqJson(input: { system: string; user: string; maxTokens:
       })
     } catch (error) {
       if (attempt < 3) continue
-      return { ok: false, error: `Groq request failed: ${error instanceof Error ? error.message : String(error)}` }
+      return { ok: false, rateLimited: true, error: `Groq request failed: ${error instanceof Error ? error.message : String(error)}` }
     }
     if (response.status === 429 || response.status >= 500) {
       const wait = waitMs(response, attempt)
       await response.body?.cancel().catch(() => {})
-      if (Date.now() + wait > input.deadline - 8000) return { ok: false, error: `Groq rate limit (HTTP ${response.status})`, rateLimited: response.status === 429 }
+      if (Date.now() + wait > input.deadline - 8000) return { ok: false, error: `Groq busy (HTTP ${response.status})`, rateLimited: true }
       await sleep(wait)
       continue
     }
@@ -71,7 +75,8 @@ export async function groqJson(input: { system: string; user: string; maxTokens:
       } catch {
         // keep raw text
       }
-      return { ok: false, error: `Groq HTTP ${response.status}: ${message}` }
+      const fatal = response.status === 401 || response.status === 403 || response.status === 404 || (response.status === 400 && /model/i.test(message) && !/json/i.test(message))
+      return { ok: false, error: `Groq HTTP ${response.status}: ${message}`, fatal }
     }
     try {
       const data = JSON.parse(text) as { choices?: { message?: { content?: string } }[]; usage?: { total_tokens?: number } }

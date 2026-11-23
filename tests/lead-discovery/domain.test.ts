@@ -52,3 +52,8 @@ test("the company website is only taken from evidence links that match the name"
   assert.equal(pickCompanyWebsite(["https://www.sequoiacap.com/"], "Acme AI", "https://techcrunch.com/x"), null)
   assert.equal(pickCompanyWebsite([], "Acme", "https://techcrunch.com/x"), null)
 })
+
+test("short generic names do not match longer brands", () => {
+  assert.equal(nameMatchesDomain("Data", "datadog.com"), false)
+  assert.equal(nameMatchesDomain("Kino AI", "kino.ai"), true)
+})

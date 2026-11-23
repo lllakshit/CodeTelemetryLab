@@ -219,7 +219,7 @@ export function AdminEmailComposer({ initialLogs, fromAddress, prefill }: AdminE
 
       setSuccess(
         prospect
-          ? `${data.message || "Email sent successfully"}. ${data.prospectUpdated ? `${prospect.company} is now marked Contacted.` : `${prospect.company} was not re-marked (its status is already past Contacted).`}`
+          ? `${data.message || "Email sent successfully"}. ${data.prospectUpdated ? `${prospect.company} is now marked Contacted.` : `${prospect.company} keeps its current status (${prospect.status.replace(/_/g, " ")}).`}`
           : data.message || "Email sent successfully",
       )
       if (prospect) {
@@ -250,7 +250,7 @@ export function AdminEmailComposer({ initialLogs, fromAddress, prefill }: AdminE
             <p>
               Draft for prospect <strong>{prospect.company}</strong>. Review and edit everything before sending; sending marks the prospect Contacted.
             </p>
-            {!toRecipients.length ? (
+            {!prefill?.to.length ? (
               <p className="mt-1 text-blue-800">No public email was found for this company, so add the recipient yourself{prospect.contactRoute ? ` (${prospect.contactRoute})` : ""}.</p>
             ) : null}
             {prospect.status !== "new" && prospect.status !== "approved" ? (

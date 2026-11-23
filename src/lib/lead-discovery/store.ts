@@ -106,8 +106,9 @@ async function readAll<T>(query: (from: number, to: number) => PromiseLike<{ dat
       throw error
     }
     out.push(...(data ?? []))
-    if (!data || data.length < 1000) break
+    if (!data || data.length < 1000) return out
   }
+  console.error(`Lead discovery: stopped reading after ${max} rows; de-duplication may miss older rows`)
   return out
 }
 
@@ -119,11 +120,11 @@ export async function loadKnownDomains(screenedWithinDays = 60): Promise<Set<str
   const supabase = createSupabaseAdminClient()
   const since = new Date(Date.now() - screenedWithinDays * 86_400_000).toISOString()
   const [prospects, screened, leads, logs, messages] = await Promise.all([
-    readAll<{ domain: string }>((from, to) => supabase.from("prospects").select("domain").range(from, to)),
-    readAll<{ domain: string }>((from, to) => supabase.from("prospect_screened").select("domain").gte("screened_at", since).range(from, to)),
-    readAll<{ email: string | null; website_url: string | null }>((from, to) => supabase.from("leads").select("email, website_url").range(from, to)),
-    readAll<{ recipient: string | null }>((from, to) => supabase.from("email_logs").select("recipient").range(from, to)),
-    readAll<{ to_emails: unknown }>((from, to) => supabase.from("outreach_messages").select("to_emails").range(from, to)),
+    readAll<{ domain: string }>((from, to) => supabase.from("prospects").select("domain").order("domain").range(from, to)),
+    readAll<{ domain: string }>((from, to) => supabase.from("prospect_screened").select("domain").gte("screened_at", since).order("domain").range(from, to)),
+    readAll<{ email: string | null; website_url: string | null }>((from, to) => supabase.from("leads").select("id, email, website_url").order("id").range(from, to)),
+    readAll<{ recipient: string | null }>((from, to) => supabase.from("email_logs").select("id, recipient").order("id").range(from, to)),
+    readAll<{ to_emails: unknown }>((from, to) => supabase.from("outreach_messages").select("id, to_emails").order("id").range(from, to)),
   ])
   const domains = new Set<string>()
   const add = (value: string | null | undefined) => {
@@ -213,7 +214,7 @@ export async function recordScreened(rows: ScreenedRow[]) {
 
 export async function listProspects(status?: ProspectStatus | null): Promise<Prospect[]> {
   const supabase = createSupabaseAdminClient()
-  let query = supabase.from("prospects").select("*").order("created_at", { ascending: false }).limit(200)
+  let query = supabase.from("prospects").select("*").order("created_at", { ascending: false }).limit(500)
   if (status) query = query.eq("status", status)
   const { data, error } = await query
   if (error) {
@@ -226,7 +227,7 @@ export async function listProspects(status?: ProspectStatus | null): Promise<Pro
 export async function countProspectsByStatus(): Promise<Record<ProspectStatus, number>> {
   const counts = Object.fromEntries(PROSPECT_STATUSES.map((status) => [status, 0])) as Record<ProspectStatus, number>
   const supabase = createSupabaseAdminClient()
-  const rows = await readAll<{ status: ProspectStatus }>((from, to) => supabase.from("prospects").select("status").range(from, to))
+  const rows = await readAll<{ status: ProspectStatus }>((from, to) => supabase.from("prospects").select("id, status").order("id").range(from, to))
   for (const row of rows) if (row.status in counts) counts[row.status] += 1
   return counts
 }

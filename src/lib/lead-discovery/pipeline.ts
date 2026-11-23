@@ -1,5 +1,5 @@
-import { normalizeDomain, slug } from "./domain.ts"
-import { enrichCandidate, type Enriched } from "./enrich.ts"
+import { nameMatchesDomain, normalizeDomain, slug } from "./domain.ts"
+import { enrichCandidate, type EnrichFailure, type Enriched } from "./enrich.ts"
 import { mapWithConcurrency } from "./fetch-page.ts"
 import { groqConfigured, groqJson } from "./groq.ts"
 import { DRAFT_SYSTEM, QUALIFY_SYSTEM, draftUser, qualifyUser } from "./prompts.ts"
@@ -10,12 +10,14 @@ import {
   finalizeDraft,
   normalizeServices,
   qualificationSchema,
-  verifiedPersonName,
+  unsupportedClaims,
+  verifiedDecisionMaker,
   type Draft,
   type Qualification,
 } from "./qualify.ts"
 import { MAX_SAVED_PER_RUN, QUALIFY_THRESHOLD, computeScore, confidenceFor, rankQualified, type ContactFacts } from "./scoring.ts"
 import { ageInDays, preScore } from "./signals.ts"
+import { clip } from "./html.ts"
 import { allSources } from "./sources/index.ts"
 import { finishRun, insertProspects, loadKnownDomains, recordScreened, startRun, type NewProspect, type ScreenedRow } from "./store.ts"
 import type { Candidate, RunSummary, ScoreBreakdown, Service } from "./types.ts"
@@ -47,10 +49,17 @@ export type RunResult =
 type Scored = {
   enriched: Enriched
   q: Qualification
+  /** Fields below are checked against the sources; use them, not q.*, for anything saved or emailed. */
+  company: string
+  signalSummary: string
+  potentialNeed: string
+  decisionMaker: { name: string; role: string } | null
+  /** Text every stated fact must come from, and date numbers that may be mentioned. */
+  sources: string[]
+  allowedNumbers: string[]
   services: Service[]
   breakdown: ScoreBreakdown
   score: number
-  decisionMakerName: string | null
   contact: ContactFacts
   signalAgeDays: number
   domain: string
@@ -84,7 +93,7 @@ function contactRoute(enriched: Enriched) {
   return `Website: ${enriched.website}`
 }
 
-async function qualify(enriched: Enriched, deadline: number, now: Date): Promise<{ scored: Scored } | { rejected: string }> {
+async function qualify(enriched: Enriched, deadline: number, now: Date): Promise<{ scored: Scored } | { rejected: string } | { retry: string }> {
   const c = enriched.candidate
   const reply = await groqJson({
     system: QUALIFY_SYSTEM,
@@ -101,37 +110,68 @@ async function qualify(enriched: Enriched, deadline: number, now: Date): Promise
     maxTokens: 650,
     deadline,
   })
-  if (!reply.ok) return { rejected: `Not scored: ${reply.error}` }
+  if (!reply.ok) {
+    // A wrong key or model fails every call: stop the run rather than marking good companies as rejected.
+    if (reply.fatal) throw new Error(reply.error)
+    if (reply.rateLimited) return { retry: reply.error }
+    return { rejected: `Model error: ${reply.error}` }
+  }
   const parsed = qualificationSchema.safeParse(reply.json)
   if (!parsed.success) return { rejected: "Model reply did not match the schema" }
   const q = parsed.data
   const services = normalizeServices(q.service_fit)
   const hard = counterEvidence(q, services)
-  const decisionMakerName = verifiedPersonName(q.decision_maker_name, q.company, [enriched.sourceText, enriched.siteText, c.summary])
+  const sources = [enriched.sourceText, enriched.siteText, c.title, c.summary]
+  const date = new Date(c.signalDate)
+  const allowedNumbers = Number.isNaN(date.getTime()) ? [] : [String(date.getUTCDate()), String(date.getUTCFullYear()), String(date.getUTCMonth() + 1)]
+  const adjustments: string[] = []
+
+  // The company name must belong to the website we verified (the model may name the investor instead).
+  const hint = c.companyHint
+  const company = nameMatchesDomain(q.company, enriched.domain) || (hint && slug(q.company) === slug(hint)) ? q.company : (hint ?? q.company)
+  if (company !== q.company) adjustments.push(`Company name taken from the source ("${company}"), not the model ("${q.company}").`)
+
+  // Every number and funding round the model states must be in the sources.
+  let signalSummary = q.signal_summary
+  if (unsupportedClaims(signalSummary, sources, allowedNumbers).length) {
+    adjustments.push(`Model summary replaced by the source headline: it stated ${unsupportedClaims(signalSummary, sources, allowedNumbers).join(", ")}, which the source does not.`)
+    signalSummary = clip(c.title, 300)
+  }
+  let potentialNeed = q.potential_need
+  if (unsupportedClaims(potentialNeed, sources, allowedNumbers).length) {
+    adjustments.push("Model's potential need mentioned facts not in the source; replaced with a neutral line.")
+    potentialNeed = `May need extra engineering capacity for ${services.slice(0, 2).join(" and ").toLowerCase() || "product work"} after this ${c.signalKind === "funding" ? "funding" : "news"}.`
+  }
+
+  const decisionMaker = verifiedDecisionMaker(q.decision_maker_name, company, [enriched.sourceText, enriched.siteText, c.summary])
   const contact: ContactFacts = {
     publicEmail: Boolean(enriched.publicEmail),
     contactPage: Boolean(enriched.contactPageUrl),
-    namedDecisionMaker: Boolean(decisionMakerName),
+    namedDecisionMaker: Boolean(decisionMaker),
   }
   const signalAgeDays = ageInDays(c.signalDate, now)
   const breakdown = computeScore({ model: q.scores, contact, signalAgeDays, rationale: q.rationale })
+  breakdown.adjustments.push(...adjustments)
   if (hard.length) return { rejected: `${hard.join("; ")} (score ${breakdown.total})` }
   return {
-    scored: { enriched, q, services, breakdown, score: breakdown.total, decisionMakerName, contact, signalAgeDays, domain: enriched.domain },
+    scored: {
+      enriched, q, company, signalSummary, potentialNeed, decisionMaker, sources: [...sources, signalSummary], allowedNumbers,
+      services, breakdown, score: breakdown.total, contact, signalAgeDays, domain: enriched.domain,
+    },
   }
 }
 
 async function writeDraft(item: Scored, deadline: number): Promise<Draft> {
-  const firstName = item.decisionMakerName ? item.decisionMakerName.split(/\s+/)[0] : null
+  const firstName = item.decisionMaker ? item.decisionMaker.name.split(/\s+/)[0] : null
   const reply = await groqJson({
     system: DRAFT_SYSTEM,
     user: draftUser({
-      company: item.q.company,
+      company: item.company,
       firstName,
-      role: item.decisionMakerName ? item.q.decision_maker_role : null,
-      signalSummary: item.q.signal_summary,
+      role: item.decisionMaker?.role ?? null,
+      signalSummary: item.signalSummary,
       signalDate: item.enriched.candidate.signalDate,
-      potentialNeed: item.q.potential_need,
+      potentialNeed: item.potentialNeed,
       services: item.services,
     }),
     maxTokens: 450,
@@ -142,14 +182,17 @@ async function writeDraft(item: Scored, deadline: number): Promise<Draft> {
     const parsed = draftSchema.safeParse(reply.json)
     if (parsed.success) {
       const finalDraft = finalizeDraft(parsed.data, [item.enriched.candidate.evidenceUrl, item.enriched.website])
-      if (finalDraft) return finalDraft
+      // A draft that states any number or round the sources do not contain is not used.
+      if (finalDraft && !unsupportedClaims(`${finalDraft.subject}\n${finalDraft.body}`, item.sources, item.allowedNumbers).length) {
+        return finalDraft
+      }
     }
   }
   return fallbackDraft({
-    company: item.q.company,
+    company: item.company,
     firstName,
-    signalSummary: item.q.signal_summary,
-    potentialNeed: item.q.potential_need,
+    signalSummary: item.signalSummary,
+    potentialNeed: item.potentialNeed,
     services: item.services,
   })
 }
@@ -230,7 +273,9 @@ export async function runDiscovery(options: RunOptions): Promise<RunResult> {
     // 3. Read the evidence and the company site for the most promising candidates.
     const toEnrich = [...unknown].sort((a, b) => preScore(b, now) - preScore(a, now)).slice(0, enrichLimit + 8)
     const enrichAbort = AbortSignal.timeout(Math.max(20_000, Math.min(90_000, deadline - Date.now() - 120_000)))
-    const results = await mapWithConcurrency(toEnrich, 6, (candidate) => enrichCandidate(candidate, enrichAbort))
+    const results = await mapWithConcurrency(toEnrich, 6, (candidate) =>
+      enrichCandidate(candidate, enrichAbort).catch((): EnrichFailure => ({ candidate, reason: "site_unreachable" })),
+    )
     const ready: Enriched[] = []
     const seenDomains = new Set<string>()
     for (const result of results) {
@@ -261,11 +306,11 @@ export async function runDiscovery(options: RunOptions): Promise<RunResult> {
       }
       const outcome = await qualify(enriched, qualifyDeadline, now)
       const company = enriched.candidate.companyHint ?? enriched.domain
+      if ("retry" in outcome) {
+        summary.notScoredInTime += 1
+        continue
+      }
       if ("rejected" in outcome) {
-        if (outcome.rejected.startsWith("Not scored")) {
-          summary.notScoredInTime += 1
-          continue
-        }
         summary.rejected += 1
         summary.rejections.push({ company, reason: outcome.rejected })
         screened.push({ domain: enriched.domain, company, evidence_url: enriched.candidate.evidenceUrl, verdict: "rejected", score: null, reason: outcome.rejected.slice(0, 500) })
@@ -275,8 +320,8 @@ export async function runDiscovery(options: RunOptions): Promise<RunResult> {
       if (outcome.scored.score < QUALIFY_THRESHOLD) {
         summary.rejected += 1
         const reason = `Score ${outcome.scored.score} is below ${QUALIFY_THRESHOLD}`
-        summary.rejections.push({ company: outcome.scored.q.company, reason })
-        screened.push({ domain: enriched.domain, company: outcome.scored.q.company, evidence_url: enriched.candidate.evidenceUrl, verdict: "rejected", score: outcome.scored.score, reason })
+        summary.rejections.push({ company: outcome.scored.company, reason })
+        screened.push({ domain: enriched.domain, company: outcome.scored.company, evidence_url: enriched.candidate.evidenceUrl, verdict: "rejected", score: outcome.scored.score, reason })
         continue
       }
       scored.push(outcome.scored)
@@ -286,7 +331,7 @@ export async function runDiscovery(options: RunOptions): Promise<RunResult> {
     // 5. Keep the best five, write their drafts, save.
     const best = rankQualified(scored).slice(0, MAX_SAVED_PER_RUN)
     for (const extra of rankQualified(scored).slice(MAX_SAVED_PER_RUN)) {
-      screened.push({ domain: extra.domain, company: extra.q.company, evidence_url: extra.enriched.candidate.evidenceUrl, verdict: "qualified_not_saved", score: extra.score, reason: "Qualified but outside today's top five" })
+      screened.push({ domain: extra.domain, company: extra.company, evidence_url: extra.enriched.candidate.evidenceUrl, verdict: "qualified_not_saved", score: extra.score, reason: "Qualified but outside today's top five" })
     }
     const rows: NewProspect[] = []
     for (const item of best) {
@@ -294,20 +339,20 @@ export async function runDiscovery(options: RunOptions): Promise<RunResult> {
       const c = item.enriched.candidate
       rows.push({
         run_id: run.id,
-        company: item.q.company,
+        company: item.company,
         website: item.enriched.website,
         domain: item.domain,
         industry: item.q.industry,
         location: item.q.location,
         signal_kind: c.signalKind,
-        signal_summary: item.q.signal_summary,
+        signal_summary: item.signalSummary,
         signal_date: c.signalDate.slice(0, 10),
         evidence_url: c.evidenceUrl,
         source: c.source,
-        potential_need: item.q.potential_need,
+        potential_need: item.potentialNeed,
         service_fit: item.services,
-        decision_maker_name: item.decisionMakerName,
-        decision_maker_role: item.decisionMakerName ? item.q.decision_maker_role : null,
+        decision_maker_name: item.decisionMaker?.name ?? null,
+        decision_maker_role: item.decisionMaker?.role ?? null,
         contact_route: contactRoute(item.enriched),
         contact_email: item.enriched.publicEmail,
         score: item.score,

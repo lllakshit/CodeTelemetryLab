@@ -75,19 +75,57 @@ function normalizeForMatch(value: string) {
     .trim()
 }
 
+const ROLE = "(?:co-?founder|founder|chief [a-z]+ officer|ceo|cto|coo|cpo|cfo|cmo|cro|president|managing director|general manager|vp(?: of)? [a-z]+|vice president(?: of)? [a-z]+|head of [a-z]+)"
+
 /**
- * A person's name is kept only if it appears word-for-word in the evidence or on the company's site, has at least
- * two words, and is not just the company name. Otherwise it is dropped, never guessed.
+ * A decision-maker is kept only if the name appears in the evidence or on the company's site right next to a role
+ * word ("CEO Jane Doe", "Jane Doe, co-founder and CTO", "Jane Doe (CEO)"). The role is taken from that text, not
+ * from the model. An investor or city named in the article has no role next to it, so it is dropped.
  */
-export function verifiedPersonName(name: string | null, company: string, sources: string[]): string | null {
+export function verifiedDecisionMaker(name: string | null, company: string, sources: string[]): { name: string; role: string } | null {
   if (!name) return null
-  const wanted = normalizeForMatch(name)
-  const words = wanted.split(" ").filter(Boolean)
-  if (words.length < 2 || words.length > 5 || wanted.length > 60) return null
-  if (wanted === normalizeForMatch(company)) return null
-  if (/\b(team|founders|ceo|cto|coo|cfo|inc|ltd|llc|capital|ventures|partners)\b/.test(wanted)) return null
-  const pattern = new RegExp(`(^| )${wanted.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}( |$)`)
-  return sources.some((text) => pattern.test(normalizeForMatch(text))) ? name.trim() : null
+  const clean = name.replace(/\s+/g, " ").trim()
+  const words = clean.split(" ")
+  if (words.length < 2 || words.length > 5 || clean.length > 60) return null
+  if (normalizeForMatch(clean) === normalizeForMatch(company)) return null
+  if (/\b(team|founders|inc|ltd|llc|capital|ventures|partners|fund|labs|group|combinator|university)\b/i.test(clean)) return null
+  const escaped = clean.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/ /g, "\\s+")
+  const before = new RegExp(`\\b(${ROLE})(?:\\s+(?:and|&)\\s+${ROLE})?[,:]?\\s+(?:and\\s+)?${escaped}\\b`, "i")
+  const after = new RegExp(`\\b${escaped}\\s*(?:,|\\(|–|—|-)\\s*(?:the\\s+|its\\s+|our\\s+)?(?:[A-Za-z]+\\s+){0,2}?(${ROLE})\\b`, "i")
+  for (const text of sources) {
+    const match = after.exec(text) ?? before.exec(text)
+    if (match) {
+      const role = match[1].replace(/\s+/g, " ")
+      return { name: clean, role: role.length <= 4 ? role.toUpperCase() : role.charAt(0).toUpperCase() + role.slice(1) }
+    }
+  }
+  return null
+}
+
+/** Numbers in a text, normalised ("$4.5M" -> "4.5", "1,200" -> "1200"). */
+function numbersIn(text: string): string[] {
+  return (text.match(/\d[\d,]*(?:\.\d+)?/g) ?? []).map((value) => value.replace(/,/g, "").replace(/\.0+$/, ""))
+}
+
+const ROUNDS = /\b(pre-?seed|seed|series [a-z]\b|angel round|bridge round|ipo)/gi
+
+/**
+ * Facts the model wrote that the sources do not contain: any number (amounts, counts, years) or funding-round name
+ * that does not appear in the source text. Empty = every checkable fact is in the sources.
+ */
+export function unsupportedClaims(claim: string, sources: string[], allowedNumbers: string[] = []): string[] {
+  const corpus = sources.join("\n")
+  const known = new Set([...numbersIn(corpus), ...allowedNumbers])
+  const lowerCorpus = corpus.toLowerCase().replace(/pre seed/g, "pre-seed")
+  const problems: string[] = []
+  // "a 15-minute call" is an offer, not a fact about them.
+  const checkable = claim.replace(/\b\d{1,2}[- ]?(?:minute|min)s?\b/gi, " ")
+  for (const number of numbersIn(checkable)) if (!known.has(number)) problems.push(number)
+  for (const round of claim.match(ROUNDS) ?? []) {
+    const value = round.toLowerCase().replace(/pre ?seed/, "pre-seed")
+    if (!lowerCorpus.includes(value)) problems.push(round)
+  }
+  return problems
 }
 
 /** Reasons the code itself rejects a candidate, whatever the model scored. Empty = no hard objection. */
@@ -121,7 +159,11 @@ export function finalizeDraft(draft: Draft, allowedUrls: string[]): Draft | null
   const allowed = [...allowedUrls, SITE, "codetelemetrylab.me"].map((url) => url.toLowerCase())
   for (const url of text.match(/\bhttps?:\/\/[^\s)]+|\bwww\.[^\s)]+/gi) ?? []) {
     const value = url.toLowerCase().replace(/[.,;:!?]+$/, "")
-    if (!allowed.some((ok) => value.startsWith(ok) || ok.startsWith(value))) return null
+    if (!allowed.some((ok) => value.startsWith(ok))) return null
+  }
+  // Bare domains ("rival.com") count as links too.
+  for (const domain of text.toLowerCase().match(/\b[a-z0-9-]+(?:\.[a-z0-9-]+)*\.(?:com|io|ai|co|net|org|dev|app|in|uk|me|tech|xyz|so)\b/g) ?? []) {
+    if (!allowed.some((ok) => ok.includes(domain))) return null
   }
   // Drop any sign-off the model added; ours goes last.
   const withoutSignoff = body

@@ -2,7 +2,7 @@
  * Enrichment: read the evidence page, find the company's own site among its links, then read the site's home page
  * and one contact/about page for a public business email. Nothing here is guessed: every value comes from a page.
  */
-import { isExcludedDomain, normalizeDomain } from "./domain.ts"
+import { hostOf, isExcludedDomain, nameMatchesDomain, normalizeDomain } from "./domain.ts"
 import { fetchPublicPage } from "./fetch-page.ts"
 import { clip, extractEmails, extractLinks, htmlToText, metaContent, pageTitle, pickPublicEmail } from "./html.ts"
 import type { Candidate } from "./types.ts"
@@ -46,7 +46,8 @@ export async function enrichCandidate(candidate: Candidate, signal: AbortSignal)
     links = [...candidate.linkedUrls, ...articleLinks(page.body, page.url)]
   }
 
-  const website = candidate.websiteUrl ? `https://${new URL(candidate.websiteUrl).hostname.replace(/^www\./, "")}/` : pickCompanyWebsite(links, candidate.companyHint, candidate.evidenceUrl)
+  const directHost = candidate.websiteUrl ? hostOf(candidate.websiteUrl) : null
+  const website = directHost ? `https://${directHost}/` : pickCompanyWebsite(links, candidate.companyHint, candidate.evidenceUrl)
   let domain = website ? normalizeDomain(website) : null
   if (!website || !domain) return { candidate, reason: "no_website" }
 
@@ -58,10 +59,14 @@ export async function enrichCandidate(candidate: Candidate, signal: AbortSignal)
   // platform (link-in-bio page, app store) means there is no real company site.
   const finalDomain = normalizeDomain(home.url)
   if (!finalDomain || isExcludedDomain(home.url)) return { candidate, reason: "no_website", domain }
-  if (finalDomain !== domain) domain = finalDomain
+  if (finalDomain !== domain) {
+    // acme.ai -> acme.com is fine; a redirect to a parked page or another company's site is not.
+    if (!candidate.companyHint || !nameMatchesDomain(candidate.companyHint, finalDomain)) return { candidate, reason: "no_website", domain }
+    domain = finalDomain
+  }
 
   const homeLinks = extractLinks(home.body, home.url)
-  const contactPageUrl = homeLinks.find((link) => normalizeDomain(link) === domain && CONTACT_PATH.test(new URL(link).pathname)) ?? null
+  const contactPageUrl = homeLinks.find((link) => normalizeDomain(link) === domain && CONTACT_PATH.test(new URL(link).pathname.replace(/\/+$/, "/"))) ?? null
   let emails = extractEmails(home.body)
   if (contactPageUrl) {
     const contact = await fetchPublicPage(contactPageUrl, { signal, timeoutMs: 7000, maxBytes: 400_000, accept: /text\/html|application\/xhtml/i })

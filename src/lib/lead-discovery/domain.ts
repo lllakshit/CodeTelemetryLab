@@ -113,7 +113,10 @@ export function nameMatchesDomain(company: string, domain: string): boolean {
   const label = slug(domainLabel(domain))
   if (name.length < 3 || label.length < 3) return false
   if (label === name) return true
-  if (label.startsWith(name) || name.startsWith(label)) return Math.min(label.length, name.length) >= 4
+  // "Acme AI" -> acme.ai, "Rivet HQ" -> rivet.dev: the name without a product suffix equals the label.
+  const core = name.replace(/(ai|hq|app|io|labs?|tech|inc|co)$/, "")
+  if (core.length >= 3 && core === label) return true
+  if (label.startsWith(name) || name.startsWith(label)) return Math.min(label.length, name.length) >= 5 && Math.abs(label.length - name.length) <= 4
   // "getacme", "acmehq", "tryacme", "useacme", "joinacme"
   const stripped = label.replace(/^(get|try|use|join|go|hey|with|meet)/, "").replace(/(hq|app|ai|io|labs?|inc|co|tech|team)$/, "")
   return stripped.length >= 3 && (stripped === name || (stripped.length >= 4 && name.startsWith(stripped)))

@@ -8,7 +8,8 @@ import {
   finalizeDraft,
   normalizeServices,
   qualificationSchema,
-  verifiedPersonName,
+  unsupportedClaims,
+  verifiedDecisionMaker,
 } from "../../src/lib/lead-discovery/qualify.ts"
 import { QUALIFY_THRESHOLD, computeScore, confidenceFor, contactScore, rankQualified, recencyCap } from "../../src/lib/lead-discovery/scoring.ts"
 
@@ -83,13 +84,24 @@ test("counter-evidence rejects sellers, wrong buyers and no service fit", () => 
   assert.ok(counterEvidence(clean, []).includes("No matching CodeTelemetryLab service"))
 })
 
-test("a decision-maker is kept only when the name is in the source text", () => {
-  const sources = ["Acme AI was founded by Jane Doe (CEO) and Raj Patel."]
-  assert.equal(verifiedPersonName("Jane Doe", "Acme AI", sources), "Jane Doe")
-  assert.equal(verifiedPersonName("John Smith", "Acme AI", sources), null)
-  assert.equal(verifiedPersonName("Jane", "Acme AI", sources), null)
-  assert.equal(verifiedPersonName("Acme AI", "Acme AI", sources), null)
-  assert.equal(verifiedPersonName("Jane Do", "Acme AI", ["Jane Doen"]), null)
+test("a decision-maker needs a role right next to the name in the source", () => {
+  const sources = ["Acme AI was founded by CEO Jane Doe and Raj Patel, co-founder and CTO. The round was led by Andreessen Horowitz. San Francisco-based."]
+  assert.deepEqual(verifiedDecisionMaker("Jane Doe", "Acme AI", sources), { name: "Jane Doe", role: "CEO" })
+  assert.deepEqual(verifiedDecisionMaker("Raj Patel", "Acme AI", sources), { name: "Raj Patel", role: "Co-founder" })
+  assert.equal(verifiedDecisionMaker("Andreessen Horowitz", "Acme AI", sources), null)
+  assert.equal(verifiedDecisionMaker("San Francisco", "Acme AI", sources), null)
+  assert.equal(verifiedDecisionMaker("John Smith", "Acme AI", sources), null)
+  assert.equal(verifiedDecisionMaker("Jane", "Acme AI", sources), null)
+  assert.deepEqual(verifiedDecisionMaker("Maria Lopez", "Acme", ["Maria Lopez (CTO) said"]), { name: "Maria Lopez", role: "CTO" })
+})
+
+test("numbers and funding rounds the source does not state are caught", () => {
+  const sources = ["Acme AI raises seed funding to automate invoices. The startup has 12 employees."]
+  assert.deepEqual(unsupportedClaims("Acme AI raised a $20M Series A", sources), ["20", "Series A"])
+  assert.deepEqual(unsupportedClaims("Acme AI raised a seed round and has 12 staff", sources), [])
+  assert.deepEqual(unsupportedClaims("Announced on 20 Nov 2026", sources, ["20", "2026", "11"]), [])
+  assert.deepEqual(unsupportedClaims("Would a 15-minute call help?", sources), [])
+  assert.deepEqual(unsupportedClaims("$4.5 million pre-seed", ["Verlo nabs $4.5 million pre seed"]), [])
 })
 
 test("drafts with invented contact details, links, placeholders or spam are refused", () => {
@@ -103,6 +115,8 @@ test("drafts with invented contact details, links, placeholders or spam are refu
   assert.equal(finalizeDraft({ subject: "Hi there", body: `${body} [Your Name]` }, []), null)
   assert.equal(finalizeDraft({ subject: "Guaranteed results", body }, []), null)
   assert.ok(finalizeDraft({ subject: "Hi there", body: `${body} https://www.codetelemetrylab.me/services` }, []))
+  assert.equal(finalizeDraft({ subject: "Hi there", body: `${body} Unlike rival.com we ship fast.` }, []), null)
+  assert.equal(finalizeDraft({ subject: "Hi there", body: `${body} See https://www.codetelemetry` }, []), null)
 })
 
 test("the fallback draft uses only given facts and our signature", () => {
