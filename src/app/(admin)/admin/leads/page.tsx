@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { format } from "date-fns"
 import { Download, Search, Trash2 } from "lucide-react"
+import { AdminLeadsTabs } from "@/components/admin-leads-tabs"
 import { SectionHeading } from "@/components/section-heading"
 import { deleteLeadAction, updateLeadAction } from "@/app/(admin)/admin/actions"
 import {
@@ -39,6 +40,8 @@ export default async function AdminLeadsPage({
 
   return (
     <div className="space-y-6">
+      <AdminLeadsTabs active="inbound" />
+
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <SectionHeading
           eyebrow="Leads"
