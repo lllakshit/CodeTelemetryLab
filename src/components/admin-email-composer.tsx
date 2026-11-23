@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent, type KeyboardEvent } from "react"
 import { Loader2, RefreshCw, Send, X } from "lucide-react"
 import {
@@ -17,9 +18,20 @@ import { describeStatus } from "@/lib/outreach/status"
 
 type FieldErrors = Partial<Record<"to" | "cc" | "bcc" | "subject" | "body", string[]>>
 
+/** Values the Email page fills in (from a discovered prospect, or from ?to=&subject=&body=). All stay editable. */
+export type ComposerPrefill = {
+  to: string[]
+  subject: string
+  body: string
+  prospect?: { id: string; company: string; status: string; contactRoute: string | null }
+  /** A prospect id was given but no such prospect exists. */
+  missingProspect?: boolean
+}
+
 type AdminEmailComposerProps = {
   initialLogs: EmailLog[]
   fromAddress: string
+  prefill?: ComposerPrefill | null
 }
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -35,14 +47,16 @@ function parseDraftEmails(value: string) {
     .filter(Boolean)
 }
 
-export function AdminEmailComposer({ initialLogs, fromAddress }: AdminEmailComposerProps) {
-  const [toRecipients, setToRecipients] = useState<string[]>([])
+export function AdminEmailComposer({ initialLogs, fromAddress, prefill }: AdminEmailComposerProps) {
+  const [toRecipients, setToRecipients] = useState<string[]>(prefill?.to ?? [])
   const [toDraft, setToDraft] = useState("")
   const [toDraftError, setToDraftError] = useState<string | null>(null)
   const [cc, setCc] = useState("")
   const [bcc, setBcc] = useState("")
-  const [subject, setSubject] = useState("")
-  const [body, setBody] = useState("")
+  const [subject, setSubject] = useState(prefill?.subject ?? "")
+  const [body, setBody] = useState(prefill?.body ?? "")
+  // The prospect this email is for; cleared after one successful send so a second email does not re-mark it.
+  const [prospect, setProspect] = useState(prefill?.prospect ?? null)
   const [sending, setSending] = useState(false)
   const [success, setSuccess] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -187,13 +201,14 @@ export function AdminEmailComposer({ initialLogs, fromAddress }: AdminEmailCompo
       const response = await fetch("/api/admin/email", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ to: recipients, cc, bcc, subject, body }),
+        body: JSON.stringify({ to: recipients, cc, bcc, subject, body, ...(prospect ? { prospectId: prospect.id } : {}) }),
       })
 
       const data = (await response.json().catch(() => ({}))) as {
         error?: string
         message?: string
         fieldErrors?: FieldErrors
+        prospectUpdated?: boolean
       }
 
       if (!response.ok) {
@@ -202,7 +217,16 @@ export function AdminEmailComposer({ initialLogs, fromAddress }: AdminEmailCompo
         return
       }
 
-      setSuccess(data.message || "Email sent successfully")
+      setSuccess(
+        prospect
+          ? `${data.message || "Email sent successfully"}. ${data.prospectUpdated ? `${prospect.company} is now marked Contacted.` : `${prospect.company} was not re-marked (its status is already past Contacted).`}`
+          : data.message || "Email sent successfully",
+      )
+      if (prospect) {
+        setProspect(null)
+        // Drop ?prospectId so a reload does not fill the same draft again.
+        window.history.replaceState(null, "", "/admin/email")
+      }
       setToRecipients([])
       setToDraft("")
       setToDraftError(null)
@@ -221,6 +245,35 @@ export function AdminEmailComposer({ initialLogs, fromAddress }: AdminEmailCompo
   return (
     <div className="space-y-8">
       <form onSubmit={onSubmit} className={`${adminSurface} space-y-5 p-6`}>
+        {prospect ? (
+          <div className="rounded-2xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm leading-6 text-blue-900">
+            <p>
+              Draft for prospect <strong>{prospect.company}</strong>. Review and edit everything before sending; sending marks the prospect Contacted.
+            </p>
+            {!toRecipients.length ? (
+              <p className="mt-1 text-blue-800">No public email was found for this company, so add the recipient yourself{prospect.contactRoute ? ` (${prospect.contactRoute})` : ""}.</p>
+            ) : null}
+            {prospect.status !== "new" && prospect.status !== "approved" ? (
+              <p className="mt-1 text-amber-800">Current status: {prospect.status.replace(/_/g, " ")}.</p>
+            ) : null}
+            <div className="mt-2 flex flex-wrap gap-3 text-xs font-semibold">
+              <Link href="/admin/leads/prospects" className="text-blue-700 underline-offset-2 hover:underline">Back to prospects</Link>
+              <button
+                type="button"
+                className="text-blue-700 underline-offset-2 hover:underline"
+                onClick={() => {
+                  setProspect(null)
+                  window.history.replaceState(null, "", "/admin/email")
+                }}
+              >
+                Send without linking to the prospect
+              </button>
+            </div>
+          </div>
+        ) : null}
+        {prefill?.missingProspect ? (
+          <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">That prospect was not found, so nothing was filled in.</div>
+        ) : null}
         <div className={`${adminSurfaceSoft} px-4 py-3`}>
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-700">From</p>
           <p className="mt-2 text-sm font-medium text-slate-950">{fromAddress}</p>

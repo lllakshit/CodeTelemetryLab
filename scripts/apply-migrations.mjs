@@ -35,7 +35,11 @@ const files = (await readdir(dir))
   .filter((name) => name.slice(0, 14) > BASELINE)
   .sort()
 
-await query("create table if not exists public.ctl_migrations (name text primary key, applied_at timestamptz not null default now())")
+await query(
+  "create table if not exists public.ctl_migrations (name text primary key, applied_at timestamptz not null default now()); " +
+    "alter table public.ctl_migrations enable row level security; " +
+    "revoke all on table public.ctl_migrations from anon, authenticated",
+)
 const applied = new Set((await query("select name from public.ctl_migrations")).map((row) => row.name))
 
 let ran = 0
