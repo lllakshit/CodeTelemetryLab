@@ -3,6 +3,7 @@ import { auth } from "@/auth"
 import { createLead, listLeads } from "@/lib/cms"
 import { leadFromCapture, leadPayload, parseLeadFormData, parseLeadJson } from "@/lib/lead-capture"
 import { getClientIp, isRateLimited } from "@/lib/rate-limit"
+import { spamReason } from "@/lib/spam-filter"
 
 export async function GET(request: Request) {
   const session = await auth()
@@ -38,6 +39,13 @@ export async function POST(request: Request) {
   }
 
   if (parsed.data.fax) {
+    return NextResponse.json({ accepted: true })
+  }
+
+  // Known spam: same answer as the honeypot, nothing saved.
+  const spam = spamReason(parsed.data)
+  if (spam) {
+    console.warn(`[leads] spam dropped (${spam})`)
     return NextResponse.json({ accepted: true })
   }
 
