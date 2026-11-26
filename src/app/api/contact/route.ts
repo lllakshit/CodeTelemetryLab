@@ -3,6 +3,7 @@ import { createLead } from "@/lib/cms"
 import { sendContactNotification } from "@/lib/contact-email"
 import { leadFromCapture, leadPayload, parseLeadFormData } from "@/lib/lead-capture"
 import { getClientIp, isRateLimited } from "@/lib/rate-limit"
+import { spamReason } from "@/lib/spam-filter"
 
 export async function POST(request: Request) {
   const clientIp = getClientIp(request)
@@ -23,6 +24,13 @@ export async function POST(request: Request) {
   }
 
   if (parsed.data.fax) {
+    redirect("/contact?sent=1")
+  }
+
+  // Known spam: answer exactly like a real send so the sender sees no difference, but save nothing and send no email.
+  const spam = spamReason(parsed.data)
+  if (spam) {
+    console.warn(`[contact] spam dropped (${spam})`)
     redirect("/contact?sent=1")
   }
 
